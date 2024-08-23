@@ -1,5 +1,5 @@
 ---
-title: "Hands-on Ex 01a"
+title: "1 Geospatial Data Science with R"
 author: "Liang Xiuhao Rydia"
 date: "Aug 22, 2024"
 date-modified: "last-modified"
