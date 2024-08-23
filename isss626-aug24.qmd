@@ -2,4 +2,4 @@
 title: "ISSS626: Geospatial Analytics and Application"
 ---
 
-## 
+## Welcome to my GAA learning journey!
