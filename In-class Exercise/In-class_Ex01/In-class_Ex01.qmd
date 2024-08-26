@@ -1,0 +1,18 @@
+---
+title: "In-class Ex 01 "
+author: "Liang Xiuhao Rydia"
+date: "Aug 26, 2024"
+date-modified: "last-modified"
+execute:
+  eval: true
+  echo: true
+  warning: false
+  freeze: true
+format: 
+  html:
+    code-fold: true
+    code-summary: "Show the code"
+---
+
+
+

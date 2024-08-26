@@ -1,5 +1,66 @@
 ---
-title: "ISSS626: Geospatial Analytics and Application"
+title: "Visual Analytics and Applications"
+listing: 
+
+  - id: Hands_on_Exercise
+    contents:
+      - "HandsOnEx/*/*.qmd"
+    sort:
+      - "last-modified"
+    type: grid
+    fields: [image, date, title, author]
+  - id: In_Class_Exercise
+    contents:
+      - "InClassEx/*/*.qmd"
+    sort:
+      - "last-modified"
+    type: grid
+    fields: [image, date, title, author]
+  
+  - id: Take_Home_Exercise
+    contents:
+      - "TakehomeEx/*/*.qmd"
+    sort:
+      - "last-modified"
+    type: grid
+    fields: [image, date, title, author]
+toc: false
 ---
 
 ## Welcome to my GAA learning journey!
+
+
+Below are the course work for this module.
+
+::: content-container
+::: listing-block
+## Hands On Exercise
+
+</a>
+
+::: {#Hands_on_Exercise}
+:::
+:::
+:::
+
+::: content-container
+::: listing-block
+## In Class Exercise
+
+</a>
+
+::: {#In_Class_Exercise}
+:::
+:::
+:::
+
+::: content-container
+::: listing-block
+## Take Home Exercise
+
+</a>
+
+::: {#Take_Home_Exercise}
+:::
+:::
+:::
