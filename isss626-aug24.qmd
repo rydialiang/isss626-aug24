@@ -29,7 +29,6 @@ toc: false
 
 ## Welcome to my GAA learning journey!
 
-
 Below are the course work for this module.
 
 ::: content-container

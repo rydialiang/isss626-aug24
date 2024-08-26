@@ -13,6 +13,3 @@ format:
     code-fold: true
     code-summary: "Show the code"
 ---
-
-
-
