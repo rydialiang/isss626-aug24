@@ -14,7 +14,9 @@ format:
     code-summary: "Show the code"
 ---
 
-This code chunk install and load the relevant package. 
+## 1.0 Loading Library and Data
+
+This code chunk install and load the relevant package.
 
 ```{r}
 pacman::p_load(tidyverse,sf,
@@ -22,12 +24,86 @@ pacman::p_load(tidyverse,sf,
 ```
 
 This code chunk imports shapefile(.shp):
+
 ```{r}
 mpsz14_shp = st_read(dsn = "data/", 
                   layer = "MP14_SUBZONE_WEB_PL")
 ```
+
 This code chunk imports kml file(.kml):
+
 ```{r}
-mpsz14_kml = st_read(dsn = "data/", 
-                  layer = "MP14_SUBZONE_WEB_PL")
+st_write(mpsz14_shp,
+         "data/MP14_SUBZONE_WEB_PL.kml",
+         delete_dsn = TRUE)
 ```
+
+::: callout-note
+-   for "delete_dsn" argument = TRUE, the file of the same name (mpsz14_shp) will be overwritten by the new file.
+:::
+
+## 2.0 Transformation / Re-projection
+
+```{r}
+mpsz19_shp <- st_read(dsn = "data/",
+                  layer = "MPSZ-2019") %>% 
+  st_transform(crs = 3414)
+```
+
+::: callout-note
+### Geographical Coordinate Systems
+
+-   GCS define locations on the earth using a three-dimensional spherical surface. For example, WGS84.
+
+-   They provides accuracy position information. Unit of measurement will be in either decimal degree or degree-minute-second format.
+
+-   GCS, however, are not appropriate for distance and area measurements. In this figure, it is clear that 1 degree distance at the north pole is relatively shorter than 1 degree at the equator.
+
+-   Refer to [9.1 Geographic Coordinate Systems](https://mgimond.github.io/Spatial/chp09_0.html#geographic-coordinate-systems) to learn more about GCS.
+:::
+
+::: callout-note
+### Projected Coordinate Systems (PCS)
+
+-   Based on a map projection such as transverse Mercator, Albers equal area, or Robinson.
+
+-   PCS provides consistent length and area measurement across space. Hence, it is important to transform a geospatial data from GCS to PCS before performing geospatial analysis.
+
+-   Refer to [9.2 Projected Coordinate Systems](https://mgimond.github.io/Spatial/chp09_0.html#projected-coordinate-systems) to learn more about GCS.
+:::
+
+::: callout-note
+## Transformation (st_transform)
+
+-   technical term: re-projection
+
+-   mpsz19_shp geometry changed.
+
+-   Before:
+
+    ![](images/clipboard-21986329.png)
+
+-   After:
+
+    ![](images/clipboard-1838988116.png)
+:::
+
+### Choosing between excel and csv file
+
+
+## 3.0 Population Data
+
+```{r}
+popdata2023 <- read_csv("data/respopagesextod2011to2020.csv")
+```
+
+
+```{r}
+popdata2023 <- popdata2023 %>%
+  group_by(PA, SZ, AG) %>%
+  summarise(POP = sum(Pop, na.rm = TRUE)) %>%
+  ungroup() %>%
+  pivot_wider(names_from = AG, values_from = POP)
+colnames (popdata2023)
+```
+
