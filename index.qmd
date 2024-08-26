@@ -29,7 +29,7 @@ toc: false
 
 ## Welcome to my GAA learning journey!
 
-Below are the course work for this module.
+Here are the latest exercises.
 
 ::: content-container
 ::: listing-block
