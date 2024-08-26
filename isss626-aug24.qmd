@@ -4,14 +4,14 @@ listing:
 
   - id: Hands_on_Exercise
     contents:
-      - "HandsOnEx/*/*.qmd"
+      - "Hands-on Exercise/*/*.qmd"
     sort:
       - "last-modified"
     type: grid
     fields: [image, date, title, author]
   - id: In_Class_Exercise
     contents:
-      - "InClassEx/*/*.qmd"
+      - "In-class Exercise/*/*.qmd"
     sort:
       - "last-modified"
     type: grid
@@ -19,7 +19,7 @@ listing:
   
   - id: Take_Home_Exercise
     contents:
-      - "TakehomeEx/*/*.qmd"
+      - "Take-home Exercise/*/*.qmd"
     sort:
       - "last-modified"
     type: grid
