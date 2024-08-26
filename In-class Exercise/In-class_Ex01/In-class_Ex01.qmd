@@ -94,14 +94,14 @@ mpsz19_shp <- st_read(dsn = "data/",
 ## 3.0 Population Data
 
 ```{r}
-popdata2023 <- read_csv("data/respopagesextod2011to2020.csv")
+popdata2023 <- read_csv("data/respopagesextod2023.csv")
 ```
 
 
 ```{r}
 popdata2023 <- popdata2023 %>%
   group_by(PA, SZ, AG) %>%
-  summarise(POP = sum(Pop, na.rm = TRUE)) %>%
+  summarise(POP = sum(Pop)) %>%
   ungroup() %>%
   pivot_wider(names_from = AG, values_from = POP)
 colnames (popdata2023)
