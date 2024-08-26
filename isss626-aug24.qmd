@@ -1,5 +1,5 @@
 ---
-title: "Visual Analytics and Applications"
+title: "Geospatial Analytics and Applications"
 listing: 
 
   - id: Hands_on_Exercise
