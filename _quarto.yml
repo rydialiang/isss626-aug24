@@ -61,7 +61,7 @@ website:
             href: Take-home Exercise/Take-home_Ex03/Take-home_Ex03.qmd
     right:
         - icon: '<i class="fab fa-linkedin"></i>'
-          href: "https://www.linkedin.com/in/rydia-liang-27969717a/"      
+          href: "https://www.linkedin.com/in/rydia-liang/"      
 format:
   html:
     theme: cosmos
