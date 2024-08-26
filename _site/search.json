@@ -229,5 +229,12 @@
     "title": "Geospatial Analytics and Applications",
     "section": "Take Home Exercise",
     "text": "Take Home Exercise\n\n\n\n\n\n\n\n\n\nTake-home Ex01\n\n\n\nLiang Xiuhao Rydia\n\n\nAug 26, 2024\n\n\n\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "In-class Exercise/In-class_Ex01/In-class_Ex01.html",
+    "href": "In-class Exercise/In-class_Ex01/In-class_Ex01.html",
+    "title": "In-class Ex 01",
+    "section": "",
+    "text": "This code chunk install and load the relevant package.\n\n\nShow the code\npacman::p_load(tidyverse,sf,\n               tmap,ggstatsplot)\n\n\nThis code chunk imports shapefile(.shp):\n\n\nShow the code\nmpsz14_shp = st_read(dsn = \"data/\", \n                  layer = \"MP14_SUBZONE_WEB_PL\")\n\n\nReading layer `MP14_SUBZONE_WEB_PL' from data source \n  `C:\\rydialiang\\isss626-aug24\\In-class Exercise\\In-class_Ex01\\data' \n  using driver `ESRI Shapefile'\nSimple feature collection with 323 features and 15 fields\nGeometry type: MULTIPOLYGON\nDimension:     XY\nBounding box:  xmin: 2667.538 ymin: 15748.72 xmax: 56396.44 ymax: 50256.33\nProjected CRS: SVY21\n\n\nThis code chunk imports kml file(.kml):\n\n\nShow the code\nmpsz14_kml = st_read(dsn = \"data/\", \n                  layer = \"MP14_SUBZONE_WEB_PL\")\n\n\nReading layer `MP14_SUBZONE_WEB_PL' from data source \n  `C:\\rydialiang\\isss626-aug24\\In-class Exercise\\In-class_Ex01\\data' \n  using driver `ESRI Shapefile'\nSimple feature collection with 323 features and 15 fields\nGeometry type: MULTIPOLYGON\nDimension:     XY\nBounding box:  xmin: 2667.538 ymin: 15748.72 xmax: 56396.44 ymax: 50256.33\nProjected CRS: SVY21"
   }
 ]

@@ -1,0 +1,15 @@
+{
+  "hash": "496457b161274751d04ac506936baf59",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\ntitle: \"In-class Ex 01 \"\nauthor: \"Liang Xiuhao Rydia\"\ndate: \"Aug 26, 2024\"\ndate-modified: \"last-modified\"\nexecute:\n  eval: true\n  echo: true\n  message: false\n  freeze: true\nformat: \n  html:\n    code-fold: true\n    code-summary: \"Show the code\"\n---\n\n\nThis code chunk install and load the relevant package. \n\n\n::: {.cell}\n\n```{.r .cell-code}\npacman::p_load(tidyverse,sf,\n               tmap,ggstatsplot)\n```\n:::\n\n\nThis code chunk imports shapefile(.shp):\n\n::: {.cell}\n\n```{.r .cell-code}\nmpsz14_shp = st_read(dsn = \"data/\", \n                  layer = \"MP14_SUBZONE_WEB_PL\")\n```\n\n::: {.cell-output .cell-output-stdout}\n\n```\nReading layer `MP14_SUBZONE_WEB_PL' from data source \n  `C:\\rydialiang\\isss626-aug24\\In-class Exercise\\In-class_Ex01\\data' \n  using driver `ESRI Shapefile'\nSimple feature collection with 323 features and 15 fields\nGeometry type: MULTIPOLYGON\nDimension:     XY\nBounding box:  xmin: 2667.538 ymin: 15748.72 xmax: 56396.44 ymax: 50256.33\nProjected CRS: SVY21\n```\n\n\n:::\n:::\n\nThis code chunk imports kml file(.kml):\n\n::: {.cell}\n\n```{.r .cell-code}\nmpsz14_kml = st_read(dsn = \"data/\", \n                  layer = \"MP14_SUBZONE_WEB_PL\")\n```\n\n::: {.cell-output .cell-output-stdout}\n\n```\nReading layer `MP14_SUBZONE_WEB_PL' from data source \n  `C:\\rydialiang\\isss626-aug24\\In-class Exercise\\In-class_Ex01\\data' \n  using driver `ESRI Shapefile'\nSimple feature collection with 323 features and 15 fields\nGeometry type: MULTIPOLYGON\nDimension:     XY\nBounding box:  xmin: 2667.538 ymin: 15748.72 xmax: 56396.44 ymax: 50256.33\nProjected CRS: SVY21\n```\n\n\n:::\n:::\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

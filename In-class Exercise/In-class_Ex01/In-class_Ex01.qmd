@@ -13,3 +13,21 @@ format:
     code-fold: true
     code-summary: "Show the code"
 ---
+
+This code chunk install and load the relevant package. 
+
+```{r}
+pacman::p_load(tidyverse,sf,
+               tmap,ggstatsplot)
+```
+
+This code chunk imports shapefile(.shp):
+```{r}
+mpsz14_shp = st_read(dsn = "data/", 
+                  layer = "MP14_SUBZONE_WEB_PL")
+```
+This code chunk imports kml file(.kml):
+```{r}
+mpsz14_kml = st_read(dsn = "data/", 
+                  layer = "MP14_SUBZONE_WEB_PL")
+```
