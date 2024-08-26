@@ -60,7 +60,7 @@ website:
           - text: "Take-home Exercise 3"
             href: Take-home Exercise/Take-home_Ex03/Take-home_Ex03.qmd
     right:
-      - icon: "{{< iconify fa6-brands linkedin >}}"
+      - icon: linkedin
         href: "https://www.linkedin.com/in/rydia-liang/" 
       - icon: github
         href: "https://github.com/rydialiang/"
