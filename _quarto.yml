@@ -64,7 +64,8 @@ website:
         href: "https://www.linkedin.com/in/rydia-liang/" 
       - icon: github
         href: "https://github.com/rydialiang/"
-      - about.qmd
+      - text: "about"
+        href: about.qmd
 
 format:
   html:
