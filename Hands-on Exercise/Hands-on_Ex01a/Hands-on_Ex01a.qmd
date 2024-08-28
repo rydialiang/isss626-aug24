@@ -216,7 +216,7 @@ In order to assign the correct EPSG code to `mpsz` data frame, *st_set_crs()* of
 mpsz3414 <- st_set_crs(mpsz, 3414)
 ```
 
-Now, let us check the CSR again by using the code chunk below.
+Now, let us check the CRS again by using the code chunk below.
 
 ```{r}
 st_crs(mpsz3414)
