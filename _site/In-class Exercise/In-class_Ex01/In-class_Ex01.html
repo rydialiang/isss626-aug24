@@ -274,7 +274,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#loading-library-and-data" id="toc-loading-library-and-data" class="nav-link active" data-scroll-target="#loading-library-and-data">1.0 Loading Library and Data</a></li>
-  <li><a href="#transformation-re-projection" id="toc-transformation-re-projection" class="nav-link" data-scroll-target="#transformation-re-projection">2.0 Transformation / Re-projection</a>
+  <li><a href="#working-with-master-plan-planning-sub-zone-data" id="toc-working-with-master-plan-planning-sub-zone-data" class="nav-link" data-scroll-target="#working-with-master-plan-planning-sub-zone-data">2.1 Working with Master Plan Planning Sub-zone Data</a></li>
+  <li><a href="#working-with-pre-school-location-data" id="toc-working-with-pre-school-location-data" class="nav-link" data-scroll-target="#working-with-pre-school-location-data">2.2 Working with Pre-school Location Data</a></li>
+  <li><a href="#working-with-master-plan-2019-subzone-boundary-data" id="toc-working-with-master-plan-2019-subzone-boundary-data" class="nav-link" data-scroll-target="#working-with-master-plan-2019-subzone-boundary-data">2.3 Working with Master Plan 2019 Subzone Boundary Data</a></li>
+  <li><a href="#handling-coordinate-systems" id="toc-handling-coordinate-systems" class="nav-link" data-scroll-target="#handling-coordinate-systems">3.0 Handling Coordinate Systems</a>
+  <ul class="collapse">
+  <li><a href="#checking-coordinate-system" id="toc-checking-coordinate-system" class="nav-link" data-scroll-target="#checking-coordinate-system">3.1 Checking coordinate system</a></li>
+  </ul></li>
+  <li><a href="#transformation-re-projection" id="toc-transformation-re-projection" class="nav-link" data-scroll-target="#transformation-re-projection">3.0 Transformation / Re-projection</a>
   <ul class="collapse">
   <li><a href="#choosing-between-excel-and-csv-file" id="toc-choosing-between-excel-and-csv-file" class="nav-link" data-scroll-target="#choosing-between-excel-and-csv-file">Choosing between excel and csv file</a></li>
   </ul></li>
@@ -311,7 +318,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">August 26, 2024</p>
+      <p class="date-modified">August 28, 2024</p>
     </div>
   </div>
     
@@ -332,6 +339,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>               tmap,ggstatsplot)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
+</section>
+<section id="working-with-master-plan-planning-sub-zone-data" class="level2">
+<h2 class="anchored" data-anchor-id="working-with-master-plan-planning-sub-zone-data">2.1 Working with Master Plan Planning Sub-zone Data</h2>
 <p>This code chunk imports shapefile(.shp):</p>
 <div class="cell">
 <details class="code-fold">
@@ -381,14 +391,140 @@ Note
 </div>
 </div>
 </section>
-<section id="transformation-re-projection" class="level2">
-<h2 class="anchored" data-anchor-id="transformation-re-projection">2.0 Transformation / Re-projection</h2>
+<section id="working-with-pre-school-location-data" class="level2">
+<h2 class="anchored" data-anchor-id="working-with-pre-school-location-data">2.2 Working with Pre-school Location Data</h2>
+<p>This code chunk imports kml file.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>mpsz19_shp <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="at">dsn =</span> <span class="st">"data/"</span>,</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">layer =</span> <span class="st">"MPSZ-2019"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(<span class="at">crs =</span> <span class="dv">3414</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>preschool_kml <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="st">"data/PreSchoolsLocation.kml"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Reading layer `PRESCHOOLS_LOCATION' from data source 
+  `C:\rydialiang\isss626-aug24\In-class Exercise\In-class_Ex01\data\PreSchoolsLocation.kml' 
+  using driver `KML'
+Simple feature collection with 2290 features and 2 fields
+Geometry type: POINT
+Dimension:     XYZ
+Bounding box:  xmin: 103.6878 ymin: 1.247759 xmax: 103.9897 ymax: 1.462134
+z_range:       zmin: 0 zmax: 0
+Geodetic CRS:  WGS 84</code></pre>
+</div>
+</div>
+<p>This code chunk imports geojson file.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>preschool_geojson <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="st">"data/PreSchoolsLocation.geojson"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Reading layer `PreSchoolsLocation' from data source 
+  `C:\rydialiang\isss626-aug24\In-class Exercise\In-class_Ex01\data\PreSchoolsLocation.geojson' 
+  using driver `GeoJSON'
+Simple feature collection with 2290 features and 2 fields
+Geometry type: POINT
+Dimension:     XYZ
+Bounding box:  xmin: 103.6878 ymin: 1.247759 xmax: 103.9897 ymax: 1.462134
+z_range:       zmin: 0 zmax: 0
+Geodetic CRS:  WGS 84</code></pre>
+</div>
+</div>
+</section>
+<section id="working-with-master-plan-2019-subzone-boundary-data" class="level2">
+<h2 class="anchored" data-anchor-id="working-with-master-plan-2019-subzone-boundary-data">2.3 Working with Master Plan 2019 Subzone Boundary Data</h2>
+<p>This code chunk import shapefile.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>mpsz19_shp <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="at">dsn =</span> <span class="st">"data/"</span>,</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">layer =</span> <span class="st">"MPSZ-2019"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Reading layer `MPSZ-2019' from data source 
+  `C:\rydialiang\isss626-aug24\In-class Exercise\In-class_Ex01\data' 
+  using driver `ESRI Shapefile'
+Simple feature collection with 332 features and 6 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: 103.6057 ymin: 1.158699 xmax: 104.0885 ymax: 1.470775
+Geodetic CRS:  WGS 84</code></pre>
+</div>
+</div>
+<p>This code chunk import kml file:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>mpsz19_kml <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="st">"data/MasterPlan2019SubzoneBoundaryNoSeaKML.kml"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Reading layer `URA_MP19_SUBZONE_NO_SEA_PL' from data source 
+  `C:\rydialiang\isss626-aug24\In-class Exercise\In-class_Ex01\data\MasterPlan2019SubzoneBoundaryNoSeaKML.kml' 
+  using driver `KML'
+Simple feature collection with 332 features and 2 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY, XYZ
+Bounding box:  xmin: 103.6057 ymin: 1.158699 xmax: 104.0885 ymax: 1.470775
+z_range:       zmin: 0 zmax: 0
+Geodetic CRS:  WGS 84</code></pre>
+</div>
+</div>
+</section>
+<section id="handling-coordinate-systems" class="level2">
+<h2 class="anchored" data-anchor-id="handling-coordinate-systems">3.0 Handling Coordinate Systems</h2>
+<section id="checking-coordinate-system" class="level3">
+<h3 class="anchored" data-anchor-id="checking-coordinate-system">3.1 Checking coordinate system</h3>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">st_crs</span>(mpsz19_shp)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Coordinate Reference System:
+  User input: WGS 84 
+  wkt:
+GEOGCRS["WGS 84",
+    DATUM["World Geodetic System 1984",
+        ELLIPSOID["WGS 84",6378137,298.257223563,
+            LENGTHUNIT["metre",1]]],
+    PRIMEM["Greenwich",0,
+        ANGLEUNIT["degree",0.0174532925199433]],
+    CS[ellipsoidal,2],
+        AXIS["latitude",north,
+            ORDER[1],
+            ANGLEUNIT["degree",0.0174532925199433]],
+        AXIS["longitude",east,
+            ORDER[2],
+            ANGLEUNIT["degree",0.0174532925199433]],
+    ID["EPSG",4326]]</code></pre>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><p>Note that the EPSG code is 4326 for WGS84.</p></li>
+<li><p>We may need to perform transformation to change the EPSG code accordingly if we notice that the EPSG code does not corresponding to the CRS.</p></li>
+<li><p>The correct EPSG code for svy21 should be <a href="https://epsg.io/3414">3414</a>.</p></li>
+</ul>
+</div>
+</div>
+</section>
+</section>
+<section id="transformation-re-projection" class="level2">
+<h2 class="anchored" data-anchor-id="transformation-re-projection">3.0 Transformation / Re-projection</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>mpsz19_shp <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="at">dsn =</span> <span class="st">"data/"</span>,</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">layer =</span> <span class="st">"MPSZ-2019"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(<span class="at">crs =</span> <span class="dv">3414</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>Reading layer `MPSZ-2019' from data source 
@@ -465,10 +601,10 @@ Transformation (st_transform)
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>popdata2023 <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/respopagesextod2011to2020.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>popdata2023 <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/respopagesextod2023.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stderr">
-<pre><code>Rows: 984656 Columns: 7
+<pre><code>Rows: 100928 Columns: 7
 ── Column specification ────────────────────────────────────────────────────────
 Delimiter: ","
 chr (5): PA, SZ, AG, Sex, TOD
@@ -481,11 +617,11 @@ dbl (2): Pop, Time
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>popdata2023 <span class="ot">&lt;-</span> popdata2023 <span class="sc">%&gt;%</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(PA, SZ, AG) <span class="sc">%&gt;%</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">POP =</span> <span class="fu">sum</span>(Pop, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> AG, <span class="at">values_from =</span> POP)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>popdata2023 <span class="ot">&lt;-</span> popdata2023 <span class="sc">%&gt;%</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(PA, SZ, AG) <span class="sc">%&gt;%</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">POP =</span> <span class="fu">sum</span>(Pop)) <span class="sc">%&gt;%</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> AG, <span class="at">values_from =</span> POP)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stderr">
 <pre><code>`summarise()` has grouped output by 'PA', 'SZ'. You can override using the
@@ -493,14 +629,14 @@ dbl (2): Pop, Time
 </div>
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span> (popdata2023)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span> (popdata2023)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code> [1] "PA"          "SZ"          "0_to_4"      "10_to_14"    "15_to_19"   
  [6] "20_to_24"    "25_to_29"    "30_to_34"    "35_to_39"    "40_to_44"   
 [11] "45_to_49"    "50_to_54"    "55_to_59"    "5_to_9"      "60_to_64"   
 [16] "65_to_69"    "70_to_74"    "75_to_79"    "80_to_84"    "85_to_89"   
-[21] "90_and_over"</code></pre>
+[21] "90_and_Over"</code></pre>
 </div>
 </div>
 

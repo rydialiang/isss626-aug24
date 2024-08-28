@@ -23,6 +23,8 @@ pacman::p_load(tidyverse,sf,
                tmap,ggstatsplot)
 ```
 
+## 2.1 Working with Master Plan Planning Sub-zone Data
+
 This code chunk imports shapefile(.shp):
 
 ```{r}
@@ -42,7 +44,52 @@ st_write(mpsz14_shp,
 -   for "delete_dsn" argument = TRUE, the file of the same name (mpsz14_shp) will be overwritten by the new file.
 :::
 
-## 2.0 Transformation / Re-projection
+## 2.2 Working with Pre-school Location Data
+
+This code chunk imports kml file.
+
+```{r}
+preschool_kml <- st_read("data/PreSchoolsLocation.kml")
+```
+
+This code chunk imports geojson file.
+
+```{r}
+preschool_geojson <- st_read("data/PreSchoolsLocation.geojson") 
+```
+
+## 2.3 Working with Master Plan 2019 Subzone Boundary Data
+
+This code chunk import shapefile.
+
+```{r}
+mpsz19_shp <- st_read(dsn = "data/",
+                layer = "MPSZ-2019")
+```
+
+This code chunk import kml file:
+
+```{r}
+mpsz19_kml <- st_read("data/MasterPlan2019SubzoneBoundaryNoSeaKML.kml")
+```
+
+## 3.0 Handling Coordinate Systems
+
+### 3.1 Checking coordinate system
+
+```{r}
+st_crs(mpsz19_shp)
+```
+
+::: callout-note
+-   Note that the EPSG code is 4326 for WGS84.
+
+-   We may need to perform transformation to change the EPSG code accordingly if we notice that the EPSG code does not corresponding to the CRS.
+
+-   The correct EPSG code for svy21 should be [3414](https://epsg.io/3414).
+:::
+
+## 3.0 Transformation / Re-projection
 
 ```{r}
 mpsz19_shp <- st_read(dsn = "data/",
@@ -90,13 +137,11 @@ mpsz19_shp <- st_read(dsn = "data/",
 
 ### Choosing between excel and csv file
 
-
 ## 3.0 Population Data
 
 ```{r}
 popdata2023 <- read_csv("data/respopagesextod2023.csv")
 ```
-
 
 ```{r}
 popdata2023 <- popdata2023 %>%
@@ -106,4 +151,3 @@ popdata2023 <- popdata2023 %>%
   pivot_wider(names_from = AG, values_from = POP)
 colnames (popdata2023)
 ```
-
