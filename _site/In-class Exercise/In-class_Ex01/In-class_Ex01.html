@@ -289,6 +289,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </ul></li>
   <li><a href="#statistical-analysis" id="toc-statistical-analysis" class="nav-link" data-scroll-target="#statistical-analysis">5.0 Statistical Analysis</a></li>
   <li><a href="#working-with-population-data" id="toc-working-with-population-data" class="nav-link" data-scroll-target="#working-with-population-data">6.0 Working with Population Data</a></li>
+  <li><a href="#data-wrangling" id="toc-data-wrangling" class="nav-link" data-scroll-target="#data-wrangling">6.1 Data Wrangling</a>
+  <ul class="collapse">
+  <li><a href="#derive-new-fields" id="toc-derive-new-fields" class="nav-link" data-scroll-target="#derive-new-fields">6.1.1 Derive New Fields</a></li>
+  <li><a href="#joining-popdata2023-and-mpsz19_shp." id="toc-joining-popdata2023-and-mpsz19_shp." class="nav-link" data-scroll-target="#joining-popdata2023-and-mpsz19_shp.">6.1.2 Joining popdata2023 and mpsz19_shp.</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -717,6 +722,7 @@ Recap on st_intersects / st_intersection
 </section>
 <section id="working-with-population-data" class="level2">
 <h2 class="anchored" data-anchor-id="working-with-population-data">6.0 Working with Population Data</h2>
+<p>The code chunk below import the csv file:</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
@@ -733,14 +739,19 @@ dbl (2): Pop, Time
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
 </div>
 </div>
+</section>
+<section id="data-wrangling" class="level2">
+<h2 class="anchored" data-anchor-id="data-wrangling">6.1 Data Wrangling</h2>
+<p>Prepare a data.frame showing population by Planning Area and Planning subzone.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>popdata2023 <span class="ot">&lt;-</span> popdata <span class="sc">%&gt;%</span></span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(PA, SZ, AG) <span class="sc">%&gt;%</span></span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">POP =</span> <span class="fu">sum</span>(Pop)) <span class="sc">%&gt;%</span></span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> AG, <span class="at">values_from =</span> POP)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>popdata2023 <span class="ot">&lt;-</span> popdata <span class="sc">%&gt;%</span> </span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(PA, SZ, AG) <span class="sc">%&gt;%</span> </span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="st">`</span><span class="at">POP</span><span class="st">`</span><span class="ot">=</span><span class="fu">sum</span>(<span class="st">`</span><span class="at">Pop</span><span class="st">`</span>)) <span class="sc">%&gt;%</span>  </span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from=</span>AG,</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>              <span class="at">values_from =</span> POP)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stderr">
 <pre><code>`summarise()` has grouped output by 'PA', 'SZ'. You can override using the
@@ -748,7 +759,7 @@ dbl (2): Pop, Time
 </div>
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span> (popdata2023)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(popdata2023)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code> [1] "PA"          "SZ"          "0_to_4"      "10_to_14"    "15_to_19"   
@@ -758,8 +769,102 @@ dbl (2): Pop, Time
 [21] "90_and_Over"</code></pre>
 </div>
 </div>
+<section id="derive-new-fields" class="level3">
+<h3 class="anchored" data-anchor-id="derive-new-fields">6.1.1 Derive New Fields</h3>
+<p>Derive a tibble data.framewith the following fields PA, SZ, YOUNG, ECONOMY ACTIVE, AGED, TOTAL, DEPENDENCY where by:</p>
+<ul>
+<li><p>YOUNG: age group 0 to 4 until age groyup 20 to 24,</p></li>
+<li><p>ECONOMY ACTIVE: age group 25-29 until age group 60-64,</p></li>
+<li><p>AGED: age group 65 and above,</p></li>
+<li><p>TOTAL: all age group, and</p></li>
+<li><p>DEPENDENCY: the ratio between young and aged against economy active group.</p></li>
+</ul>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>popdata2023 <span class="ot">&lt;-</span> popdata2023 <span class="sc">%&gt;%</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">YOUNG=</span><span class="fu">rowSums</span>(.[<span class="dv">3</span><span class="sc">:</span><span class="dv">6</span>]) <span class="co"># Aged 0 - 24, 10 - 24</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>         <span class="sc">+</span><span class="fu">rowSums</span>(.[<span class="dv">14</span>])) <span class="sc">%&gt;%</span> <span class="co"># Aged 5 - 9</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="st">`</span><span class="at">ECONOMY ACTIVE</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">rowSums</span>(.[<span class="dv">7</span><span class="sc">:</span><span class="dv">13</span>])<span class="sc">+</span> <span class="co"># Aged 25 - 59</span></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rowSums</span>(.[<span class="dv">15</span>])) <span class="sc">%&gt;%</span>  <span class="co"># Aged 60 -64</span></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="st">`</span><span class="at">AGED</span><span class="st">`</span><span class="ot">=</span><span class="fu">rowSums</span>(.[<span class="dv">16</span><span class="sc">:</span><span class="dv">21</span>])) <span class="sc">%&gt;%</span></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="st">`</span><span class="at">TOTAL</span><span class="st">`</span><span class="ot">=</span><span class="fu">rowSums</span>(.[<span class="dv">3</span><span class="sc">:</span><span class="dv">21</span>])) <span class="sc">%&gt;%</span></span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="st">`</span><span class="at">DEPENDENCY</span><span class="st">`</span><span class="ot">=</span>(<span class="st">`</span><span class="at">YOUNG</span><span class="st">`</span> <span class="sc">+</span> <span class="st">`</span><span class="at">AGED</span><span class="st">`</span>)</span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>  <span class="sc">/</span> <span class="st">`</span><span class="at">ECONOMY ACTIVE</span><span class="st">`</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="st">`</span><span class="at">PA</span><span class="st">`</span>, <span class="st">`</span><span class="at">SZ</span><span class="st">`</span>, <span class="st">`</span><span class="at">YOUNG</span><span class="st">`</span>, </span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">ECONOMY ACTIVE</span><span class="st">`</span>, <span class="st">`</span><span class="at">AGED</span><span class="st">`</span>,</span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">TOTAL</span><span class="st">`</span>, <span class="st">`</span><span class="at">DEPENDENCY</span><span class="st">`</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="callout callout-style-default callout-caution callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Caution
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><p>Take note of the column number for each age group. Some do not run in sequence.</p>
+<ul>
+<li><p>Aged 5 - 9: Column 14</p></li>
+<li><p>Aged 60 -64: Column 15</p></li>
+</ul></li>
+</ul>
+</div>
+</div>
+</section>
+<section id="joining-popdata2023-and-mpsz19_shp." class="level3">
+<h3 class="anchored" data-anchor-id="joining-popdata2023-and-mpsz19_shp.">6.1.2 Joining popdata2023 and mpsz19_shp.</h3>
+<p>Using dplyr::mutate_at() to change to uppercase:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>popdata2023 <span class="ot">&lt;-</span> popdata2023 <span class="sc">%&gt;%</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate_at</span>(<span class="at">.vars =</span> <span class="fu">vars</span>(PA, SZ), </span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">.funs =</span> <span class="fu">list</span>(toupper)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Combining using left_join():</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>mpsz_pop2023 <span class="ot">&lt;-</span> <span class="fu">left_join</span>(mpsz19_shp, popdata2023,</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>                          <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"SUBZONE_N"</span> <span class="ot">=</span> <span class="st">"SZ"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>pop2023_mpsz <span class="ot">&lt;-</span> <span class="fu">left_join</span>(popdata2023, mpsz19_shp, </span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>                          <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"SZ"</span> <span class="ot">=</span> <span class="st">"SUBZONE_N"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><p>Sequence of the left_join() will determine the order of the columns in the new data.frame.</p></li>
+<li><p>The data.frame columns will be added in the same sequence as in the left_join() arguments.</p>
+<ul>
+<li><p>i.e.&nbsp;mpsz_pop2023 df will have SUBZONE_N as the first column followed by all other columns in mpsz, then followed by columns in the pop2023.</p></li>
+<li><p>pop2023_mpsz will have PA as the first column, followed by all other columns in pop2023, then followed by columns in the mpsz.</p></li>
+</ul></li>
+</ul>
+</div>
+</div>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->

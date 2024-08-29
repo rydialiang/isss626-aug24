@@ -209,15 +209,93 @@ ggscatterstats(data = mpsz19_shp,
 
 ## 6.0 Working with Population Data
 
+The code chunk below import the csv file:
+
 ```{r}
 popdata <- read_csv("data/respopagesextod2023.csv")
 ```
 
+## 6.1 Data Wrangling
+
+Prepare a data.frame showing population by Planning Area and Planning subzone.
+
 ```{r}
-popdata2023 <- popdata %>%
-  group_by(PA, SZ, AG) %>%
-  summarise(POP = sum(Pop)) %>%
-  ungroup() %>%
-  pivot_wider(names_from = AG, values_from = POP)
-colnames (popdata2023)
+popdata2023 <- popdata %>% 
+  group_by(PA, SZ, AG) %>% 
+  summarise(`POP`=sum(`Pop`)) %>%  
+  ungroup() %>% 
+  pivot_wider(names_from=AG,
+              values_from = POP)
+
+colnames(popdata2023)
 ```
+
+### 6.1.1 Derive New Fields
+
+Derive a tibble data.framewith the following fields PA, SZ, YOUNG, ECONOMY ACTIVE, AGED, TOTAL, DEPENDENCY where by:
+
+-   YOUNG: age group 0 to 4 until age groyup 20 to 24,
+
+-   ECONOMY ACTIVE: age group 25-29 until age group 60-64,
+
+-   AGED: age group 65 and above,
+
+-   TOTAL: all age group, and
+
+-   DEPENDENCY: the ratio between young and aged against economy active group.
+
+```{r}
+popdata2023 <- popdata2023 %>%
+  mutate(YOUNG=rowSums(.[3:6]) # Aged 0 - 24, 10 - 24
+         +rowSums(.[14])) %>% # Aged 5 - 9
+  mutate(`ECONOMY ACTIVE` = rowSums(.[7:13])+ # Aged 25 - 59
+  rowSums(.[15])) %>%  # Aged 60 -64
+  mutate(`AGED`=rowSums(.[16:21])) %>%
+  mutate(`TOTAL`=rowSums(.[3:21])) %>%
+  mutate(`DEPENDENCY`=(`YOUNG` + `AGED`)
+  / `ECONOMY ACTIVE`) %>% 
+  select(`PA`, `SZ`, `YOUNG`, 
+         `ECONOMY ACTIVE`, `AGED`,
+         `TOTAL`, `DEPENDENCY`)
+```
+
+::: callout-caution
+-   Take note of the column number for each age group. Some do not run in sequence.
+
+    -   Aged 5 - 9: Column 14
+
+    -   Aged 60 -64: Column 15
+:::
+
+### 6.1.2 Joining popdata2023 and mpsz19_shp.
+
+Using dplyr::mutate_at() to change to uppercase:
+
+```{r}
+popdata2023 <- popdata2023 %>%
+  mutate_at(.vars = vars(PA, SZ), 
+          .funs = list(toupper)) 
+```
+
+Combining using left_join():
+
+```{r}
+mpsz_pop2023 <- left_join(mpsz19_shp, popdata2023,
+                          by = c("SUBZONE_N" = "SZ"))
+
+```
+
+```{r}
+pop2023_mpsz <- left_join(popdata2023, mpsz19_shp, 
+                          by = c("SZ" = "SUBZONE_N"))
+```
+
+::: callout-note
+-   Sequence of the left_join() will determine the order of the columns in the new data.frame.
+
+-   The data.frame columns will be added in the same sequence as in the left_join() arguments.
+
+    -   i.e. mpsz_pop2023 df will have SUBZONE_N as the first column followed by all other columns in mpsz, then followed by columns in the pop2023.
+
+    -   pop2023_mpsz will have PA as the first column, followed by all other columns in pop2023, then followed by columns in the mpsz.
+:::
