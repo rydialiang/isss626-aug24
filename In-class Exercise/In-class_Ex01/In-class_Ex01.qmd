@@ -14,6 +14,8 @@ format:
     code-summary: "Show the code"
 ---
 
+![](images/clipboard-330117975.png)
+
 ## 1.0 Loading Library and Data
 
 This code chunk install and load the relevant package.
@@ -197,9 +199,9 @@ Tip: Refer to [`ggscatterstats()`](https://indrajeetpatil.github.io/ggstatsplot/
 ```{r}
 mpsz19_shp$`PreSch Density` <- as.numeric(as.character(mpsz19_shp$`PreSch Density`))
 mpsz19_shp$`PreSch Count` <- as.numeric(as.character(mpsz19_shp$`PreSch Count`)) 
-mpsz19_shp <- as.data.frame(mpsz19_shp)
+mpsz19_shp_1 <- as.data.frame(mpsz19_shp)
 
-ggscatterstats(data = mpsz19_shp,
+ggscatterstats(data = mpsz19_shp_1,
                x = `PreSch Density`,
                y = `PreSch Count`,
                type = "parametric",
@@ -302,5 +304,229 @@ pop2023_mpsz <- left_join(popdata2023, mpsz19_shp,
 
 ## 7.0 Choropleth Map of Dependency Ratio by Planning Subzone
 
-```{}
+```{r}
+tmap_style("white")
 ```
+
+```{r}
+tm_shape(mpsz_pop2023)+
+  tm_fill("DEPENDENCY", 
+          style = "quantile", 
+          palette = "Blues",
+          title = "Dependency ratio") +
+  tm_layout(main.title = "Distribution of Dependency Ratio by planning subzone",
+            main.title.position = "center",
+            main.title.size = 1.2,
+            legend.height = 0.45, 
+            legend.width = 0.35,
+            frame = TRUE,
+            bg.color = "#FFE5CC") +
+  tm_borders(alpha = 0.5) +
+  tm_compass(type="8star", size = 2) +
+  tm_scale_bar(position = c("center", "bottom")) +
+  tm_grid(alpha =0.2) +
+  tm_credits("Source: Planning Sub-zone boundary from Urban Redevelopment Authorithy (URA)\n and Population data from Department of Statistics DOS", 
+             position = c("left", "top"))
+  
+```
+
+## 8.0 Analytical Map: Percentile Map
+
+### 8.1 The concept
+
+The percentile map is a special type of quantile map with six specific categories: 0-1%,1-10%, 10-50%,50-90%,90-99%, and 99-100%. The corresponding breakpoints can be derived by means of the base R quantile command, passing an explicit vector of cumulative probabilities as c(0,.01,.1,.5,.9,.99,1). Note that the begin and endpoint need to be included.
+
+### 8.2 Step 1: Data Preparation
+
+The code chunk below excludes records with NA by using the code chunk below.
+
+```{r}
+mpsz_pop2023 <- mpsz_pop2023 %>%
+  drop_na()
+```
+
+### 8.3 Step 2: The get function
+
+The code chunk below defines a function to get the input data and field to be used for creating the percentile map.
+
+```{r}
+get.var <- function(vname,df) {
+  v <- df[vname] %>% 
+    st_set_geometry(NULL)
+  v <- unname(v[,1])
+  return(v)
+}
+```
+
+### 8.4 Step 3: A percentile mapping function
+
+The code chunk below creates a function for computing and plotting the percentile map.
+
+```{r}
+percentmap <- function(vnam, df, legtitle=NA, mtitle="Percentile Map"){
+  percent <- c(0,.01,.1,.5,.9,.99,1)
+  var <- get.var(vnam, df)
+  bperc <- quantile(var, percent)
+  tm_shape(mpsz_pop2023) +
+  tm_polygons() +
+  tm_shape(df) +
+     tm_fill(vnam,
+             title=legtitle,
+             breaks=bperc,
+             palette="Blues",
+          labels=c("< 1%", "1% - 10%", "10% - 50%", "50% - 90%", "90% - 99%", "> 99%"))  +
+  tm_borders() +
+  tm_layout(main.title = mtitle, 
+            title.position = c("right","bottom"))
+}
+```
+
+### 8.5 Step 4: Running the functions
+
+The code chunk below runs the percentile map function.
+
+```{r}
+percentmap("DEPENDENCY", mpsz_pop2023)
+  
+```
+
+## 9.0 Analytical Map: Box Map
+
+### The Concept
+
+In essence, a box map is an augmented quartile map, with an additional lower and upper category. When there are lower outliers, then the starting point for the breaks is the minimum value, and the second break is the lower fence. In contrast, when there are no lower outliers, then the starting point for the breaks will be the lower fence, and the second break is the minimum value (there will be no observations that fall in the interval between the lower fence and the minimum value).
+
+```{r}
+ggplot(data = mpsz_pop2023,
+       aes(x = "",
+           y = DEPENDENCY)) +
+  geom_boxplot()
+```
+
+### 9.1 Step 1: Creating the boxbreaks function
+
+The code chunk on the right is an R function that creating break points for a box map.
+
+-   arguments:
+
+    -   v: vector with observations
+
+    -   mult: multiplier for IQR (default 1.5)
+
+-   returns:
+
+    -   bb: vector with 7 break points compute quartile and fences
+
+```{r}
+boxbreaks <- function(v,mult=1.5) {
+  qv <- unname(quantile(v))
+  iqr <- qv[4] - qv[2]
+  upfence <- qv[4] + mult * iqr
+  lofence <- qv[2] - mult * iqr
+  # initialize break points vector
+  bb <- vector(mode="numeric",length=7)
+  # logic for lower and upper fences
+  if (lofence < qv[1]) {  # no lower outliers
+    bb[1] <- lofence
+    bb[2] <- floor(qv[1])
+  } else {
+    bb[2] <- lofence
+    bb[1] <- qv[1]
+  }
+  if (upfence > qv[5]) { # no upper outliers
+    bb[7] <- upfence
+    bb[6] <- ceiling(qv[5])
+  } else {
+    bb[6] <- upfence
+    bb[7] <- qv[5]
+  }
+  bb[3:5] <- qv[2:4]
+  return(bb)
+}
+```
+
+### 9.2 Step 2: Creating the get.var function
+
+The code chunk on the right an R function to extract a variable as a vector out of an sf data frame.
+
+-   arguments:
+
+    -   vname: variable name (as character, in quotes)
+
+    -   df: name of sf data frame
+
+-   returns:
+
+    -   v: vector with values (without a column name)
+
+```{r}
+get.var <- function(vname,df) {
+  v <- df[vname] %>% st_set_geometry(NULL)
+  v <- unname(v[,1])
+  return(v)
+}
+```
+
+### 9.3 Step 3: Boxmap function
+
+The code chunk on the right is an R function to create a box map.
+
+-   arguments:
+
+    -   vnam: variable name (as character, in quotes)
+
+    -   df: simple features polygon layer
+
+    -   legtitle: legend title
+
+    -   mtitle: map title
+
+    -   mult: multiplier for IQR
+
+-   returns:
+
+    -   a tmap-element (plots a map)
+
+```{r}
+boxmap <- function(vnam, df, 
+                   legtitle=NA,
+                   mtitle="Box Map",
+                   mult=1.5){
+  var <- get.var(vnam,df)
+  bb <- boxbreaks(var)
+  tm_shape(df) +
+    tm_polygons() +
+  tm_shape(df) +
+     tm_fill(vnam,title=legtitle,
+             breaks=bb,
+             palette="Blues",
+          labels = c("lower outlier", 
+                     "< 25%", 
+                     "25% - 50%", 
+                     "50% - 75%",
+                     "> 75%", 
+                     "upper outlier"))  +
+  tm_borders() +
+  tm_layout(main.title = mtitle, 
+            title.position = c("left",
+                               "top"))
+}
+```
+
+### 9.4 Step 4: Plotting Box Map
+
+```{r}
+boxmap("DEPENDENCY", mpsz_pop2023)
+```
+
+### 9.5 Plotting Interactive Box Map
+
+```{r}
+tmap_options(check.and.fix = TRUE)
+tmap_mode("view")
+boxmap("DEPENDENCY", mpsz_pop2023)
+```
+
+## 10 Reference
+
+Prof T.S. Kam: Geospatial Analytics & Application [In-Class Ex 01](https://isss626-ay2024-25aug.netlify.app/in-class_ex/in-class_ex01/in-class_ex01#/title-slide)
