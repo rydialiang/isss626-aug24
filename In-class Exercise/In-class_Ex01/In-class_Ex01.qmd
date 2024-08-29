@@ -89,7 +89,9 @@ st_crs(mpsz19_shp)
 -   The correct EPSG code for svy21 should be [3414](https://epsg.io/3414).
 :::
 
-## 3.0 Transformation / Re-projection
+### 3.2 Transformation / Re-projection
+
+Import and transform coordinate system for the shapefile:
 
 ```{r}
 mpsz19_shp <- st_read(dsn = "data/",
@@ -135,16 +137,84 @@ mpsz19_shp <- st_read(dsn = "data/",
     ![](images/clipboard-1838988116.png)
 :::
 
-### Choosing between excel and csv file
-
-## 3.0 Population Data
+Import and transform kml file:
 
 ```{r}
-popdata2023 <- read_csv("data/respopagesextod2023.csv")
+preschool <- st_read("data/PreSchoolsLocation.kml") %>%
+  st_transform(crs = 3414)
+```
+
+::: callout-note
+## Note on CSV and Excel file
+
+We may prefer to work with csv file as it is tidier. Excel file may contain headers and merged cell, which may result in requirement for data cleaning.
+:::
+
+## 4.0 Geospatial Data Wrangling
+
+### 4.1 Point-in-Polygon count
+
+The code chunk below count the number of pre-schools in each planning sub-zone.
+
+```{r}
+mpsz19_shp <- mpsz19_shp %>%
+  mutate(`PreSch Count` = lengths(
+    st_intersects(mpsz19_shp, preschool)))
+```
+
+::: callout-note
+## Recap on st_intersects / st_intersection
+
+-   *st_intersects*: touch or overlap. This [commands](https://r-spatial.github.io/sf/reference/geos_binary_pred.html) compare two sf data object and return a sparse matrix with matching (TRUE) indexes, or a full logical matrix.
+
+-   st_intersection: intersection of pairs of geometries. This command overlay two sf data frames.
+:::
+
+### 4.2 Computing Density
+
+The code chunk below performs the following tasks:
+
+-   Derive the area of each planning sub-zone.
+
+-   Drop the unit of measurement of the area (i.e. m\^2)
+
+-   Calculate the density of pre-school at the planning sub-zone level.
+
+```{r}
+mpsz19_shp <- mpsz19_shp %>%
+  mutate(Area = units::drop_units(
+    st_area(.)),
+    `PreSch Density` = `PreSch Count` / Area * 1000000
+  )
+```
+
+## 5.0 Statistical Analysis
+
+The tasks: Using appropriate Exploratory Data Analysis (EDA) and Confirmatory Data Analysis (CDA) methods to explore and confirm the statistical relationship between Pre-school Density and Pre-school count.
+
+Tip: Refer to [`ggscatterstats()`](https://indrajeetpatil.github.io/ggstatsplot/articles/web_only/ggscatterstats.html) of **ggstatsplot** package.
+
+```{r}
+mpsz19_shp$`PreSch Density` <- as.numeric(as.character(mpsz19_shp$`PreSch Density`))
+mpsz19_shp$`PreSch Count` <- as.numeric(as.character(mpsz19_shp$`PreSch Count`)) 
+mpsz19_shp <- as.data.frame(mpsz19_shp)
+
+ggscatterstats(data = mpsz19_shp,
+               x = `PreSch Density`,
+               y = `PreSch Count`,
+               type = "parametric",
+               label.var = `SUBZONE_N`,
+               label.expression =  `PreSch Density` > 30 |`PreSch Count` > 50) 
+```
+
+## 6.0 Working with Population Data
+
+```{r}
+popdata <- read_csv("data/respopagesextod2023.csv")
 ```
 
 ```{r}
-popdata2023 <- popdata2023 %>%
+popdata2023 <- popdata %>%
   group_by(PA, SZ, AG) %>%
   summarise(POP = sum(Pop)) %>%
   ungroup() %>%
