@@ -297,5 +297,10 @@ pop2023_mpsz <- left_join(popdata2023, mpsz19_shp,
 
     -   i.e. mpsz_pop2023 df will have SUBZONE_N as the first column followed by all other columns in mpsz, then followed by columns in the pop2023.
 
-    -   pop2023_mpsz will have PA as the first column, followed by all other columns in pop2023, then followed by columns in the mpsz.
+-   pop2023_mpsz will have PA as the first column, followed by all other columns in pop2023, then followed by columns in the mpsz.
 :::
+
+## 7.0 Choropleth Map of Dependency Ratio by Planning Subzone
+
+```{}
+```
