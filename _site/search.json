@@ -353,8 +353,8 @@
     "objectID": "Hands-on Exercise/Hands-on_Ex02b/Hands-on_Ex02b.html#overview",
     "href": "Hands-on Exercise/Hands-on_Ex02b/Hands-on_Ex02b.html#overview",
     "title": "5 2nd Order Spatial Point Patterns Analysis Methods",
-    "section": "",
-    "text": "Spatial Point Pattern Analysis is the evaluation of the pattern or distribution, of a set of points on a surface. The point can be location of:\n\nevents such as crime, traffic accident and disease onset, or\nbusiness services (coffee and fastfood outlets) or facilities such as childcare and eldercare.\n\nUsing appropriate functions of spatstat, this hands-on exercise aims to discover the spatial point processes of childecare centres in Singapore.\nThe specific questions we would like to answer are as follows:\n\nare the childcare centres in Singapore randomly distributed throughout the country?\nif the answer is not, then the next logical question is where are the locations with higher concentration of childcare centres?"
+    "section": "5.1 Overview",
+    "text": "5.1 Overview\nSpatial Point Pattern Analysis is the evaluation of the pattern or distribution, of a set of points on a surface. The point can be location of:\n\nevents such as crime, traffic accident and disease onset, or\nbusiness services (coffee and fastfood outlets) or facilities such as childcare and eldercare.\n\nUsing appropriate functions of spatstat, this hands-on exercise aims to discover the spatial point processes of childecare centres in Singapore.\nThe specific questions we would like to answer are as follows:\n\nare the childcare centres in Singapore randomly distributed throughout the country?\nif the answer is not, then the next logical question is where are the locations with higher concentration of childcare centres?"
   },
   {
     "objectID": "Hands-on Exercise/Hands-on_Ex02b/Hands-on_Ex02b.html#the-data",
