@@ -14,6 +14,8 @@ format:
     code-summary: "Show the code"
 ---
 
+![](images/clipboard-1134873991.png)
+
 ## **4.1 Overview**
 
 Spatial Point Pattern Analysis is the evaluation of the pattern or distribution, of a set of points on a surface. The point can be location of:
