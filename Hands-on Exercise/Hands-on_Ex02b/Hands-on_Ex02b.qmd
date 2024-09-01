@@ -14,6 +14,8 @@ format:
     code-summary: "Show the code"
 ---
 
+![](images/clipboard-316435035.png)
+
 ## **5.1 Overview**
 
 Spatial Point Pattern Analysis is the evaluation of the pattern or distribution, of a set of points on a surface. The point can be location of:
@@ -254,7 +256,7 @@ plot(childcare_jw_ppp.km, main="Jurong West")
 
 ```
 
-##  **Second-order Spatial Point Patterns Analysis**
+## **Second-order Spatial Point Patterns Analysis**
 
 ## **5.7 Analysing Spatial Point Process Using G-Function**
 
