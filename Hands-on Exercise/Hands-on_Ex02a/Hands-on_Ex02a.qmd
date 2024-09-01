@@ -58,7 +58,7 @@ Use the code chunk below to install and launch the five R packages.
 
 ```{r}
 pacman::p_load(sf, raster, spatstat, tmap, tidyverse,
-               ggstatsplot)
+               ggstatsplot, maptools)
 ```
 
 ## **5.4 Spatial Data Wrangling**
@@ -234,7 +234,7 @@ If we want to know how many locations have more than one point event, we can use
 sum(multiplicity(childcare_ppp) > 1)
 ```
 
-The output shows that there are 128 duplicated point events.
+The output shows that there are no duplicated point events.
 
 To view the locations of these duplicate point events, we will plot `childcare` data by using the code chunk below.
 
@@ -479,3 +479,213 @@ kde_childcareSG_bw_raster <- raster(kde_childcareSG.bw)
 ```
 
 Let us take a look at the properties of *kde_childcareSG_bw_raster* RasterLayer.
+
+```{r}
+kde_childcareSG_bw_raster
+```
+
+Notice that the crs property is NA.
+
+#### 4.7.3.2 Assigning projection systems
+
+The code chunk below will be used to include the CRS information on kde_childcareSG_bw_raster RasterLayer.
+
+```{r}
+projection(kde_childcareSG_bw_raster) <- CRS("+init=EPSG:3414")
+kde_childcareSG_bw_raster
+```
+
+Notice that the crs property is completed.
+
+### **4.7.4 Visualising the output in tmap**
+
+Finally, we will display the raster in cartographic quality map using **tmap** package.
+
+```{r}
+tm_shape(kde_childcareSG_bw_raster) + 
+  tm_raster("layer", palette = "viridis") +
+  tm_layout(legend.position = c("right", "bottom"), frame = FALSE)
+```
+
+Notice that the raster values are encoded explicitly onto the raster pixel using the values in “v”” field.
+
+### **4.7.5 Comparing Spatial Point Patterns using KDE**
+
+In this section, you will learn how to compare KDE of childcare at Ponggol, Tampines, Chua Chu Kang and Jurong West planning areas.
+
+#### 4.7.5.1 Extracting study area
+
+The code chunk below will be used to extract the target planning areas.
+
+```{r}
+pg <- mpsz_sf %>%
+  filter(PLN_AREA_N == "PUNGGOL")
+tm <- mpsz_sf %>%
+  filter(PLN_AREA_N == "TAMPINES")
+ck <- mpsz_sf %>%
+  filter(PLN_AREA_N == "CHOA CHU KANG")
+jw <- mpsz_sf %>%
+  filter(PLN_AREA_N == "JURONG WEST")
+```
+
+Plotting target planning areas:
+
+```{r}
+par(mfrow=c(2,2))
+plot(pg, main = "Ponggol")
+```
+
+```{r}
+plot(tm, main = "Tampines")
+```
+
+```{r}
+plot(jw, main = "Jurong West")
+```
+
+#### 4.7.5.2 Creating ***owin*** object
+
+Now, we will convert these sf objects into owin objects that is required by **spatstat**.
+
+```{r}
+pg_owin = as.owin(pg)
+tm_owin = as.owin(tm)
+ck_owin = as.owin(ck)
+jw_owin = as.owin(jw)
+```
+
+#### 4.7.5.3 Combining childcare points and the study area
+
+By using the code chunk below, we are able to extract childcare that is within the specific region to do our analysis later on.
+
+```{r}
+childcare_pg_ppp = childcare_ppp_jit[pg_owin]
+childcare_tm_ppp = childcare_ppp_jit[tm_owin]
+childcare_ck_ppp = childcare_ppp_jit[ck_owin]
+childcare_jw_ppp = childcare_ppp_jit[jw_owin]
+```
+
+rescale.ppp()
+
+```{r}
+childcare_pg_ppp.km = rescale.ppp(childcare_pg_ppp, 1000, "km")
+childcare_tm_ppp.km = rescale.ppp(childcare_tm_ppp, 1000, "km")
+childcare_ck_ppp.km = rescale.ppp(childcare_ck_ppp, 1000, "km")
+childcare_jw_ppp.km = rescale.ppp(childcare_jw_ppp, 1000, "km")
+```
+
+Plot
+
+```{r}
+par(mfrow=c(2,2))
+plot(childcare_pg_ppp.km, main="Punggol")
+plot(childcare_tm_ppp.km, main="Tampines")
+plot(childcare_ck_ppp.km, main="Choa Chu Kang")
+plot(childcare_jw_ppp.km, main="Jurong West")
+```
+
+#### 4.7.5.4 Computing KDE
+
+The code chunk below will be used to compute the KDE of these four planning area. ***bw.diggle*** method is used to derive the bandwidth of each
+
+```{r}
+par(mfrow=c(2,2))
+plot(density(childcare_pg_ppp.km, 
+             sigma=bw.diggle, 
+             edge=TRUE, 
+             kernel="gaussian"),
+     main="Punggol")
+plot(density(childcare_tm_ppp.km, 
+             sigma=bw.diggle, 
+             edge=TRUE, 
+             kernel="gaussian"),
+     main="Tempines")
+plot(density(childcare_ck_ppp.km, 
+             sigma=bw.diggle, 
+             edge=TRUE, 
+             kernel="gaussian"),
+     main="Choa Chu Kang")
+plot(density(childcare_jw_ppp.km, 
+             sigma=bw.diggle, 
+             edge=TRUE, 
+             kernel="gaussian"),
+     main="JUrong West")
+```
+
+#### 4.7.5.5 Computing fixed bandwidth KDE
+
+For comparison purposes, we will use 250m as the bandwidth.
+
+```{r}
+par(mfrow=c(2,2))
+plot(density(childcare_ck_ppp.km, 
+             sigma=0.25, 
+             edge=TRUE, 
+             kernel="gaussian"),
+     main="Chou Chu Kang")
+plot(density(childcare_jw_ppp.km, 
+             sigma=0.25, 
+             edge=TRUE, 
+             kernel="gaussian"),
+     main="JUrong West")
+plot(density(childcare_pg_ppp.km, 
+             sigma=0.25, 
+             edge=TRUE, 
+             kernel="gaussian"),
+     main="Punggol")
+plot(density(childcare_tm_ppp.km, 
+             sigma=0.25, 
+             edge=TRUE, 
+             kernel="gaussian"),
+     main="Tampines")
+```
+
+## **4.8 Nearest Neighbour Analysis**
+
+In this section, we will perform the Clark-Evans test of aggregation for a spatial point pattern by using [*clarkevans.test()*](https://www.rdocumentation.org/packages/spatstat/versions/1.63-3/topics/clarkevans.test) of **statspat**.
+
+The test hypotheses are:
+
+Ho = The distribution of childcare services are randomly distributed.
+
+H1= The distribution of childcare services are not randomly distributed.
+
+The 95% confident interval will be used.
+
+### **4.8.1 Testing spatial point patterns using Clark and Evans Test**
+
+```{r}
+clarkevans.test(childcareSG_ppp,
+                correction="none",
+                clipregion="sg_owin",
+                alternative=c("clustered"),
+                nsim=99)
+```
+
+### **4.8.2 Clark and Evans Test: Choa Chu Kang planning area**
+
+In the code chunk below, [*clarkevans.test()*](https://rdrr.io/cran/spatstat/man/clarkevans.test.html) of **spatstat** is used to performs Clark-Evans test of aggregation for childcare centre in Choa Chu Kang planning area.
+
+```{r}
+clarkevans.test(childcare_ck_ppp,
+                correction="none",
+                clipregion=NULL,
+                alternative=c("two.sided"),
+                nsim=999)
+```
+
+### **4.8.3 Clark and Evans Test: Tampines planning area**
+
+In the code chunk below, the similar test is used to analyse the spatial point patterns of childcare centre in Tampines planning area.
+
+```{r}
+clarkevans.test(childcare_tm_ppp,
+                correction="none",
+                clipregion=NULL,
+                alternative=c("two.sided"),
+                nsim=999)
+```
+
+## 4.9 Reference
+
+Prof T.S. Kam - [Chapter 4](https://r4gdsa.netlify.app/chap04): R for Geospatial Data Science and Analytics
