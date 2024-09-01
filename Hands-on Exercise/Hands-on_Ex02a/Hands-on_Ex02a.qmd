@@ -1,5 +1,5 @@
 ---
-title: "2a: 1st Order Spatial Point Patterns Analysis Methods"
+title: "4 1st Order Spatial Point Patterns Analysis Methods"
 author: "Liang Xiuhao Rydia"
 date: "Aug 31, 2024"
 date-modified: "last-modified"
@@ -116,12 +116,19 @@ sg <- st_transform(sg_sf,3414)
 
 After checking the referencing system of each geospatial data data frame, it is also useful for us to plot a map to show their spatial patterns.
 
-> DIY: Using the mapping methods you learned in Hands-on Exercise 1, prepare a map as shown below.
+> DIY: Using the mapping methods you learned in Hands-on Exercise 3, prepare a map as shown below.
 
 ![](images/clipboard-201045715.png)
 
 ```{r}
-plot(st_geometry(mpsz_sf))
+plot(st_geometry(mpsz_sf),
+     col='lightgrey')
+plot(childcare_sf,
+     add=T,
+     col='black',
+     fill='black',
+     pch=22,
+     cex=.1)
 ```
 
 Notice that all the geospatial layers are within the same map extend. This shows that their referencing system and coordinate values are referred to similar spatial context. This is very important in any geospatial analysis.
