@@ -1,0 +1,15 @@
+{
+  "hash": "2a2a3ab03b50a9e6f5e924f1c35f19ce",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\ntitle: \"In-class Ex 02\"\nauthor: \"Liang Xiuhao Rydia\"\ndate: \"Sep 2, 2024\"\ndate-modified: \"last-modified\"\nexecute:\n  eval: true\n  echo: true\n  message: false\n  freeze: true\nformat: \n  html:\n    code-fold: true\n    code-summary: \"Show the code\"\n---\n\n\n## Issue 1: Installing maptools\n\nmaptools is retired and binary is removed from CRAN. However, we can download from Posit Public Package Manager snapshots by using the code chunk below:\n\n\n::: {.cell}\n\n```{.r .cell-code}\ninstall.packages(\"maptools\",\n                 repos = \"https://packagemanager.posit.co/cran/2023-10-13\")\n```\n\n::: {.cell-output .cell-output-stdout}\n\n```\npackage 'maptools' successfully unpacked and MD5 sums checked\n\nThe downloaded binary packages are in\n\tC:\\Users\\user\\AppData\\Local\\Temp\\RtmpCYwpST\\downloaded_packages\n```\n\n\n:::\n:::\n\n\n::: callout-note\n-   Avoid sp because we have to use maptools and maptools is retired as mentioned.\n\n-   Use sf straight. We can convert to ppp directly without more steps compared to sp.\n\n-   Shiny is developed by Posit. Dedicate support for Shiny repository. We can request Posit to have a repository required by you.\n:::\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

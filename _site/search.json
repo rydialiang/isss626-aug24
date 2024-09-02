@@ -425,5 +425,19 @@
     "title": "5 2nd Order Spatial Point Patterns Analysis Methods",
     "section": "6.0 Reference",
     "text": "6.0 Reference\nProf T.S. Kam - Chapter 5: R for Geospatial Data Science and Analytics"
+  },
+  {
+    "objectID": "In-class Exercise/In-class_Ex02/In-class_Ex02.html",
+    "href": "In-class Exercise/In-class_Ex02/In-class_Ex02.html",
+    "title": "In-class Ex 02",
+    "section": "",
+    "text": "maptools is retired and binary is removed from CRAN. However, we can download from Posit Public Package Manager snapshots by using the code chunk below:\n\n\nShow the code\ninstall.packages(\"maptools\",\n                 repos = \"https://packagemanager.posit.co/cran/2023-10-13\")\n\n\npackage 'maptools' successfully unpacked and MD5 sums checked\n\nThe downloaded binary packages are in\n    C:\\Users\\user\\AppData\\Local\\Temp\\RtmpCYwpST\\downloaded_packages\n\n\n\n\n\n\n\n\nNote\n\n\n\n\nAvoid sp because we have to use maptools and maptools is retired as mentioned.\nUse sf straight. We can convert to ppp directly without more steps compared to sp.\nShiny is developed by Posit. Dedicate support for Shiny repository. We can request Posit to have a repository required by you."
+  },
+  {
+    "objectID": "In-class Exercise/In-class_Ex02/In-class_Ex02.html#issue-1-installing-maptools",
+    "href": "In-class Exercise/In-class_Ex02/In-class_Ex02.html#issue-1-installing-maptools",
+    "title": "In-class Ex 02",
+    "section": "",
+    "text": "maptools is retired and binary is removed from CRAN. However, we can download from Posit Public Package Manager snapshots by using the code chunk below:\n\n\nShow the code\ninstall.packages(\"maptools\",\n                 repos = \"https://packagemanager.posit.co/cran/2023-10-13\")\n\n\npackage 'maptools' successfully unpacked and MD5 sums checked\n\nThe downloaded binary packages are in\n    C:\\Users\\user\\AppData\\Local\\Temp\\RtmpCYwpST\\downloaded_packages\n\n\n\n\n\n\n\n\nNote\n\n\n\n\nAvoid sp because we have to use maptools and maptools is retired as mentioned.\nUse sf straight. We can convert to ppp directly without more steps compared to sp.\nShiny is developed by Posit. Dedicate support for Shiny repository. We can request Posit to have a repository required by you."
   }
 ]
