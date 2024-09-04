@@ -278,6 +278,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#issue-1-installing-maptools" id="toc-issue-1-installing-maptools" class="nav-link active" data-scroll-target="#issue-1-installing-maptools">Issue 1: Installing maptools</a></li>
+  <li><a href="#issue-2-creating-coastal-outline" id="toc-issue-2-creating-coastal-outline" class="nav-link" data-scroll-target="#issue-2-creating-coastal-outline">Issue 2: Creating coastal outline</a>
+  <ul class="collapse">
+  <li><a href="#working-with-st_union" id="toc-working-with-st_union" class="nav-link" data-scroll-target="#working-with-st_union">Working with st_union()</a></li>
+  </ul></li>
+  <li><a href="#kernel-density-estimation" id="toc-kernel-density-estimation" class="nav-link" data-scroll-target="#kernel-density-estimation">Kernel Density Estimation</a></li>
+  <li><a href="#monte-carlo-simulation" id="toc-monte-carlo-simulation" class="nav-link" data-scroll-target="#monte-carlo-simulation">Monte Carlo Simulation</a></li>
+  <li><a href="#edge-correction" id="toc-edge-correction" class="nav-link" data-scroll-target="#edge-correction">Edge Correction</a></li>
+  <li><a href="#checking-duplicates" id="toc-checking-duplicates" class="nav-link" data-scroll-target="#checking-duplicates">Checking Duplicates</a></li>
   </ul>
 </nav>
     </div>
@@ -310,7 +318,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">September 2, 2024</p>
+      <p class="date-modified">September 4, 2024</p>
     </div>
   </div>
     
@@ -321,21 +329,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(sf, raster, spatstat, tmap, tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
 <section id="issue-1-installing-maptools" class="level2">
 <h2 class="anchored" data-anchor-id="issue-1-installing-maptools">Issue 1: Installing maptools</h2>
 <p>maptools is retired and binary is removed from CRAN. However, we can download from Posit Public Package Manager snapshots by using the code chunk below:</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"maptools"</span>,</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>                 <span class="at">repos =</span> <span class="st">"https://packagemanager.posit.co/cran/2023-10-13"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"maptools"</span>,</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>                 <span class="at">repos =</span> <span class="st">"https://packagemanager.posit.co/cran/2023-10-13"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-stdout">
-<pre><code>package 'maptools' successfully unpacked and MD5 sums checked
-
-The downloaded binary packages are in
-    C:\Users\user\AppData\Local\Temp\RtmpCYwpST\downloaded_packages</code></pre>
-</div>
 </div>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -351,6 +359,153 @@ Note
 <li><p>Avoid sp because we have to use maptools and maptools is retired as mentioned.</p></li>
 <li><p>Use sf straight. We can convert to ppp directly without more steps compared to sp.</p></li>
 <li><p>Shiny is developed by Posit. Dedicate support for Shiny repository. We can request Posit to have a repository required by you.</p></li>
+<li><p>Remember to add “#| eval: False” in quarto code chunk after installation:</p>
+<p><img src="images/clipboard-3459518601.png" class="img-fluid"></p></li>
+</ul>
+</div>
+</div>
+</section>
+<section id="issue-2-creating-coastal-outline" class="level2">
+<h2 class="anchored" data-anchor-id="issue-2-creating-coastal-outline">Issue 2: Creating coastal outline</h2>
+<p>In sf package, there are two functions allow us to combine XXXX.</p>
+<section id="working-with-st_union" class="level3">
+<h3 class="anchored" data-anchor-id="working-with-st_union">Working with st_union()</h3>
+<p>Derive the coastal outline sf tibble data.frame.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>sg_sf <span class="ot">&lt;-</span> mpsz_sf <span class="sc">%&gt;%</span> </span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_union</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+sf package
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><p>buffer</p></li>
+<li><p>remove boundaries / dissolve (GIS term)</p></li>
+<li><p>manipulate</p></li>
+</ul>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+spatstat package
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><p>ppp: if input data is sp object. convert generic sp object.</p></li>
+<li><p>as.ppp: if input is sf. Allow us to create point object.</p></li>
+<li><p>as.owin: Allow us to create boundary.</p></li>
+<li><p>Advice: Don’t use sp!!</p></li>
+</ul>
+</div>
+</div>
+</section>
+</section>
+<section id="kernel-density-estimation" class="level2">
+<h2 class="anchored" data-anchor-id="kernel-density-estimation">Kernel Density Estimation</h2>
+<p>2 different ways to covert KDE output into grid object.</p>
+<ol type="1">
+<li><p>maptools method(retired)</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>gridded_kde_childcareSG_ad <span class="ot">&lt;-</span> maptools<span class="sc">::</span><span class="fu">as.SpatialGridDataFrame</span>(kde_childcareSG_adaptive)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">spplot</span>(gridded_kde_childcareSG_ad)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div></li>
+<li><p>spatstat.geom method (use this)</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>gridded_kde_childcareSG_ad <span class="ot">&lt;-</span> <span class="fu">as</span>(kde_childcareSG_adaptive,</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>                                 <span class="st">"SpatialGridDataFrame"</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">spplot</span>(gridded_kde_childcareSG_ad)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div></li>
+</ol>
+</section>
+<section id="monte-carlo-simulation" class="level2">
+<h2 class="anchored" data-anchor-id="monte-carlo-simulation">Monte Carlo Simulation</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">12345</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Monte Carlo Simulation
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><p>remember to set.seed(1234), to ensure the simulation for randomisation is fixed.</p></li>
+<li><p>This ensure reproducibility.</p></li>
+</ul>
+</div>
+</div>
+</section>
+<section id="edge-correction" class="level2">
+<h2 class="anchored" data-anchor-id="edge-correction">Edge Correction</h2>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Edge correction
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><p>If we are looking at Singapore as a whole, it is bounded by sea, hence we do not need worry about edge correction, as data points will not be in the sea.</p></li>
+<li><p>However, if we are looking at study region, for example, planning area, the points at the edges correction is important to handle biases that arises from estimating spatial statistics near the boundaries of a study region.</p></li>
+<li><p>Important for K-function, L-function, pair correlation function, etc.</p></li>
+</ul>
+</div>
+</div>
+</section>
+<section id="checking-duplicates" class="level2">
+<h2 class="anchored" data-anchor-id="checking-duplicates">Checking Duplicates</h2>
+<p>For example, there are multiple childcare centers in a mall, but all the points are stacked together.</p>
+<ol type="1">
+<li>Check duplicate</li>
+<li>Count the coincidence points</li>
+<li>Sum up coincidence points</li>
+<li>Use jitter approach( nsim = 49) , simulate 50 times.</li>
+</ol>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><p>Convert multiple points into a marked point, and indicate as the sum of the number of coincidence points.</p></li>
+<li><p>If the point is marked point, then we will not need to sum up multiplicity.</p></li>
+<li><p>Need to check if the point is marked point.</p></li>
 </ul>
 </div>
 </div>

@@ -1,7 +1,7 @@
 ---
 title: "Take-home Ex01"
 author: "Liang Xiuhao Rydia"
-date: "Aug 26, 2024"
+date: "Sep 2, 2024"
 date-modified: "last-modified"
 execute:
   eval: true
@@ -13,3 +13,47 @@ format:
     code-fold: true
     code-summary: "Show the code"
 ---
+
+## The Study Area
+
+The study area is Bangkok Metropolitan Area.
+
+WGS 84 / UTM zone 47N
+
+EPSG code 32647
+
+## 1.0 Loading Library and Importing Traffic Accident Data
+
+```{r}
+pacman::p_load(sf, raster, spatstat, tmap, tidyverse)
+```
+
+```{r}
+rdacc_sf <- read_csv("data/thai_road_accident_2019_2022.csv") %>%
+  filter(!is.na(longitude) &longitude != "",
+         !is.na(latitude) & latitude != "") %>% 
+  st_as_sf(coords = c("longitude", "latitude"),
+           crs = 4326) %>% 
+  st_transform(crs = 32647)
+```
+
+::: callout-note
+## Notes on rdacc_sf
+
+-   incident_datetime is datetime format of POSIXct.
+
+-   st_as_sf(coords = c("longitude", "latitude"), crs = 4326) combines and longitude and latitude columns into geometry column
+
+-   Thai projection code is 32647, hence we use this code chunk: st_transform(crs = 32647)
+
+-   Filter is used to remove the longitude and latitude that has na as value.
+
+-   Check what is the number of data lost after removing na. Make sure the study region, the data lost is not significant. (not more than 5% lost)
+:::
+
+```{r}
+```
+
+## References
+
+News: <https://www.who.int/news-room/fact-sheets/detail/road-traffic-injuries>

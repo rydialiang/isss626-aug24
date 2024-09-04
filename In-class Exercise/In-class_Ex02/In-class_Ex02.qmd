@@ -14,11 +14,16 @@ format:
     code-summary: "Show the code"
 ---
 
+```{r}
+pacman::p_load(sf, raster, spatstat, tmap, tidyverse)
+```
+
 ## Issue 1: Installing maptools
 
 maptools is retired and binary is removed from CRAN. However, we can download from Posit Public Package Manager snapshots by using the code chunk below:
 
 ```{r}
+#| eval: false
 install.packages("maptools",
                  repos = "https://packagemanager.posit.co/cran/2023-10-13")
 ```
@@ -29,4 +34,108 @@ install.packages("maptools",
 -   Use sf straight. We can convert to ppp directly without more steps compared to sp.
 
 -   Shiny is developed by Posit. Dedicate support for Shiny repository. We can request Posit to have a repository required by you.
+
+-   Remember to add "#\| eval: False" in quarto code chunk after installation:
+
+    ![](images/clipboard-3459518601.png)
+:::
+
+## Issue 2: Creating coastal outline
+
+In sf package, there are two functions allow us to combine XXXX.
+
+### Working with st_union()
+
+Derive the coastal outline sf tibble data.frame.
+
+```{r}
+#| eval: False
+sg_sf <- mpsz_sf %>% 
+  st_union()
+```
+
+::: callout-note
+## sf package
+
+-   buffer
+
+-   remove boundaries / dissolve (GIS term)
+
+-   manipulate
+:::
+
+::: callout-note
+## spatstat package
+
+-   ppp: if input data is sp object. convert generic sp object.
+
+-   as.ppp: if input is sf. Allow us to create point object.
+
+-   as.owin: Allow us to create boundary.
+
+-   Advice: Don't use sp!!
+:::
+
+## Kernel Density Estimation
+
+2 different ways to covert KDE output into grid object.
+
+1.  maptools method(retired)
+
+    ```{r}
+    #| eval: False
+    gridded_kde_childcareSG_ad <- maptools::as.SpatialGridDataFrame(kde_childcareSG_adaptive)
+    spplot(gridded_kde_childcareSG_ad)
+    ```
+
+2.  spatstat.geom method (use this)
+
+    ```{r}
+    #| eval: False
+    gridded_kde_childcareSG_ad <- as(kde_childcareSG_adaptive,
+                                     "SpatialGridDataFrame")
+    spplot(gridded_kde_childcareSG_ad)
+    ```
+
+## Monte Carlo Simulation
+
+```{r}
+set.seed(12345)
+```
+
+::: callout-tip
+## Monte Carlo Simulation
+
+-   remember to set.seed(1234), to ensure the simulation for randomisation is fixed.
+
+-   This ensure reproducibility.
+:::
+
+## Edge Correction
+
+::: callout-note
+## Edge correction
+
+-   If we are looking at Singapore as a whole, it is bounded by sea, hence we do not need worry about edge correction, as data points will not be in the sea.
+
+-   However, if we are looking at study region, for example, planning area, the points at the edges correction is important to handle biases that arises from estimating spatial statistics near the boundaries of a study region.
+
+-   Important for K-function, L-function, pair correlation function, etc.
+:::
+
+## Checking Duplicates
+
+For example, there are multiple childcare centers in a mall, but all the points are stacked together.
+
+1.  Check duplicate
+2.  Count the coincidence points
+3.  Sum up coincidence points
+4.  Use jitter approach( nsim = 49) , simulate 50 times.
+
+::: callout-important
+-   Convert multiple points into a marked point, and indicate as the sum of the number of coincidence points.
+
+-   If the point is marked point, then we will not need to sum up multiplicity.
+
+-   Need to check if the point is marked point.
 :::
