@@ -14,6 +14,8 @@ format:
     code-summary: "Show the code"
 ---
 
+![](images/clipboard-2125730519.png)
+
 ```{r}
 pacman::p_load(sf, raster, spatstat, tmap, tidyverse)
 ```
