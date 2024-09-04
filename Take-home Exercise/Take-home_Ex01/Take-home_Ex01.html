@@ -6,8 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Liang Xiuhao Rydia">
+<meta name="dcterms.date" content="2024-09-02">
 
-<title>ISSS626: GAA - Geospatial Analytics and Applications</title>
+<title>ISSS626: GAA - Take-home Ex01</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,27 +22,59 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-listing/list.min.js"></script>
-<script src="site_libs/quarto-listing/quarto-listing.js"></script>
-<script src="site_libs/quarto-html/quarto.js"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -68,133 +102,19 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<script>
 
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-Hands_on_Exercise .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
-
-    const options = {
-      valueNames: ['listing-image','listing-date','listing-title','listing-author',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      
-      searchColumns: ["listing-title","listing-author","listing-date","listing-image","listing-description"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-Hands_on_Exercise'] = new List('listing-Hands_on_Exercise', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  
-
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-In_Class_Exercise .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
-
-    const options = {
-      valueNames: ['listing-image','listing-date','listing-title','listing-author',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      
-      searchColumns: ["listing-title","listing-author","listing-date","listing-image","listing-description"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-In_Class_Exercise'] = new List('listing-In_Class_Exercise', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  
-
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-Take_Home_Exercise .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
-
-    const options = {
-      valueNames: ['listing-image','listing-date','listing-title','listing-author',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      
-      searchColumns: ["listing-title","listing-author","listing-date","listing-image","listing-description"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-Take_Home_Exercise'] = new List('listing-Take_Home_Exercise', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  </script>
-
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
-
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
 
 <link rel="stylesheet" href="styles.css">
 </head>
 
-<body class="nav-fixed fullcontent">
+<body class="nav-fixed">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="./index.html">
+    <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title">ISSS626: GAA</span>
     </a>
   </div>
@@ -210,51 +130,51 @@ window.Quarto = {
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-hands-on-exercise">    
         <li>
-    <a class="dropdown-item" href="./Hands-on Exercise/Hands-on_Ex01a/Hands-on_Ex01a.html">
+    <a class="dropdown-item" href="../../Hands-on Exercise/Hands-on_Ex01a/Hands-on_Ex01a.html">
  <span class="dropdown-text">1a: Geospatial Data Wrangling with R</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./Hands-on Exercise/Hands-on_Ex01b/Hands-on_Ex01b.html">
+    <a class="dropdown-item" href="../../Hands-on Exercise/Hands-on_Ex01b/Hands-on_Ex01b.html">
  <span class="dropdown-text">1b: Choropleth Mapping with R</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./Hands-on Exercise/Hands-on_Ex02a/Hands-on_Ex02a.html">
+    <a class="dropdown-item" href="../../Hands-on Exercise/Hands-on_Ex02a/Hands-on_Ex02a.html">
  <span class="dropdown-text">2a: 1st Order Spatial Point Patterns Analysis Methods</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./Hands-on Exercise/Hands-on_Ex02b/Hands-on_Ex02b.html">
+    <a class="dropdown-item" href="../../Hands-on Exercise/Hands-on_Ex02b/Hands-on_Ex02b.html">
  <span class="dropdown-text">2b: 2nd Order Spatial Point Patterns Analysis Methods</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./Hands-on Exercise/Hands-on_Ex03/Hands-on_Ex03.qmd">
+    <a class="dropdown-item" href="../../Hands-on Exercise/Hands-on_Ex03/Hands-on_Ex03.qmd">
  <span class="dropdown-text">Hands-on Exercise 3</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./Hands-on Exercise/Hands-on_Ex04/Hands-on_Ex04.qmd">
+    <a class="dropdown-item" href="../../Hands-on Exercise/Hands-on_Ex04/Hands-on_Ex04.qmd">
  <span class="dropdown-text">Hands-on Exercise 4</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./Hands-on Exercise/Hands-on_Ex05/Hands-on_Ex05.qmd">
+    <a class="dropdown-item" href="../../Hands-on Exercise/Hands-on_Ex05/Hands-on_Ex05.qmd">
  <span class="dropdown-text">Hands-on Exercise 5</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./Hands-on Exercise/Hands-on_Ex06/Hands-on_Ex06.qmd">
+    <a class="dropdown-item" href="../../Hands-on Exercise/Hands-on_Ex06/Hands-on_Ex06.qmd">
  <span class="dropdown-text">Hands-on Exercise 6</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./Hands-on Exercise/Hands-on_Ex07/Hands-on_Ex07.qmd">
+    <a class="dropdown-item" href="../../Hands-on Exercise/Hands-on_Ex07/Hands-on_Ex07.qmd">
  <span class="dropdown-text">Hands-on Exercise 7</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./Hands-on Exercise/Hands-on_Ex08/Hands-on_Ex08.qmd">
+    <a class="dropdown-item" href="../../Hands-on Exercise/Hands-on_Ex08/Hands-on_Ex08.qmd">
  <span class="dropdown-text">Hands-on Exercise 8</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./Hands-on Exercise/Hands-on_Ex09/Hands-on_Ex09.qmd">
+    <a class="dropdown-item" href="../../Hands-on Exercise/Hands-on_Ex09/Hands-on_Ex09.qmd">
  <span class="dropdown-text">Hands-on Exercise 9</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./Hands-on Exercise/Hands-on_Ex10/Hands-on_Ex10.qmd">
+    <a class="dropdown-item" href="../../Hands-on Exercise/Hands-on_Ex10/Hands-on_Ex10.qmd">
  <span class="dropdown-text">Hands-on Exercise 10</span></a>
   </li>  
     </ul>
@@ -265,43 +185,43 @@ window.Quarto = {
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-in-class-exercise">    
         <li>
-    <a class="dropdown-item" href="./In-class Exercise/In-class_Ex01/In-class_Ex01.html">
+    <a class="dropdown-item" href="../../In-class Exercise/In-class_Ex01/In-class_Ex01.html">
  <span class="dropdown-text">In-class Exercise 1</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./In-class Exercise/In-class_Ex02/In-class_Ex02.html">
+    <a class="dropdown-item" href="../../In-class Exercise/In-class_Ex02/In-class_Ex02.html">
  <span class="dropdown-text">In-class Exercise 2</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./In-class Exercise/In-class_Ex03/In-class_Ex03.qmd">
+    <a class="dropdown-item" href="../../In-class Exercise/In-class_Ex03/In-class_Ex03.qmd">
  <span class="dropdown-text">In-class Exercise 3</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./In-class Exercise/In-class_Ex04/In-class_Ex04.qmd">
+    <a class="dropdown-item" href="../../In-class Exercise/In-class_Ex04/In-class_Ex04.qmd">
  <span class="dropdown-text">In-class Exercise 4</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./In-class Exercise/In-class_Ex05/In-class_Ex05.qmd">
+    <a class="dropdown-item" href="../../In-class Exercise/In-class_Ex05/In-class_Ex05.qmd">
  <span class="dropdown-text">In-class Exercise 5</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./In-class Exercise/In-class_Ex06/In-class_Ex06.qmd">
+    <a class="dropdown-item" href="../../In-class Exercise/In-class_Ex06/In-class_Ex06.qmd">
  <span class="dropdown-text">In-class Exercise 6</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./In-class Exercise/In-class_Ex07/In-class_Ex07.qmd">
+    <a class="dropdown-item" href="../../In-class Exercise/In-class_Ex07/In-class_Ex07.qmd">
  <span class="dropdown-text">In-class Exercise 7</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./In-class Exercise/In-class_Ex08/In-class_Ex08.qmd">
+    <a class="dropdown-item" href="../../In-class Exercise/In-class_Ex08/In-class_Ex08.qmd">
  <span class="dropdown-text">In-class Exercise 8</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./In-class Exercise/In-class_Ex09/In-class_Ex09.qmd">
+    <a class="dropdown-item" href="../../In-class Exercise/In-class_Ex09/In-class_Ex09.qmd">
  <span class="dropdown-text">In-class Exercise 9</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./In-class Exercise/In-class_Ex10/In-class_Ex10.qmd">
+    <a class="dropdown-item" href="../../In-class Exercise/In-class_Ex10/In-class_Ex10.qmd">
  <span class="dropdown-text">In-class Exercise 10</span></a>
   </li>  
     </ul>
@@ -312,15 +232,15 @@ window.Quarto = {
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-take-home-exercise">    
         <li>
-    <a class="dropdown-item" href="./Take-home Exercise/Take-home_Ex01/Take-home_Ex01.html">
+    <a class="dropdown-item" href="../../Take-home Exercise/Take-home_Ex01/Take-home_Ex01.html">
  <span class="dropdown-text">Take-home Exercise 1</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./Take-home Exercise/Take-home_Ex02/Take-home_Ex02.qmd">
+    <a class="dropdown-item" href="../../Take-home Exercise/Take-home_Ex02/Take-home_Ex02.qmd">
  <span class="dropdown-text">Take-home Exercise 2</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./Take-home Exercise/Take-home_Ex03/Take-home_Ex03.qmd">
+    <a class="dropdown-item" href="../../Take-home Exercise/Take-home_Ex03/Take-home_Ex03.qmd">
  <span class="dropdown-text">Take-home Exercise 3</span></a>
   </li>  
     </ul>
@@ -338,7 +258,7 @@ window.Quarto = {
 <span class="menu-text"></span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./about.html"> 
+    <a class="nav-link" href="../../about.html"> 
 <span class="menu-text">about</span></a>
   </li>  
 </ul>
@@ -352,21 +272,49 @@ window.Quarto = {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#the-study-area" id="toc-the-study-area" class="nav-link active" data-scroll-target="#the-study-area">The Study Area</a></li>
+  <li><a href="#loading-library-and-importing-traffic-accident-data" id="toc-loading-library-and-importing-traffic-accident-data" class="nav-link" data-scroll-target="#loading-library-and-importing-traffic-accident-data">1.0 Loading Library and Importing Traffic Accident Data</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul>
+</nav>
+    </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Geospatial Analytics and Applications</h1>
+<h1 class="title">Take-home Ex01</h1>
 </div>
 
 
 
 <div class="quarto-title-meta">
 
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Liang Xiuhao Rydia </p>
+          </div>
+  </div>
     
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">September 2, 2024</p>
+    </div>
+  </div>
   
+    <div>
+    <div class="quarto-title-meta-heading">Modified</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date-modified">September 4, 2024</p>
+    </div>
+  </div>
     
   </div>
   
@@ -375,192 +323,57 @@ window.Quarto = {
 </header>
 
 
-<section id="welcome-to-my-gaa-learning-journey" class="level2">
-<h2 class="anchored" data-anchor-id="welcome-to-my-gaa-learning-journey">Welcome to my GAA learning journey!</h2>
-<p>Here are the latest exercises.</p>
+<section id="the-study-area" class="level2">
+<h2 class="anchored" data-anchor-id="the-study-area">The Study Area</h2>
+<p>The study area is Bangkok Metropolitan Area.</p>
+<p>WGS 84 / UTM zone 47N</p>
+<p>EPSG code 32647</p>
 </section>
-<div class="content-container">
-<section id="hands-on-exercise" class="level2 listing-block">
-<h2 class="anchored" data-anchor-id="hands-on-exercise">Hands On Exercise</h2>
-<p></p>
-<div id="listing-Hands_on_Exercise" class="quarto-listing quarto-listing-container-grid">
-<div class="list grid quarto-listing-cols-3">
-<div class="g-col-1" data-index="0" data-listing-date-sort="1724256000000" data-listing-file-modified-sort="1724846482101" data-listing-date-modified-sort="1724846482000" data-listing-reading-time-sort="15" data-listing-word-count-sort="2822">
-<a href="./Hands-on Exercise/Hands-on_Ex01a/Hands-on_Ex01a.html" class="quarto-grid-link">
-<div class="quarto-grid-item card h-100 card-left">
-<!-- img(9CEB782EFEE6)[progressive=false, height=150px]:Hands-on Exercise/Hands-on_Ex01a/Hands-on_Ex01a.html -->
-<div class="card-body post-contents">
-<h5 class="no-anchor card-title listing-title">
-1 Geospatial Data Science with R
-</h5>
-<div class="card-attribution card-text-small justify">
-<div class="listing-author">
-Liang Xiuhao Rydia
+<section id="loading-library-and-importing-traffic-accident-data" class="level2">
+<h2 class="anchored" data-anchor-id="loading-library-and-importing-traffic-accident-data">1.0 Loading Library and Importing Traffic Accident Data</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(sf, raster, spatstat, tmap, tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
-<div class="listing-date">
-Aug 22, 2024
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>rdacc_sf <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/thai_road_accident_2019_2022.csv"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(longitude) <span class="sc">&amp;</span>longitude <span class="sc">!=</span> <span class="st">""</span>,</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>         <span class="sc">!</span><span class="fu">is.na</span>(latitude) <span class="sc">&amp;</span> latitude <span class="sc">!=</span> <span class="st">""</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_as_sf</span>(<span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"longitude"</span>, <span class="st">"latitude"</span>),</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>           <span class="at">crs =</span> <span class="dv">4326</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(<span class="at">crs =</span> <span class="dv">32647</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
 </div>
-</div>
-</div>
-</a>
-</div>
-<div class="g-col-1" data-index="1" data-listing-date-sort="1724342400000" data-listing-file-modified-sort="1725276051740" data-listing-date-modified-sort="1725276051000" data-listing-reading-time-sort="19" data-listing-word-count-sort="3640">
-<a href="./Hands-on Exercise/Hands-on_Ex01b/Hands-on_Ex01b.html" class="quarto-grid-link">
-<div class="quarto-grid-item card h-100 card-left">
-<!-- img(9CEB782EFEE6)[progressive=false, height=150px]:Hands-on Exercise/Hands-on_Ex01b/Hands-on_Ex01b.html -->
-<div class="card-body post-contents">
-<h5 class="no-anchor card-title listing-title">
-2 Thematic Mapping and GeoVisualisation with R
-</h5>
-<div class="card-attribution card-text-small justify">
-<div class="listing-author">
-Liang Xiuhao Rydia
-</div>
-<div class="listing-date">
-Aug 23, 2024
+<div class="callout-title-container flex-fill">
+Notes on rdacc_sf
 </div>
 </div>
-</div>
-</div>
-</a>
-</div>
-<div class="g-col-1" data-index="2" data-listing-date-sort="1725033600000" data-listing-file-modified-sort="1725428168749" data-listing-date-modified-sort="1725428168000" data-listing-reading-time-sort="18" data-listing-word-count-sort="3586">
-<a href="./Hands-on Exercise/Hands-on_Ex02a/Hands-on_Ex02a.html" class="quarto-grid-link">
-<div class="quarto-grid-item card h-100 card-left">
-<!-- img(9CEB782EFEE6)[progressive=false, height=150px]:Hands-on Exercise/Hands-on_Ex02a/Hands-on_Ex02a.html -->
-<div class="card-body post-contents">
-<h5 class="no-anchor card-title listing-title">
-4 1st Order Spatial Point Patterns Analysis Methods
-</h5>
-<div class="card-attribution card-text-small justify">
-<div class="listing-author">
-Liang Xiuhao Rydia
-</div>
-<div class="listing-date">
-Aug 31, 2024
-</div>
-</div>
-</div>
-</div>
-</a>
-</div>
-<div class="g-col-1" data-index="3" data-listing-date-sort="1725033600000" data-listing-file-modified-sort="1725440173491" data-listing-date-modified-sort="1725440173000" data-listing-reading-time-sort="12" data-listing-word-count-sort="2249">
-<a href="./Hands-on Exercise/Hands-on_Ex02b/Hands-on_Ex02b.html" class="quarto-grid-link">
-<div class="quarto-grid-item card h-100 card-left">
-<!-- img(9CEB782EFEE6)[progressive=false, height=150px]:Hands-on Exercise/Hands-on_Ex02b/Hands-on_Ex02b.html -->
-<div class="card-body post-contents">
-<h5 class="no-anchor card-title listing-title">
-5 2nd Order Spatial Point Patterns Analysis Methods
-</h5>
-<div class="card-attribution card-text-small justify">
-<div class="listing-author">
-Liang Xiuhao Rydia
-</div>
-<div class="listing-date">
-Aug 31, 2024
-</div>
-</div>
-</div>
-</div>
-</a>
-</div>
-</div>
-<div class="listing-no-matching d-none">
-No matching items
+<div class="callout-body-container callout-body">
+<ul>
+<li><p>incident_datetime is datetime format of POSIXct.</p></li>
+<li><p>st_as_sf(coords = c(“longitude”, “latitude”), crs = 4326) combines and longitude and latitude columns into geometry column</p></li>
+<li><p>Thai projection code is 32647, hence we use this code chunk: st_transform(crs = 32647)</p></li>
+<li><p>Filter is used to remove the longitude and latitude that has na as value.</p></li>
+<li><p>Check what is the number of data lost after removing na. Make sure the study region, the data lost is not significant. (not more than 5% lost)</p></li>
+</ul>
 </div>
 </div>
 </section>
-</div>
-<div class="content-container">
-<section id="in-class-exercise" class="level2 listing-block">
-<h2 class="anchored" data-anchor-id="in-class-exercise">In Class Exercise</h2>
-<p></p>
-<div id="listing-In_Class_Exercise" class="quarto-listing quarto-listing-container-grid">
-<div class="list grid quarto-listing-cols-3">
-<div class="g-col-1" data-index="0" data-listing-date-sort="1724601600000" data-listing-file-modified-sort="1724939578124" data-listing-date-modified-sort="1724939578000" data-listing-reading-time-sort="13" data-listing-word-count-sort="2549">
-<a href="./In-class Exercise/In-class_Ex01/In-class_Ex01.html" class="quarto-grid-link">
-<div class="quarto-grid-item card h-100 card-left">
-<!-- img(9CEB782EFEE6)[progressive=false, height=150px]:In-class Exercise/In-class_Ex01/In-class_Ex01.html -->
-<div class="card-body post-contents">
-<h5 class="no-anchor card-title listing-title">
-In-class Ex 01
-</h5>
-<div class="card-attribution card-text-small justify">
-<div class="listing-author">
-Liang Xiuhao Rydia
-</div>
-<div class="listing-date">
-Aug 26, 2024
-</div>
-</div>
-</div>
-</div>
-</a>
-</div>
-<div class="g-col-1" data-index="1" data-listing-date-sort="1725206400000" data-listing-file-modified-sort="1725440788868" data-listing-date-modified-sort="1725440788000" data-listing-reading-time-sort="3" data-listing-word-count-sort="526">
-<a href="./In-class Exercise/In-class_Ex02/In-class_Ex02.html" class="quarto-grid-link">
-<div class="quarto-grid-item card h-100 card-left">
-<!-- img(9CEB782EFEE6)[progressive=false, height=150px]:In-class Exercise/In-class_Ex02/In-class_Ex02.html -->
-<div class="card-body post-contents">
-<h5 class="no-anchor card-title listing-title">
-In-class Ex 02
-</h5>
-<div class="card-attribution card-text-small justify">
-<div class="listing-author">
-Liang Xiuhao Rydia
-</div>
-<div class="listing-date">
-Sep 2, 2024
-</div>
-</div>
-</div>
-</div>
-</a>
-</div>
-</div>
-<div class="listing-no-matching d-none">
-No matching items
-</div>
-</div>
-</section>
-</div>
-<div class="content-container">
-<section id="take-home-exercise" class="level2 listing-block">
-<h2 class="anchored" data-anchor-id="take-home-exercise">Take Home Exercise</h2>
-<p></p>
-<div id="listing-Take_Home_Exercise" class="quarto-listing quarto-listing-container-grid">
-<div class="list grid quarto-listing-cols-3">
-<div class="g-col-1" data-index="0" data-listing-date-sort="1725206400000" data-listing-file-modified-sort="1725426545910" data-listing-date-modified-sort="1725426545000" data-listing-reading-time-sort="1" data-listing-word-count-sort="166">
-<a href="./Take-home Exercise/Take-home_Ex01/Take-home_Ex01.html" class="quarto-grid-link">
-<div class="quarto-grid-item card h-100 card-left">
-<!-- img(9CEB782EFEE6)[progressive=false, height=150px]:Take-home Exercise/Take-home_Ex01/Take-home_Ex01.html -->
-<div class="card-body post-contents">
-<h5 class="no-anchor card-title listing-title">
-Take-home Ex01
-</h5>
-<div class="card-attribution card-text-small justify">
-<div class="listing-author">
-Liang Xiuhao Rydia
-</div>
-<div class="listing-date">
-Sep 2, 2024
-</div>
-</div>
-</div>
-</div>
-</a>
-</div>
-</div>
-<div class="listing-no-matching d-none">
-No matching items
-</div>
-</div>
-</section>
-</div>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<p>News: <a href="https://www.who.int/news-room/fact-sheets/detail/road-traffic-injuries" class="uri">https://www.who.int/news-room/fact-sheets/detail/road-traffic-injuries</a></p>
 
 
-
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
