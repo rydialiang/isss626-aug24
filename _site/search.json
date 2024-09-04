@@ -47,5 +47,40 @@
     "title": "In-class Ex 02",
     "section": "Checking Duplicates",
     "text": "Checking Duplicates\nFor example, there are multiple childcare centers in a mall, but all the points are stacked together.\n\nCheck duplicate\nCount the coincidence points\nSum up coincidence points\nUse jitter approach( nsim = 49) , simulate 50 times.\n\n\n\n\n\n\n\nImportant\n\n\n\n\nConvert multiple points into a marked point, and indicate as the sum of the number of coincidence points.\nIf the point is marked point, then we will not need to sum up multiplicity.\nNeed to check if the point is marked point."
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Geospatial Analytics and Applications",
+    "section": "",
+    "text": "Here are the latest exercises."
+  },
+  {
+    "objectID": "index.html#welcome-to-my-gaa-learning-journey",
+    "href": "index.html#welcome-to-my-gaa-learning-journey",
+    "title": "Geospatial Analytics and Applications",
+    "section": "",
+    "text": "Here are the latest exercises."
+  },
+  {
+    "objectID": "index.html#hands-on-exercise",
+    "href": "index.html#hands-on-exercise",
+    "title": "Geospatial Analytics and Applications",
+    "section": "Hands On Exercise",
+    "text": "Hands On Exercise\n\n\n\n\n\n\n\n\n\n1 Geospatial Data Science with R\n\n\n\nLiang Xiuhao Rydia\n\n\nAug 22, 2024\n\n\n\n\n\n\n\n\n\n\n\n\n2 Thematic Mapping and GeoVisualisation with R\n\n\n\nLiang Xiuhao Rydia\n\n\nAug 23, 2024\n\n\n\n\n\n\n\n\n\n\n\n\n4 1st Order Spatial Point Patterns Analysis Methods\n\n\n\nLiang Xiuhao Rydia\n\n\nAug 31, 2024\n\n\n\n\n\n\n\n\n\n\n\n\n5 2nd Order Spatial Point Patterns Analysis Methods\n\n\n\nLiang Xiuhao Rydia\n\n\nAug 31, 2024\n\n\n\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "index.html#in-class-exercise",
+    "href": "index.html#in-class-exercise",
+    "title": "Geospatial Analytics and Applications",
+    "section": "In Class Exercise",
+    "text": "In Class Exercise\n\n\n\n\n\n\n\n\n\nIn-class Ex 01\n\n\n\nLiang Xiuhao Rydia\n\n\nAug 26, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nIn-class Ex 02\n\n\n\nLiang Xiuhao Rydia\n\n\nSep 2, 2024\n\n\n\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "index.html#take-home-exercise",
+    "href": "index.html#take-home-exercise",
+    "title": "Geospatial Analytics and Applications",
+    "section": "Take Home Exercise",
+    "text": "Take Home Exercise\n\n\n\n\n\n\n\n\n\nTake-home Ex01\n\n\n\nLiang Xiuhao Rydia\n\n\nSep 2, 2024\n\n\n\n\n\n\n\n\nNo matching items"
   }
 ]
