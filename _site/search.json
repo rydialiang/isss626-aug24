@@ -67,7 +67,7 @@
     "href": "index.html#hands-on-exercise",
     "title": "Geospatial Analytics and Applications",
     "section": "Hands On Exercise",
-    "text": "Hands On Exercise\n\n\n\n\n\n\n\n\n\n1 Geospatial Data Science with R\n\n\n\nLiang Xiuhao Rydia\n\n\nAug 22, 2024\n\n\n\n\n\n\n\n\n\n\n\n\n2 Thematic Mapping and GeoVisualisation with R\n\n\n\nLiang Xiuhao Rydia\n\n\nAug 23, 2024\n\n\n\n\n\n\n\n\n\n\n\n\n4 1st Order Spatial Point Patterns Analysis Methods\n\n\n\nLiang Xiuhao Rydia\n\n\nAug 31, 2024\n\n\n\n\n\n\n\n\n\n\n\n\n5 2nd Order Spatial Point Patterns Analysis Methods\n\n\n\nLiang Xiuhao Rydia\n\n\nAug 31, 2024\n\n\n\n\n\n\n\n\nNo matching items"
+    "text": "Hands On Exercise\n\n\n\n\n\n\n\n\n\n1 Geospatial Data Science with R\n\n\n\nLiang Xiuhao Rydia\n\n\nAug 22, 2024\n\n\n\n\n\n\n\n\n\n\n\n\n2 Thematic Mapping and GeoVisualisation with R\n\n\n\nLiang Xiuhao Rydia\n\n\nAug 23, 2024\n\n\n\n\n\n\n\n\n\n\n\n\n4 1st Order Spatial Point Patterns Analysis Methods\n\n\n\nLiang Xiuhao Rydia\n\n\nAug 31, 2024\n\n\n\n\n\n\n\n\n\n\n\n\n5 2nd Order Spatial Point Patterns Analysis Methods\n\n\n\nLiang Xiuhao Rydia\n\n\nAug 31, 2024\n\n\n\n\n\n\n\n\n\n\n\n\n7 Network Constrained Spatial Point Patterns Analysis\n\n\n\nLiang Xiuhao Rydia\n\n\nSep 4, 2024\n\n\n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "index.html#in-class-exercise",
@@ -166,5 +166,47 @@
     "title": "ISSS626: GAA",
     "section": "",
     "text": "&lt;!DOCTYPE qgis PUBLIC ‘http://mrcc.com/qgis.dtd’ ‘SYSTEM’&gt;     dataset\n\n\n        0 0     false"
+  },
+  {
+    "objectID": "Hands-on Exercise/Hands-on_Ex03/Hands-on_Ex03.html",
+    "href": "Hands-on Exercise/Hands-on_Ex03/Hands-on_Ex03.html",
+    "title": "7 Network Constrained Spatial Point Patterns Analysis",
+    "section": "",
+    "text": "Network constrained Spatial Point Patterns Analysis (NetSPAA) is a collection of spatial point patterns analysis methods special developed for analysing spatial point event occurs on or alongside network. The spatial point event can be locations of traffic accident or childcare centre for example. The network, on the other hand can be a road network or river network.\nIn this hands-on exercise, you are going to gain hands-on experience on using appropriate functions of spNetwork package:\n\nto derive network kernel density estimation (NKDE), and\nto perform network G-function and k-function analysis"
+  },
+  {
+    "objectID": "Hands-on Exercise/Hands-on_Ex03/Hands-on_Ex03.html#overview",
+    "href": "Hands-on Exercise/Hands-on_Ex03/Hands-on_Ex03.html#overview",
+    "title": "7 Network Constrained Spatial Point Patterns Analysis",
+    "section": "",
+    "text": "Network constrained Spatial Point Patterns Analysis (NetSPAA) is a collection of spatial point patterns analysis methods special developed for analysing spatial point event occurs on or alongside network. The spatial point event can be locations of traffic accident or childcare centre for example. The network, on the other hand can be a road network or river network.\nIn this hands-on exercise, you are going to gain hands-on experience on using appropriate functions of spNetwork package:\n\nto derive network kernel density estimation (NKDE), and\nto perform network G-function and k-function analysis"
+  },
+  {
+    "objectID": "Hands-on Exercise/Hands-on_Ex03/Hands-on_Ex03.html#the-data",
+    "href": "Hands-on Exercise/Hands-on_Ex03/Hands-on_Ex03.html#the-data",
+    "title": "7 Network Constrained Spatial Point Patterns Analysis",
+    "section": "7.2 The Data",
+    "text": "7.2 The Data\nIn this study, we will analyse the spatial distribution of childcare centre in Punggol planning area. For the purpose of this study, two geospatial data sets will be used. They are:\n\nPunggol_St, a line features geospatial data which store the road network within Punggol Planning Area.\nPunggol_CC, a point feature geospatial data which store the location of childcare centres within Punggol Planning Area.\n\nBoth data sets are in ESRI shapefile format."
+  },
+  {
+    "objectID": "Hands-on Exercise/Hands-on_Ex03/Hands-on_Ex03.html#installing-and-launching-the-r-packages",
+    "href": "Hands-on Exercise/Hands-on_Ex03/Hands-on_Ex03.html#installing-and-launching-the-r-packages",
+    "title": "7 Network Constrained Spatial Point Patterns Analysis",
+    "section": "7.3 Installing and launching the R packages",
+    "text": "7.3 Installing and launching the R packages\nIn this hands-on exercise, four R packages will be used, they are:\n\nspNetwork, which provides functions to perform Spatial Point Patterns Analysis such as kernel density estimation (KDE) and K-function on network. It also can be used to build spatial matrices (‘listw’ objects like in ‘spdep’ package) to conduct any kind of traditional spatial analysis with spatial weights based on reticular distances.\nsf package provides functions to manage, processing, and manipulate Simple Features, a formal geospatial data standard that specifies a storage and access model of spatial geometries such as points, lines, and polygons.\ntmap which provides functions for plotting cartographic quality static point patterns maps or interactive maps by using leaflet API.\n\nUse the code chunk below to install and launch the four R packages.\n\n\nShow the code\npacman::p_load(tidyverse,tmap,\n               sf, spNetwork)"
+  },
+  {
+    "objectID": "Hands-on Exercise/Hands-on_Ex03/Hands-on_Ex03.html#data-import-and-preparation",
+    "href": "Hands-on Exercise/Hands-on_Ex03/Hands-on_Ex03.html#data-import-and-preparation",
+    "title": "7 Network Constrained Spatial Point Patterns Analysis",
+    "section": "7.4 Data Import and Preparation",
+    "text": "7.4 Data Import and Preparation\nThe code chunk below uses st_read() of sf package to important Punggol_St and Punggol_CC geospatial data sets into RStudio as sf data frames.\n\n\nShow the code\nnetwork &lt;- st_read(dsn=\"data/geospatial\", \n                   layer=\"Punggol_St\")\n\n\nReading layer `Punggol_St' from data source \n  `C:\\rydialiang\\isss626-aug24\\Hands-on Exercise\\Hands-on_Ex03\\data\\geospatial' \n  using driver `ESRI Shapefile'\nSimple feature collection with 2642 features and 2 fields\nGeometry type: LINESTRING\nDimension:     XY\nBounding box:  xmin: 34038.56 ymin: 40941.11 xmax: 38882.85 ymax: 44801.27\nProjected CRS: SVY21 / Singapore TM\n\n\n\n\nShow the code\nchildcare &lt;- st_read(dsn=\"data/geospatial\",\n                     layer=\"Punggol_CC\")\n\n\nReading layer `Punggol_CC' from data source \n  `C:\\rydialiang\\isss626-aug24\\Hands-on Exercise\\Hands-on_Ex03\\data\\geospatial' \n  using driver `ESRI Shapefile'\nSimple feature collection with 61 features and 1 field\nGeometry type: POINT\nDimension:     XYZ\nBounding box:  xmin: 34423.98 ymin: 41503.6 xmax: 37619.47 ymax: 44685.77\nz_range:       zmin: 0 zmax: 0\nProjected CRS: SVY21 / Singapore TM\n\n\nWe can examine the structure of the output simple features data tables in RStudio. Alternative, code chunk below can be used to print the content of network and childcare simple features objects by using the code chunk below.\n\nNetworkChildcare\n\n\n\n\nShow the code\nnetwork\n\n\nSimple feature collection with 2642 features and 2 fields\nGeometry type: LINESTRING\nDimension:     XY\nBounding box:  xmin: 34038.56 ymin: 40941.11 xmax: 38882.85 ymax: 44801.27\nProjected CRS: SVY21 / Singapore TM\nFirst 10 features:\n     LINK_ID                   ST_NAME                       geometry\n1  116130894                PUNGGOL RD LINESTRING (36546.89 44574....\n2  116130897 PONGGOL TWENTY-FOURTH AVE LINESTRING (36546.89 44574....\n3  116130901   PONGGOL SEVENTEENTH AVE LINESTRING (36012.73 44154....\n4  116130902   PONGGOL SEVENTEENTH AVE LINESTRING (36062.81 44197....\n5  116130907           PUNGGOL CENTRAL LINESTRING (36131.85 42755....\n6  116130908                PUNGGOL RD LINESTRING (36112.93 42752....\n7  116130909           PUNGGOL CENTRAL LINESTRING (36127.4 42744.5...\n8  116130910               PUNGGOL FLD LINESTRING (35994.98 42428....\n9  116130911               PUNGGOL FLD LINESTRING (35984.97 42407....\n10 116130912            EDGEFIELD PLNS LINESTRING (36200.87 42219....\n\n\n\n\n\n\nShow the code\nchildcare\n\n\nSimple feature collection with 61 features and 1 field\nGeometry type: POINT\nDimension:     XYZ\nBounding box:  xmin: 34423.98 ymin: 41503.6 xmax: 37619.47 ymax: 44685.77\nz_range:       zmin: 0 zmax: 0\nProjected CRS: SVY21 / Singapore TM\nFirst 10 features:\n      Name                      geometry\n1   kml_10 POINT Z (36173.81 42550.33 0)\n2   kml_99 POINT Z (36479.56 42405.21 0)\n3  kml_100 POINT Z (36618.72 41989.13 0)\n4  kml_101 POINT Z (36285.37 42261.42 0)\n5  kml_122  POINT Z (35414.54 42625.1 0)\n6  kml_161 POINT Z (36545.16 42580.09 0)\n7  kml_172 POINT Z (35289.44 44083.57 0)\n8  kml_188 POINT Z (36520.56 42844.74 0)\n9  kml_205  POINT Z (36924.01 41503.6 0)\n10 kml_222 POINT Z (37141.76 42326.36 0)"
+  },
+  {
+    "objectID": "Hands-on Exercise/Hands-on_Ex03/Hands-on_Ex03.html#visualising-the-geospatial-data",
+    "href": "Hands-on Exercise/Hands-on_Ex03/Hands-on_Ex03.html#visualising-the-geospatial-data",
+    "title": "7 Network Constrained Spatial Point Patterns Analysis",
+    "section": "7.5 Visualising the Geospatial Data",
+    "text": "7.5 Visualising the Geospatial Data\nBefore we jump into the analysis, it is a good practice to visualise the geospatial data. There are at least two ways to visualise the geospatial data. One way is by using plot() of Base R as shown in the code chunk below.\n\n\nShow the code\nplot(st_geometry(network))\nplot(childcare,add=T,col =\"red\",pch = 19)\n\n\n\n\n\n\n\n\n\nTo visualise the geospatial data with high cartographic quality and interactive manner, the mapping function of tmap package can be used as shown in the code chunk below.\n\n\nShow the code\ntmap_mode('view')\ntm_shape(childcare) + \n  tm_dots(col =\"red\") +\n  tm_shape(network) +\n  tm_lines()\n\n\n\n\n\n\n\n\nShow the code\ntmap_mode('plot')"
   }
 ]
