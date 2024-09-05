@@ -143,6 +143,10 @@ The points are located at center of the line based on the length of the line.
 We are ready to computer the NKDE by using the code chunk below.
 
 ```{r}
+childcare <- st_zm(childcare)
+```
+
+```{r}
 densities <- nkde(network, 
                   events = childcare,
                   w = rep(1, nrow(childcare)),
@@ -177,3 +181,102 @@ The user guide of **spNetwork** package provide a comprehensive discussion of [*
 #### 7.6.3.1 Visualising NKDE
 
 Before we can visualise the NKDE values, code chunk below will be used to insert the computed density values (i.e. densities) into *samples* and *lixels* objects as *density* field.
+
+```{r}
+samples$density <- densities
+lixels$density <- densities
+```
+
+Since svy21 projection system is in meter, the computed density values are very small i.e. 0.0000005. The code chunk below is used to resale the density values from number of events per meter to number of events per kilometer.
+
+```{r}
+# rescaling to help the mapping
+samples$density <- samples$density*1000
+lixels$density <- lixels$density*1000
+```
+
+The code below uses appropriate functions of tmap package to prepare interactive and high cartographic quality map visualisation.
+
+```{r}
+tmap_mode('view')
+tm_shape(lixels)+
+  tm_lines(col="density")+
+tm_shape(childcare)+
+  tm_dots(col = "red")
+tmap_mode('plot')
+```
+
+The interactive map above effectively reveals road segments (darker color) with relatively higher density of childcare centres than road segments with relatively lower density of childcare centres (lighter color).
+
+## **7.7 Network Constrained G- and K-Function Analysis**
+
+In this section, we are going to perform complete spatial randomness (CSR) test by using *kfunctions()* of **spNetwork** package. The null hypothesis is defined as:
+
+**Ho: The observed spatial point events (i.e distribution of childcare centres) are uniformly distributed over a street network in Punggol Planning Area.**
+
+The CSR test is based on the assumption of the binomial point process which implies the hypothesis that the childcare centres are randomly and independently distributed over the street network.
+
+If this hypothesis is rejected, we may infer that the distribution of childcare centres are spatially interacting and dependent on each other; as a result, they may form non-random patterns.
+
+```{r}
+kfun_childcare <- kfunctions(network, 
+                             childcare,
+                             start = 0, 
+                             end = 1000, 
+                             step = 50, 
+                             width = 50, 
+                             nsim = 50, 
+                             resolution = 50,
+                             verbose = FALSE, 
+                             conf_int = 0.05)
+```
+
+What can we learn from the code chunk above?
+
+There are ten arguments used in the code chunk above they are:
+
+-   lines: A SpatialLinesDataFrame with the sampling points. The geometries must be a SpatialLinesDataFrame (may crash if some geometries are invalid).
+
+-   points: A SpatialPointsDataFrame representing the points on the network. These points will be snapped on the network.
+
+-   start: A double, the start value for evaluating the k and g functions.
+
+-   end: A double, the last value for evaluating the k and g functions.
+
+-   step: A double, the jump between two evaluations of the k and g function.
+
+-   width: The width of each donut for the g-function.
+
+-   nsim: An integer indicating the number of Monte Carlo simulations required. In the above example, 50 simulation was performed. **Note:** most of the time, more simulations are required for inference
+
+-   resolution: When simulating random points on the network, selecting a resolution will reduce greatly the calculation time. When resolution is null the random points can occur everywhere on the graph. If a value is specified, the edges are split according to this value and the random points are selected vertices on the new network.
+
+-   conf_int: A double indicating the width confidence interval (default = 0.05).
+
+For the usage of other arguments, you should refer to the user guide of **spNetwork** package.
+
+The output of *kfunctions()* is a list with the following values:
+
+-   *plotkA*, a ggplot2 object representing the values of the k-function
+
+-   *plotgA*, a ggplot2 object representing the values of the g-function
+
+-   *valuesA*, a DataFrame with the values used to build the plots
+
+For example, we can visualise the ggplot2 object of k-function by using the code chunk below.
+
+```{r}
+kfun_childcare$plotk
+```
+
+The blue line is the empirical network K-function of the childcare centres in Punggol planning area. The gray envelop represents the results of the 50 simulations in the interval 2.5% - 97.5%. Because the blue line between the distance of 250m-400m are below the gray area, we can infer that the childcare centres in Punggol planning area resemble regular pattern at the distance of 250m-400m.
+
+## **7.8 References**
+
+-   [spNetwork: Spatial Analysis on Network](https://cran.r-project.org/web/packages/spNetwork/index.html)
+
+-   [Network Kernel Density Estimate](https://cran.r-project.org/web/packages/spNetwork/vignettes/NKDE.html)
+
+-   [Details about NKDE](https://cran.r-project.org/web/packages/spNetwork/vignettes/NKDEdetailed.html)
+
+-   [Network k Functions](https://cran.r-project.org/web/packages/spNetwork/vignettes/KNetworkFunctions.html)
