@@ -25,7 +25,7 @@
     "href": "index.html#in-class-exercise",
     "title": "Geospatial Analytics and Applications",
     "section": "In Class Exercise",
-    "text": "In Class Exercise\n\n\n\n\n\n\n\n\n\nIn-class Ex 01\n\n\n\nLiang Xiuhao Rydia\n\n\nAug 26, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nIn-class Ex 02\n\n\n\nLiang Xiuhao Rydia\n\n\nSep 2, 2024\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items"
+    "text": "In Class Exercise\n\n\n\n\n\n\n\n\n\nIn-class Ex 01\n\n\n\nLiang Xiuhao Rydia\n\n\nAug 26, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nIn-class Ex 02\n\n\n\nLiang Xiuhao Rydia\n\n\nSep 2, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nIn-class Ex 03\n\n\n\nLiang Xiuhao Rydia\n\n\nSep 9, 2024\n\n\n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "index.html#take-home-exercise",
@@ -369,5 +369,26 @@
     "title": "In-class Ex 01",
     "section": "10 Reference",
     "text": "10 Reference\nProf T.S. Kam: Geospatial Analytics & Application In-Class Ex 01"
+  },
+  {
+    "objectID": "Take-home Exercise/Take-home_Ex01/Take-home_Ex01.html#the-study-area",
+    "href": "Take-home Exercise/Take-home_Ex01/Take-home_Ex01.html#the-study-area",
+    "title": "Take-home Ex01",
+    "section": "The Study Area",
+    "text": "The Study Area\nThe study area is Bangkok Metropolitan Area.\nWGS 84 / UTM zone 47N\nEPSG code 32647"
+  },
+  {
+    "objectID": "Take-home Exercise/Take-home_Ex01/Take-home_Ex01.html#loading-library-and-importing-traffic-accident-data",
+    "href": "Take-home Exercise/Take-home_Ex01/Take-home_Ex01.html#loading-library-and-importing-traffic-accident-data",
+    "title": "Take-home Ex01",
+    "section": "1.0 Loading Library and Importing Traffic Accident Data",
+    "text": "1.0 Loading Library and Importing Traffic Accident Data\n\n\nShow the code\npacman::p_load(sf, raster, spatstat, tmap, tidyverse)\n\n\n\n\nShow the code\nrdacc_sf &lt;- read_csv(\"data/thai_road_accident_2019_2022.csv\") %&gt;%\n  filter(!is.na(longitude) &longitude != \"\",\n         !is.na(latitude) & latitude != \"\") %&gt;% \n  st_as_sf(coords = c(\"longitude\", \"latitude\"),\n           crs = 4326) %&gt;% \n  st_transform(crs = 32647)\n\n\n\n\n\n\n\n\nNotes on rdacc_sf\n\n\n\n\nincident_datetime is datetime format of POSIXct.\nst_as_sf(coords = c(“longitude”, “latitude”), crs = 4326) combines and longitude and latitude columns into geometry column\nThai projection code is 32647, hence we use this code chunk: st_transform(crs = 32647)\nFilter is used to remove the longitude and latitude that has na as value.\nCheck what is the number of data lost after removing na. Make sure the study region, the data lost is not significant. (not more than 5% lost)"
+  },
+  {
+    "objectID": "Take-home Exercise/Take-home_Ex01/Take-home_Ex01.html#references",
+    "href": "Take-home Exercise/Take-home_Ex01/Take-home_Ex01.html#references",
+    "title": "Take-home Ex01",
+    "section": "References",
+    "text": "References\nNews: https://www.who.int/news-room/fact-sheets/detail/road-traffic-injuries"
   }
 ]

@@ -14,6 +14,8 @@ format:
     code-summary: "Show the code"
 ---
 
+![](images/A_detailed_illustration_of_a_study_on_road_traffic_landscape.jpeg)
+
 ## The Study Area
 
 The study area is Bangkok Metropolitan Area.
