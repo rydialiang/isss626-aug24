@@ -34,6 +34,16 @@ format:
 
 -   [Thailand - Subnational Administrative Boundaries](https://data.humdata.org/dataset/cod-ab-tha?) on HDX.
 
+::: callout-caution
+## On Projection
+
+-   to check on the following:
+
+    -   WGS 84 / UTM zone 47N
+
+    -   EPSG code 32647
+:::
+
 ## 2.0 Loading Library and Importing Traffic Accident Data
 
 ```{r}
@@ -73,9 +83,33 @@ rdacc_sf <- read_csv("data/rawdata/thai_road_accident_2019_2022.csv") %>%
 -   Check what is the number of data lost after removing na. Make sure the study region, the data lost is not significant. (not more than 5% lost)
 
 -   use readr::read_csv() to ensure the data is imported as tibble data frame. Do not use read.csv().
+
+-   Check the data.
 :::
 
-### 3.2 Importing Spatial
+### 3.1.1 Wrangling the Date Fields 
+
+Using tidyverse::lubridate
+
+```{r}
+rdacc_sf <- rdacc_sf %>% 
+  mutate(DayOfWeek = day(incident_datetime)) %>% 
+  mutate(Month = month(incident_datetime,
+                       label = TRUE,
+                       abbr = TRUE))
+```
+
+```{r}
+write_rds(rdacc_sf, "data/rds/rdacc_sf.rds")
+```
+
+::: callout-note
+## Lubridate
+
+-   lubridate::month(): label = TRUE -\> change it into factor. If we do not use label = TRUE, it will be sorted using alphabetical logic. If it is a factor, it will be sorted according to date/month logic from Jan to Dec.
+:::
+
+### 3.2 Importing Spatial Data
 
 ```{r}
 

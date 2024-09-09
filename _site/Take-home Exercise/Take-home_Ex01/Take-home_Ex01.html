@@ -286,7 +286,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#importing-data" id="toc-importing-data" class="nav-link" data-scroll-target="#importing-data">3.0 Importing Data</a>
   <ul class="collapse">
   <li><a href="#importing-aspatial-data-and-converting-it-into-spatial-data" id="toc-importing-aspatial-data-and-converting-it-into-spatial-data" class="nav-link" data-scroll-target="#importing-aspatial-data-and-converting-it-into-spatial-data">3.1 Importing Aspatial Data and Converting it into Spatial Data</a></li>
-  <li><a href="#importing-spatial" id="toc-importing-spatial" class="nav-link" data-scroll-target="#importing-spatial">3.2 Importing Spatial</a></li>
+  <li><a href="#wrangling-the-date-fields" id="toc-wrangling-the-date-fields" class="nav-link" data-scroll-target="#wrangling-the-date-fields">3.1.1 Wrangling the Date Fields</a></li>
+  <li><a href="#importing-spatial-data" id="toc-importing-spatial-data" class="nav-link" data-scroll-target="#importing-spatial-data">3.2 Importing Spatial Data</a></li>
   </ul></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
@@ -351,6 +352,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><p><a href="https://data.humdata.org/dataset/hotosm_tha_roads">Thailand Roads (OpenStreetMap Export)</a> on HDX.</p></li>
 <li><p><a href="https://data.humdata.org/dataset/cod-ab-tha?">Thailand - Subnational Administrative Boundaries</a> on HDX.</p></li>
 </ul>
+<div class="callout callout-style-default callout-caution callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+On Projection
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><p>to check on the following:</p>
+<ul>
+<li><p>WGS 84 / UTM zone 47N</p></li>
+<li><p>EPSG code 32647</p></li>
+</ul></li>
+</ul>
+</div>
+</div>
 </section>
 <section id="loading-library-and-importing-traffic-accident-data" class="level2">
 <h2 class="anchored" data-anchor-id="loading-library-and-importing-traffic-accident-data">2.0 Loading Library and Importing Traffic Accident Data</h2>
@@ -398,12 +418,48 @@ Notes on rdacc_sf
 <li><p>Filter is used to remove the longitude and latitude that has na as value.</p></li>
 <li><p>Check what is the number of data lost after removing na. Make sure the study region, the data lost is not significant. (not more than 5% lost)</p></li>
 <li><p>use readr::read_csv() to ensure the data is imported as tibble data frame. Do not use read.csv().</p></li>
+<li><p>Check the data.</p></li>
 </ul>
 </div>
 </div>
 </section>
-<section id="importing-spatial" class="level3">
-<h3 class="anchored" data-anchor-id="importing-spatial">3.2 Importing Spatial</h3>
+<section id="wrangling-the-date-fields" class="level3">
+<h3 class="anchored" data-anchor-id="wrangling-the-date-fields">3.1.1 Wrangling the Date Fields</h3>
+<p>Using tidyverse::lubridate</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>rdacc_sf <span class="ot">&lt;-</span> rdacc_sf <span class="sc">%&gt;%</span> </span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">DayOfWeek =</span> <span class="fu">day</span>(incident_datetime)) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Month =</span> <span class="fu">month</span>(incident_datetime,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>                       <span class="at">label =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>                       <span class="at">abbr =</span> <span class="cn">TRUE</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write_rds</span>(rdacc_sf, <span class="st">"data/rds/rdacc_sf.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Lubridate
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>lubridate::month(): label = TRUE -&gt; change it into factor. If we do not use label = TRUE, it will be sorted using alphabetical logic. If it is a factor, it will be sorted according to date/month logic from Jan to Dec.</li>
+</ul>
+</div>
+</div>
+</section>
+<section id="importing-spatial-data" class="level3">
+<h3 class="anchored" data-anchor-id="importing-spatial-data">3.2 Importing Spatial Data</h3>
 </section>
 </section>
 <section id="references" class="level2">
