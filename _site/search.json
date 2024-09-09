@@ -390,5 +390,54 @@
     "title": "Take-home Ex01",
     "section": "References",
     "text": "References\nNews: https://www.who.int/news-room/fact-sheets/detail/road-traffic-injuries"
+  },
+  {
+    "objectID": "In-class Exercise/In-class_Ex03/In-class_Ex03.html",
+    "href": "In-class Exercise/In-class_Ex03/In-class_Ex03.html",
+    "title": "In-class Ex 03",
+    "section": "",
+    "text": "Show the code\npacman::p_load(sf,\n               spNetwork,\n               tmap,\n               tidyverse)\n\n\n\nsf: used for importing and exporting (.rds)\nspNetwork: using sf tibble data frame as input.\ntmap: for creating quality map. tidyverse: readr() for .csv. lubridate() to manipulate date type data."
+  },
+  {
+    "objectID": "In-class Exercise/In-class_Ex03/In-class_Ex03.html#loading-the-packages",
+    "href": "In-class Exercise/In-class_Ex03/In-class_Ex03.html#loading-the-packages",
+    "title": "In-class Ex 03",
+    "section": "",
+    "text": "Show the code\npacman::p_load(sf,\n               spNetwork,\n               tmap,\n               tidyverse)\n\n\n\nsf: used for importing and exporting (.rds)\nspNetwork: using sf tibble data frame as input.\ntmap: for creating quality map. tidyverse: readr() for .csv. lubridate() to manipulate date type data."
+  },
+  {
+    "objectID": "In-class Exercise/In-class_Ex03/In-class_Ex03.html#data-import-and-preparation",
+    "href": "In-class Exercise/In-class_Ex03/In-class_Ex03.html#data-import-and-preparation",
+    "title": "In-class Ex 03",
+    "section": "2.0 Data Import and Preparation",
+    "text": "2.0 Data Import and Preparation\n\n\nShow the code\nnetwork &lt;- st_read(dsn=\"data/geospatial\", \n                   layer=\"Punggol_St\")\n\n\nReading layer `Punggol_St' from data source \n  `C:\\rydialiang\\isss626-aug24\\In-class Exercise\\In-class_Ex03\\data\\geospatial' \n  using driver `ESRI Shapefile'\nSimple feature collection with 2642 features and 2 fields\nGeometry type: LINESTRING\nDimension:     XY\nBounding box:  xmin: 34038.56 ymin: 40941.11 xmax: 38882.85 ymax: 44801.27\nProjected CRS: SVY21 / Singapore TM\n\n\n\n\n\n\n\n\nNote\n\n\n\n\nCheck that geometry is Linestring.\n\n\n\n\n\nShow the code\nchildcare_xyz &lt;- st_read(dsn=\"data/geospatial\",\n                     layer=\"Punggol_CC\")\n\n\nReading layer `Punggol_CC' from data source \n  `C:\\rydialiang\\isss626-aug24\\In-class Exercise\\In-class_Ex03\\data\\geospatial' \n  using driver `ESRI Shapefile'\nSimple feature collection with 61 features and 1 field\nGeometry type: POINT\nDimension:     XYZ\nBounding box:  xmin: 34423.98 ymin: 41503.6 xmax: 37619.47 ymax: 44685.77\nz_range:       zmin: 0 zmax: 0\nProjected CRS: SVY21 / Singapore TM\n\n\n\n\nShow the code\nchildcare &lt;- st_read(dsn=\"data/geospatial\",\n                     layer=\"Punggol_CC\") %&gt;% \n  st_zm(drop = TRUE,\n        what = 'ZM')\n\n\nReading layer `Punggol_CC' from data source \n  `C:\\rydialiang\\isss626-aug24\\In-class Exercise\\In-class_Ex03\\data\\geospatial' \n  using driver `ESRI Shapefile'\nSimple feature collection with 61 features and 1 field\nGeometry type: POINT\nDimension:     XYZ\nBounding box:  xmin: 34423.98 ymin: 41503.6 xmax: 37619.47 ymax: 44685.77\nz_range:       zmin: 0 zmax: 0\nProjected CRS: SVY21 / Singapore TM\n\n\n\n\n\n\n\n\nNote\n\n\n\n\nchildcare_xyz: We notice that the Dimension is XYZ. i.e. it is 3 dimension, X,Y, and Z. (before processing with st_zm())\nchildcare_xyz is POINT Z data in geometry.\n\nZ- value = height\nst_zm() removes the dimension.\nchildcare is now a POINT geometry.\n\n\n\n\n\n\nShow the code\nplot(network) \nplot(childcare,add=T,col =\"red\",pch = 19)\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nsf layers\n\n\n\n\nwhen we use plot(network), it will show individual columns as a layer, based on the unique names of the LINK_ID or ST_NAME.\nwe use st_geometry() as below instead.\nWe use plot() for a quick look. It is by no means a comprehensive way to plot a quality map, but more of helping us to understand the geometry quickly.\n\n\n\n\n\nShow the code\nplot(st_geometry(network)) \nplot(childcare,add=T,col =\"red\",pch = 19)\n\n\n\n\n\n\n\n\n\n\n\nShow the code\ntmap_mode('view')\n\n\ntmap mode set to interactive viewing\n\n\nShow the code\ntm_shape(childcare) + \n  tm_dots(col =\"red\") +\n  tm_shape(network) +\n  tm_lines()\n\n\n\n\n\n\nShow the code\ntmap_mode('plot')\n\n\ntmap mode set to plotting\n\n\n\n\n\n\n\n\ntmap notes\n\n\n\n\ntmap_mode(): “plot” or “view” to set the interactivity of tmap.\n\ntmap_mode(“view”) allow use to open different background layers like OpenStreetMap etc.\nwe can also change the layers (childcare, network) that we want to hide or appear.\n\ntmap_shape: the extend/boundaries of the data.\ntmap_symbols: add symbols\ntm_squares():\ntm_bubbles(): size changes when zooming in and out. Absolute size\ntm_dots(): size remains relative same size\nLeaflet: used by foursquare/mapbox"
+  },
+  {
+    "objectID": "In-class Exercise/In-class_Ex03/In-class_Ex03.html#preparing-the-lixels-objects",
+    "href": "In-class Exercise/In-class_Ex03/In-class_Ex03.html#preparing-the-lixels-objects",
+    "title": "In-class Ex 03",
+    "section": "2.0 Preparing the lixels objects",
+    "text": "2.0 Preparing the lixels objects\n\n\nShow the code\nlixels &lt;- lixelize_lines(network, \n                         700, \n                         mindist = 350)\n\n\n\n\nShow the code\nlixels_350 &lt;- lixelize_lines(network, \n                         700, \n                         mindist = 350)\n\n\n\n\nShow the code\nlixels_500 &lt;- lixelize_lines(network, \n                         700, \n                         mindist = 500)\n\n\n\n\n\n\n\n\nLixels\n\n\n\n\n700: derived from research on willing walkable distance in Singapore.\n350: mindist is half of 700. Decide after testing. Start with half of 700. Take note of how many observations are added to the original data.\nHow to decide what is a good outcome for number of lixels obs.?\n\ncalculate nearest neighbour\ntake lowest 10% (rough gauge) of the data to ensure all these points are included."
+  },
+  {
+    "objectID": "In-class Exercise/In-class_Ex03/In-class_Ex03.html#generating-line-centre-points",
+    "href": "In-class Exercise/In-class_Ex03/In-class_Ex03.html#generating-line-centre-points",
+    "title": "In-class Ex 03",
+    "section": "3.0 Generating line centre points",
+    "text": "3.0 Generating line centre points\n\n\nShow the code\nsamples &lt;- lines_center(lixels)"
+  },
+  {
+    "objectID": "In-class Exercise/In-class_Ex03/In-class_Ex03.html#performing-nkde",
+    "href": "In-class Exercise/In-class_Ex03/In-class_Ex03.html#performing-nkde",
+    "title": "In-class Ex 03",
+    "section": "4.0 Performing NKDE",
+    "text": "4.0 Performing NKDE\n\n\nShow the code\ndensities &lt;- nkde(network, \n                  events = childcare,\n                  w = rep(1, nrow(childcare)),\n                  samples = samples,\n                  kernel_name = \"quartic\",\n                  bw = 300, \n                  div= \"bw\", \n                  method = \"simple\", \n                  digits = 1, \n                  tol = 1,\n                  grid_shape = c(1,1), \n                  max_depth = 8,\n                  agg = 5, \n                  sparse = TRUE,\n                  verbose = FALSE)\n\n\n\n\nShow the code\nsamples$density &lt;- densities\nlixels$density &lt;- densities\n\n\n\n\n\n\n\n\nNKDE\n\n\n\n\nDon’t use Gaussian to avoid negative values\nOutput is a list called densities: a list of number which is the intensity value of the line\nuse samples$density and lixels$density to append the calculated densities into each dataset.\n\n!!! do not sort the data. If not, the data will be appended in the wrong column.\nsimilar to using left_join(), except that there is no need to have unique identifier.\n\nuse lixel data if we want to highlight the line.\nuse samples data if we want to highlight the point.\n\n\n\n\n\nShow the code\n# rescaling to help the mapping\nsamples$density &lt;- samples$density*1000\nlixels$density &lt;- lixels$density*1000"
+  },
+  {
+    "objectID": "In-class Exercise/In-class_Ex03/In-class_Ex03.html#network-constrained-g--and-k-function-analysis",
+    "href": "In-class Exercise/In-class_Ex03/In-class_Ex03.html#network-constrained-g--and-k-function-analysis",
+    "title": "In-class Ex 03",
+    "section": "Network Constrained G- and K-Function Analysis",
+    "text": "Network Constrained G- and K-Function Analysis\n\n\nShow the code\nkfun_childcare &lt;- kfunctions(network, \n                             childcare,\n                             start = 0, \n                             end = 1000, \n                             step = 50, \n                             width = 50, \n                             nsim = 50, \n                             resolution = 50,\n                             verbose = FALSE, \n                             conf_int = 0.05)"
   }
 ]

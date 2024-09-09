@@ -13,3 +13,213 @@ format:
     code-fold: true
     code-summary: "Show the code"
 ---
+
+## 1.0 Loading the Packages
+
+```{r}
+pacman::p_load(sf,
+               spNetwork,
+               tmap,
+               tidyverse)
+```
+
+-   sf: used for importing and exporting (.rds)
+
+-   spNetwork: using sf tibble data frame as input.
+
+-   tmap: for creating quality map. tidyverse: readr() for .csv. lubridate() to manipulate date type data.
+
+## 2.0 Data Import and Preparation
+
+```{r}
+network <- st_read(dsn="data/geospatial", 
+                   layer="Punggol_St")
+```
+
+::: callout-note
+-   Check that geometry is Linestring.
+:::
+
+```{r}
+childcare_xyz <- st_read(dsn="data/geospatial",
+                     layer="Punggol_CC")
+```
+
+```{r}
+childcare <- st_read(dsn="data/geospatial",
+                     layer="Punggol_CC") %>% 
+  st_zm(drop = TRUE,
+        what = 'ZM')
+```
+
+::: callout-note
+-   childcare_xyz: We notice that the Dimension is XYZ. i.e. it is 3 dimension, X,Y, and Z. (before processing with st_zm())
+
+-   childcare_xyz is POINT Z data in geometry.
+
+    ![](images/clipboard-165906991.png)
+
+-   Z- value = height
+
+-   st_zm() removes the dimension.
+
+-   childcare is now a POINT geometry.
+
+    ![](images/clipboard-1491116477.png)
+:::
+
+```{r}
+plot(network) 
+plot(childcare,add=T,col ="red",pch = 19)
+```
+
+::: callout-note
+## sf layers
+
+-   when we use plot(network), it will show individual columns as a layer, based on the unique names of the LINK_ID or ST_NAME.
+
+-   we use st_geometry() as below instead.
+
+-   We use plot() for a quick look. It is by no means a comprehensive way to plot a quality map, but more of helping us to understand the geometry quickly.
+:::
+
+```{r}
+plot(st_geometry(network)) 
+plot(childcare,add=T,col ="red",pch = 19)
+```
+
+```{r}
+tmap_mode('view')
+tm_shape(childcare) + 
+  tm_dots(col ="red") +
+  tm_shape(network) +
+  tm_lines()
+tmap_mode('plot')
+```
+
+::: callout-note
+## tmap notes
+
+-   tmap_mode(): "plot" or "view" to set the interactivity of tmap.
+
+    -   tmap_mode("view") allow use to open different background layers like OpenStreetMap etc.
+
+    -   we can also change the layers (childcare, network) that we want to hide or appear.
+
+-   tmap_shape: the extend/boundaries of the data.
+
+-   tmap_symbols: add symbols
+
+-   tm_squares():
+
+-   tm_bubbles(): size changes when zooming in and out. Absolute size
+
+-   tm_dots(): size remains relative same size
+
+-   Leaflet: used by foursquare/[mapbox](https://www.mapbox.com/)
+:::
+
+## 2.0 Preparing the lixels objects
+
+```{r}
+lixels <- lixelize_lines(network, 
+                         700, 
+                         mindist = 350)
+```
+
+```{r}
+lixels_350 <- lixelize_lines(network, 
+                         700, 
+                         mindist = 350)
+```
+
+```{r}
+lixels_500 <- lixelize_lines(network, 
+                         700, 
+                         mindist = 500)
+```
+
+::: callout-note
+## Lixels
+
+-   700: derived from research on willing walkable distance in Singapore.
+
+-   350: mindist is half of 700. Decide after testing. Start with half of 700. Take note of how many observations are added to the original data.
+
+-   How to decide what is a good outcome for number of lixels obs.?
+
+    -   calculate nearest neighbour
+
+    -   take lowest 10% (rough gauge) of the data to ensure all these points are included.
+:::
+
+## 3.0 **Generating line centre points**
+
+```{r}
+samples <- lines_center(lixels) 
+```
+
+
+## 4.0 **Performing NKDE**
+
+```{r}
+densities <- nkde(network, 
+                  events = childcare,
+                  w = rep(1, nrow(childcare)),
+                  samples = samples,
+                  kernel_name = "quartic",
+                  bw = 300, 
+                  div= "bw", 
+                  method = "simple", 
+                  digits = 1, 
+                  tol = 1,
+                  grid_shape = c(1,1), 
+                  max_depth = 8,
+                  agg = 5, 
+                  sparse = TRUE,
+                  verbose = FALSE)
+```
+
+```{r}
+samples$density <- densities
+lixels$density <- densities
+```
+
+::: callout-note
+## NKDE
+
+-   Don't use Gaussian to avoid negative values
+
+-   Output is a list called densities: a list of number which is the intensity value of the line
+
+-   use samples\$density and lixels\$density to append the calculated densities into each dataset.
+
+    -   !!! do not sort the data. If not, the data will be appended in the wrong column.
+
+    -   similar to using left_join(), except that there is no need to have unique identifier.
+
+-   use lixel data if we want to highlight the line.
+
+-   use samples data if we want to highlight the point.
+:::
+
+```{r}
+# rescaling to help the mapping
+samples$density <- samples$density*1000
+lixels$density <- lixels$density*1000
+```
+
+## **Network Constrained G- and K-Function Analysis**
+
+```{r}
+kfun_childcare <- kfunctions(network, 
+                             childcare,
+                             start = 0, 
+                             end = 1000, 
+                             step = 50, 
+                             width = 50, 
+                             nsim = 50, 
+                             resolution = 50,
+                             verbose = FALSE, 
+                             conf_int = 0.05)
+```
