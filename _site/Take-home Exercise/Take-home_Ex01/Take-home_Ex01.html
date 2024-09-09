@@ -277,8 +277,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#the-study-area" id="toc-the-study-area" class="nav-link active" data-scroll-target="#the-study-area">The Study Area</a></li>
-  <li><a href="#loading-library-and-importing-traffic-accident-data" id="toc-loading-library-and-importing-traffic-accident-data" class="nav-link" data-scroll-target="#loading-library-and-importing-traffic-accident-data">1.0 Loading Library and Importing Traffic Accident Data</a></li>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">1.0 Introduction</a>
+  <ul class="collapse">
+  <li><a href="#the-study-area" id="toc-the-study-area" class="nav-link" data-scroll-target="#the-study-area">1.1 The Study Area</a></li>
+  </ul></li>
+  <li><a href="#the-datasets" id="toc-the-datasets" class="nav-link" data-scroll-target="#the-datasets">1.2 The Datasets</a></li>
+  <li><a href="#loading-library-and-importing-traffic-accident-data" id="toc-loading-library-and-importing-traffic-accident-data" class="nav-link" data-scroll-target="#loading-library-and-importing-traffic-accident-data">2.0 Loading Library and Importing Traffic Accident Data</a></li>
+  <li><a href="#importing-data" id="toc-importing-data" class="nav-link" data-scroll-target="#importing-data">3.0 Importing Data</a>
+  <ul class="collapse">
+  <li><a href="#importing-aspatial-data-and-converting-it-into-spatial-data" id="toc-importing-aspatial-data-and-converting-it-into-spatial-data" class="nav-link" data-scroll-target="#importing-aspatial-data-and-converting-it-into-spatial-data">3.1 Importing Aspatial Data and Converting it into Spatial Data</a></li>
+  <li><a href="#importing-spatial" id="toc-importing-spatial" class="nav-link" data-scroll-target="#importing-spatial">3.2 Importing Spatial</a></li>
+  </ul></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
 </nav>
@@ -324,24 +333,47 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <p><img src="images/A_detailed_illustration_of_a_study_on_road_traffic_landscape.jpeg" class="img-fluid"></p>
-<section id="the-study-area" class="level2">
-<h2 class="anchored" data-anchor-id="the-study-area">The Study Area</h2>
-<p>The study area is Bangkok Metropolitan Area.</p>
-<p>WGS 84 / UTM zone 47N</p>
-<p>EPSG code 32647</p>
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">1.0 Introduction</h2>
+<section id="the-study-area" class="level3">
+<h3 class="anchored" data-anchor-id="the-study-area">1.1 The Study Area</h3>
+<ul>
+<li><p>The study area is Bangkok Metropolitan Area.</p></li>
+<li><p>WGS 84 / UTM zone 47N</p></li>
+<li><p>EPSG code 32647</p></li>
+</ul>
+</section>
+</section>
+<section id="the-datasets" class="level2">
+<h2 class="anchored" data-anchor-id="the-datasets">1.2 The Datasets</h2>
+<ul>
+<li><p><a href="https://www.kaggle.com/datasets/thaweewatboy/thailand-road-accident-2019-2022">Thailand Road Accident [2019-2022]</a> on Kaggle</p></li>
+<li><p><a href="https://data.humdata.org/dataset/hotosm_tha_roads">Thailand Roads (OpenStreetMap Export)</a> on HDX.</p></li>
+<li><p><a href="https://data.humdata.org/dataset/cod-ab-tha?">Thailand - Subnational Administrative Boundaries</a> on HDX.</p></li>
+</ul>
 </section>
 <section id="loading-library-and-importing-traffic-accident-data" class="level2">
-<h2 class="anchored" data-anchor-id="loading-library-and-importing-traffic-accident-data">1.0 Loading Library and Importing Traffic Accident Data</h2>
+<h2 class="anchored" data-anchor-id="loading-library-and-importing-traffic-accident-data">2.0 Loading Library and Importing Traffic Accident Data</h2>
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(sf, raster, spatstat, tmap, tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(sf, </span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>               raster,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>               spNetwork,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>               tmap, </span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>               tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
+</section>
+<section id="importing-data" class="level2">
+<h2 class="anchored" data-anchor-id="importing-data">3.0 Importing Data</h2>
+<section id="importing-aspatial-data-and-converting-it-into-spatial-data" class="level3">
+<h3 class="anchored" data-anchor-id="importing-aspatial-data-and-converting-it-into-spatial-data">3.1 Importing Aspatial Data and Converting it into Spatial Data</h3>
+<p>Since the <code>Thailand Road Accident [2019-2022]</code> is data set is in csv file format, we will use <a href="https://readr.tidyverse.org/reference/read_delim.html">read_csv()</a> of readr package to import <code>Thailand Road Accident [2019-2022]</code>.Following which, we use the pipe function and dplyr::filter() to filter out rows that has “na” or is empty in value. Next, we use st_as_sf to combine the longitude and latitude in the csv file can combine it into “geometry” column. Lastly, we use st_transform to change the Coordinate Reference System (CRS) to 32647, which is Thailand’s <a href="https://epsg.io/map#srs=32647&amp;x=769964.9694806639&amp;y=1455180.7056970089&amp;z=5&amp;layer=streets">ESPG code</a>. The output R object is called rdacc_sf and it is a sf data frame.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>rdacc_sf <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/thai_road_accident_2019_2022.csv"</span>) <span class="sc">%&gt;%</span></span>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>rdacc_sf <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/rawdata/thai_road_accident_2019_2022.csv"</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(longitude) <span class="sc">&amp;</span>longitude <span class="sc">!=</span> <span class="st">""</span>,</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>         <span class="sc">!</span><span class="fu">is.na</span>(latitude) <span class="sc">&amp;</span> latitude <span class="sc">!=</span> <span class="st">""</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_as_sf</span>(<span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"longitude"</span>, <span class="st">"latitude"</span>),</span>
@@ -365,9 +397,14 @@ Notes on rdacc_sf
 <li><p>Thai projection code is 32647, hence we use this code chunk: st_transform(crs = 32647)</p></li>
 <li><p>Filter is used to remove the longitude and latitude that has na as value.</p></li>
 <li><p>Check what is the number of data lost after removing na. Make sure the study region, the data lost is not significant. (not more than 5% lost)</p></li>
+<li><p>use readr::read_csv() to ensure the data is imported as tibble data frame. Do not use read.csv().</p></li>
 </ul>
 </div>
 </div>
+</section>
+<section id="importing-spatial" class="level3">
+<h3 class="anchored" data-anchor-id="importing-spatial">3.2 Importing Spatial</h3>
+</section>
 </section>
 <section id="references" class="level2">
 <h2 class="anchored" data-anchor-id="references">References</h2>

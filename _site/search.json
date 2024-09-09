@@ -381,8 +381,8 @@
     "objectID": "Take-home Exercise/Take-home_Ex01/Take-home_Ex01.html#loading-library-and-importing-traffic-accident-data",
     "href": "Take-home Exercise/Take-home_Ex01/Take-home_Ex01.html#loading-library-and-importing-traffic-accident-data",
     "title": "Take-home Ex01",
-    "section": "1.0 Loading Library and Importing Traffic Accident Data",
-    "text": "1.0 Loading Library and Importing Traffic Accident Data\n\n\nShow the code\npacman::p_load(sf, raster, spatstat, tmap, tidyverse)\n\n\n\n\nShow the code\nrdacc_sf &lt;- read_csv(\"data/thai_road_accident_2019_2022.csv\") %&gt;%\n  filter(!is.na(longitude) &longitude != \"\",\n         !is.na(latitude) & latitude != \"\") %&gt;% \n  st_as_sf(coords = c(\"longitude\", \"latitude\"),\n           crs = 4326) %&gt;% \n  st_transform(crs = 32647)\n\n\n\n\n\n\n\n\nNotes on rdacc_sf\n\n\n\n\nincident_datetime is datetime format of POSIXct.\nst_as_sf(coords = c(“longitude”, “latitude”), crs = 4326) combines and longitude and latitude columns into geometry column\nThai projection code is 32647, hence we use this code chunk: st_transform(crs = 32647)\nFilter is used to remove the longitude and latitude that has na as value.\nCheck what is the number of data lost after removing na. Make sure the study region, the data lost is not significant. (not more than 5% lost)"
+    "section": "2.0 Loading Library and Importing Traffic Accident Data",
+    "text": "2.0 Loading Library and Importing Traffic Accident Data\n\n\nShow the code\npacman::p_load(sf, \n               raster,\n               spNetwork,\n               tmap, \n               tidyverse)"
   },
   {
     "objectID": "Take-home Exercise/Take-home_Ex01/Take-home_Ex01.html#references",
@@ -439,5 +439,26 @@
     "title": "In-class Ex 03",
     "section": "Network Constrained G- and K-Function Analysis",
     "text": "Network Constrained G- and K-Function Analysis\n\n\nShow the code\nkfun_childcare &lt;- kfunctions(network, \n                             childcare,\n                             start = 0, \n                             end = 1000, \n                             step = 50, \n                             width = 50, \n                             nsim = 50, \n                             resolution = 50,\n                             verbose = FALSE, \n                             conf_int = 0.05)"
+  },
+  {
+    "objectID": "Take-home Exercise/Take-home_Ex01/Take-home_Ex01.html#introduction",
+    "href": "Take-home Exercise/Take-home_Ex01/Take-home_Ex01.html#introduction",
+    "title": "Take-home Ex01",
+    "section": "1.0 Introduction",
+    "text": "1.0 Introduction\n\n1.1 The Study Area\n\nThe study area is Bangkok Metropolitan Area.\nWGS 84 / UTM zone 47N\nEPSG code 32647"
+  },
+  {
+    "objectID": "Take-home Exercise/Take-home_Ex01/Take-home_Ex01.html#the-datasets",
+    "href": "Take-home Exercise/Take-home_Ex01/Take-home_Ex01.html#the-datasets",
+    "title": "Take-home Ex01",
+    "section": "1.2 The Datasets",
+    "text": "1.2 The Datasets\n\nThailand Road Accident [2019-2022] on Kaggle\nThailand Roads (OpenStreetMap Export) on HDX.\nThailand - Subnational Administrative Boundaries on HDX."
+  },
+  {
+    "objectID": "Take-home Exercise/Take-home_Ex01/Take-home_Ex01.html#importing-data",
+    "href": "Take-home Exercise/Take-home_Ex01/Take-home_Ex01.html#importing-data",
+    "title": "Take-home Ex01",
+    "section": "3.0 Importing Data",
+    "text": "3.0 Importing Data\n\n3.1 Importing Aspatial Data and Converting it into Spatial Data\nSince the Thailand Road Accident [2019-2022] is data set is in csv file format, we will use read_csv() of readr package to import Thailand Road Accident [2019-2022].Following which, we use the pipe function and dplyr::filter() to filter out rows that has “na” or is empty in value. Next, we use st_as_sf to combine the longitude and latitude in the csv file can combine it into “geometry” column. Lastly, we use st_transform to change the Coordinate Reference System (CRS) to 32647, which is Thailand’s ESPG code. The output R object is called rdacc_sf and it is a sf data frame.\n\n\nShow the code\nrdacc_sf &lt;- read_csv(\"data/rawdata/thai_road_accident_2019_2022.csv\") %&gt;%\n  filter(!is.na(longitude) &longitude != \"\",\n         !is.na(latitude) & latitude != \"\") %&gt;% \n  st_as_sf(coords = c(\"longitude\", \"latitude\"),\n           crs = 4326) %&gt;% \n  st_transform(crs = 32647)\n\n\n\n\n\n\n\n\nNotes on rdacc_sf\n\n\n\n\nincident_datetime is datetime format of POSIXct.\nst_as_sf(coords = c(“longitude”, “latitude”), crs = 4326) combines and longitude and latitude columns into geometry column\nThai projection code is 32647, hence we use this code chunk: st_transform(crs = 32647)\nFilter is used to remove the longitude and latitude that has na as value.\nCheck what is the number of data lost after removing na. Make sure the study region, the data lost is not significant. (not more than 5% lost)\nuse readr::read_csv() to ensure the data is imported as tibble data frame. Do not use read.csv().\n\n\n\n\n\n3.2 Importing Spatial"
   }
 ]

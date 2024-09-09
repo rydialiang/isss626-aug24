@@ -16,22 +16,42 @@ format:
 
 ![](images/A_detailed_illustration_of_a_study_on_road_traffic_landscape.jpeg)
 
-## The Study Area
+## 1.0 Introduction
 
-The study area is Bangkok Metropolitan Area.
+### 1.1 The Study Area
 
-WGS 84 / UTM zone 47N
+-   The study area is Bangkok Metropolitan Area.
 
-EPSG code 32647
+-   WGS 84 / UTM zone 47N
 
-## 1.0 Loading Library and Importing Traffic Accident Data
+-   EPSG code 32647
+
+## 1.2 The Datasets
+
+-   [Thailand Road Accident \[2019-2022\]](https://www.kaggle.com/datasets/thaweewatboy/thailand-road-accident-2019-2022) on Kaggle
+
+-   [Thailand Roads (OpenStreetMap Export)](https://data.humdata.org/dataset/hotosm_tha_roads) on HDX.
+
+-   [Thailand - Subnational Administrative Boundaries](https://data.humdata.org/dataset/cod-ab-tha?) on HDX.
+
+## 2.0 Loading Library and Importing Traffic Accident Data
 
 ```{r}
-pacman::p_load(sf, raster, spatstat, tmap, tidyverse)
+pacman::p_load(sf, 
+               raster,
+               spNetwork,
+               tmap, 
+               tidyverse)
 ```
 
+## 3.0 Importing Data
+
+### 3.1 Importing Aspatial Data and Converting it into Spatial Data
+
+Since the `Thailand Road Accident [2019-2022]` is data set is in csv file format, we will use [read_csv()](https://readr.tidyverse.org/reference/read_delim.html) of readr package to import `Thailand Road Accident [2019-2022]`.Following which, we use the pipe function and dplyr::filter() to filter out rows that has "na" or is empty in value. Next, we use st_as_sf to combine the longitude and latitude in the csv file can combine it into "geometry" column. Lastly, we use st_transform to change the Coordinate Reference System (CRS) to 32647, which is Thailand's [ESPG code](https://epsg.io/map#srs=32647&x=769964.9694806639&y=1455180.7056970089&z=5&layer=streets). The output R object is called rdacc_sf and it is a sf data frame.
+
 ```{r}
-rdacc_sf <- read_csv("data/thai_road_accident_2019_2022.csv") %>%
+rdacc_sf <- read_csv("data/rawdata/thai_road_accident_2019_2022.csv") %>%
   filter(!is.na(longitude) &longitude != "",
          !is.na(latitude) & latitude != "") %>% 
   st_as_sf(coords = c("longitude", "latitude"),
@@ -51,9 +71,14 @@ rdacc_sf <- read_csv("data/thai_road_accident_2019_2022.csv") %>%
 -   Filter is used to remove the longitude and latitude that has na as value.
 
 -   Check what is the number of data lost after removing na. Make sure the study region, the data lost is not significant. (not more than 5% lost)
+
+-   use readr::read_csv() to ensure the data is imported as tibble data frame. Do not use read.csv().
 :::
 
+### 3.2 Importing Spatial
+
 ```{r}
+
 ```
 
 ## References
