@@ -14,6 +14,8 @@ format:
     code-summary: "Show the code"
 ---
 
+![](images/clipboard-339016013.png)
+
 ## 1.0 Loading the Packages
 
 ```{r}
@@ -158,7 +160,6 @@ lixels_500 <- lixelize_lines(network,
 ```{r}
 samples <- lines_center(lixels) 
 ```
-
 
 ## 4.0 **Performing NKDE**
 
