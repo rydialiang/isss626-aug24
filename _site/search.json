@@ -402,8 +402,8 @@
     "objectID": "In-class Exercise/In-class_Ex03/In-class_Ex03.html#loading-the-packages",
     "href": "In-class Exercise/In-class_Ex03/In-class_Ex03.html#loading-the-packages",
     "title": "In-class Ex 03",
-    "section": "",
-    "text": "Show the code\npacman::p_load(sf,\n               spNetwork,\n               tmap,\n               tidyverse)\n\n\n\nsf: used for importing and exporting (.rds)\nspNetwork: using sf tibble data frame as input.\ntmap: for creating quality map. tidyverse: readr() for .csv. lubridate() to manipulate date type data."
+    "section": "1.0 Loading the Packages",
+    "text": "1.0 Loading the Packages\n\n\nShow the code\npacman::p_load(sf,\n               spNetwork,\n               tmap,\n               tidyverse)\n\n\n\nsf: used for importing and exporting (.rds)\nspNetwork: using sf tibble data frame as input.\ntmap: for creating quality map. tidyverse: readr() for .csv. lubridate() to manipulate date type data."
   },
   {
     "objectID": "In-class Exercise/In-class_Ex03/In-class_Ex03.html#data-import-and-preparation",
