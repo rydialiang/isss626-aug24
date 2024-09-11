@@ -15,9 +15,9 @@ website:
             href: Hands-on Exercise/Hands-on_Ex02a/Hands-on_Ex02a.qmd
           - text: "2b: 2nd Order Spatial Point Patterns Analysis Methods"
             href: Hands-on Exercise/Hands-on_Ex02b/Hands-on_Ex02b.qmd
-          - text: "Hands-on Exercise 3"
+          - text: "3: Network Constrained Spatial Point Patterns Analysis"
             href: Hands-on Exercise/Hands-on_Ex03/Hands-on_Ex03.qmd
-          - text: "Hands-on Exercise 4"
+          - text: "4: Spatial Weights and Applications"
             href: Hands-on Exercise/Hands-on_Ex04/Hands-on_Ex04.qmd
           - text: "Hands-on Exercise 5"
             href: Hands-on Exercise/Hands-on_Ex05/Hands-on_Ex05.qmd
