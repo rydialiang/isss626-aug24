@@ -147,11 +147,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>  
         <li>
     <a class="dropdown-item" href="../../Hands-on Exercise/Hands-on_Ex03/Hands-on_Ex03.html">
- <span class="dropdown-text">Hands-on Exercise 3</span></a>
+ <span class="dropdown-text">3: Network Constrained Spatial Point Patterns Analysis</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="../../Hands-on Exercise/Hands-on_Ex04/Hands-on_Ex04.qmd">
- <span class="dropdown-text">Hands-on Exercise 4</span></a>
+    <a class="dropdown-item" href="../../Hands-on Exercise/Hands-on_Ex04/Hands-on_Ex04.html">
+ <span class="dropdown-text">4: Spatial Weights and Applications</span></a>
   </li>  
         <li>
     <a class="dropdown-item" href="../../Hands-on Exercise/Hands-on_Ex05/Hands-on_Ex05.qmd">
@@ -277,7 +277,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">1.0 Introduction</a>
+  <li><a href="#introduction-objectives" id="toc-introduction-objectives" class="nav-link active" data-scroll-target="#introduction-objectives">1.0 Introduction &amp; Objectives</a>
   <ul class="collapse">
   <li><a href="#the-study-area" id="toc-the-study-area" class="nav-link" data-scroll-target="#the-study-area">1.1 The Study Area</a></li>
   </ul></li>
@@ -322,7 +322,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">September 9, 2024</p>
+      <p class="date-modified">September 13, 2024</p>
     </div>
   </div>
     
@@ -334,12 +334,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <p><img src="images/A_detailed_illustration_of_a_study_on_road_traffic_landscape.jpeg" class="img-fluid"></p>
-<section id="introduction" class="level2">
-<h2 class="anchored" data-anchor-id="introduction">1.0 Introduction</h2>
+<section id="introduction-objectives" class="level2">
+<h2 class="anchored" data-anchor-id="introduction-objectives">1.0 Introduction &amp; Objectives</h2>
+<p>In this Take-Home Exercise 1, we will be discovering factors affecting road traffic accidents in the <a href="https://en.wikipedia.org/wiki/Bangkok_Metropolitan_Region">Bangkok Metropolitan Region BMR</a> by employing both spatial spatio-temporal point patterns analysis methods.</p>
+<p>The specific objectives of this take-home exercise are as follows:</p>
+<ul>
+<li><p>To visualize the spatio-temporal dynamics of road traffic accidents in BMR using appropriate statistical graphics and geovisualization methods.</p></li>
+<li><p>To conduct detailed spatial analysis of road traffic accidents using appropriate Network Spatial Point Patterns Analysis methods.</p></li>
+<li><p>To conduct detailed spatio-temporal analysis of road traffic accidents using appropriate Temporal Network Spatial Point Patterns Analysis methods.</p></li>
+</ul>
 <section id="the-study-area" class="level3">
 <h3 class="anchored" data-anchor-id="the-study-area">1.1 The Study Area</h3>
 <ul>
-<li><p>The study area is Bangkok Metropolitan Area.</p></li>
+<li><p>Thailand has four administrative level:</p>
+<ul>
+<li><p>Level 1 - Provinces (Changwat) - Total: 76 provinces + Bangkok as special administrative area.</p></li>
+<li><p>Level 2 - District (Amphoe)</p></li>
+<li><p>Level 3 - Sub-district (Tambon)</p></li>
+<li><p>Level 4 - Village (Muban)</p></li>
+</ul></li>
+<li><p>In this exercise we will focus our analysis on the study area called the <a href="https://en.wikipedia.org/wiki/Bangkok_Metropolitan_Region">Bangkok Metropolitan Region (BMR)</a>, which consists of <a href="https://en.wikipedia.org/wiki/Bangkok">Bangkok</a> and its five adjacent provinces, namely <a href="https://en.wikipedia.org/wiki/Nakhon_Pathom_Province" title="Nakhon Pathom Province">Nakhon Pathom</a>, <a href="#0" title="Pathum Thani Province">Pathum Thani</a>, <a href="#0" title="Nonthaburi Province">Nonthaburi</a>, <a href="#0" title="Samut Prakan Province">Samut Prakan</a>, and <a href="#0" title="Samut Sakhon Province">Samut Sakhon</a>.</p></li>
 <li><p>WGS 84 / UTM zone 47N</p></li>
 <li><p>EPSG code 32647</p></li>
 </ul>
@@ -351,6 +365,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><p><a href="https://www.kaggle.com/datasets/thaweewatboy/thailand-road-accident-2019-2022">Thailand Road Accident [2019-2022]</a> on Kaggle</p></li>
 <li><p><a href="https://data.humdata.org/dataset/hotosm_tha_roads">Thailand Roads (OpenStreetMap Export)</a> on HDX.</p></li>
 <li><p><a href="https://data.humdata.org/dataset/cod-ab-tha?">Thailand - Subnational Administrative Boundaries</a> on HDX.</p></li>
+<li></li>
 </ul>
 <div class="callout callout-style-default callout-caution callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -440,6 +455,12 @@ Notes on rdacc_sf
 <details class="code-fold">
 <summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write_rds</span>(rdacc_sf, <span class="st">"data/rds/rdacc_sf.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>rdacc_sf <span class="ot">&lt;-</span> <span class="fu">read_rds</span>(<span class="st">"data/rds/rdacc_sf.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="callout callout-style-default callout-note callout-titled">

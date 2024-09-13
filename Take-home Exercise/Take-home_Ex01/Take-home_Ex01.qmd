@@ -16,11 +16,31 @@ format:
 
 ![](images/A_detailed_illustration_of_a_study_on_road_traffic_landscape.jpeg)
 
-## 1.0 Introduction
+## 1.0 Introduction & Objectives
+
+In this Take-Home Exercise 1, we will be discovering factors affecting road traffic accidents in the [Bangkok Metropolitan Region BMR](https://en.wikipedia.org/wiki/Bangkok_Metropolitan_Region) by employing both spatial spatio-temporal point patterns analysis methods.
+
+The specific objectives of this take-home exercise are as follows:
+
+-   To visualize the spatio-temporal dynamics of road traffic accidents in BMR using appropriate statistical graphics and geovisualization methods.
+
+-   To conduct detailed spatial analysis of road traffic accidents using appropriate Network Spatial Point Patterns Analysis methods.
+
+-   To conduct detailed spatio-temporal analysis of road traffic accidents using appropriate Temporal Network Spatial Point Patterns Analysis methods.
 
 ### 1.1 The Study Area
 
--   The study area is Bangkok Metropolitan Area.
+-   Thailand has four administrative level:
+
+    -   Level 1 - Provinces (Changwat)  - Total: 76 provinces + Bangkok as special administrative area.
+
+    -   Level 2 - District (Amphoe)
+
+    -   Level 3 - Sub-district (Tambon)
+
+    -   Level 4 - Village (Muban)
+
+-   In this exercise we will focus our analysis on the study area called the [Bangkok Metropolitan Region (BMR)](https://en.wikipedia.org/wiki/Bangkok_Metropolitan_Region), which consists of [Bangkok](https://en.wikipedia.org/wiki/Bangkok) and its five adjacent provinces, namely [Nakhon Pathom](https://en.wikipedia.org/wiki/Nakhon_Pathom_Province "Nakhon Pathom Province"), [Pathum Thani](#0 "Pathum Thani Province"), [Nonthaburi](#0 "Nonthaburi Province"), [Samut Prakan](#0 "Samut Prakan Province"), and [Samut Sakhon](#0 "Samut Sakhon Province").
 
 -   WGS 84 / UTM zone 47N
 
@@ -33,6 +53,8 @@ format:
 -   [Thailand Roads (OpenStreetMap Export)](https://data.humdata.org/dataset/hotosm_tha_roads) on HDX.
 
 -   [Thailand - Subnational Administrative Boundaries](https://data.humdata.org/dataset/cod-ab-tha?) on HDX.
+
+-   
 
 ::: callout-caution
 ## On Projection
@@ -87,11 +109,12 @@ rdacc_sf <- read_csv("data/rawdata/thai_road_accident_2019_2022.csv") %>%
 -   Check the data.
 :::
 
-### 3.1.1 Wrangling the Date Fields 
+### 3.1.1 Wrangling the Date Fields
 
 Using tidyverse::lubridate
 
 ```{r}
+#| eval: False
 rdacc_sf <- rdacc_sf %>% 
   mutate(DayOfWeek = day(incident_datetime)) %>% 
   mutate(Month = month(incident_datetime,
@@ -101,6 +124,10 @@ rdacc_sf <- rdacc_sf %>%
 
 ```{r}
 write_rds(rdacc_sf, "data/rds/rdacc_sf.rds")
+```
+
+```{r}
+rdacc_sf <- read_rds("data/rds/rdacc_sf.rds")
 ```
 
 ::: callout-note
