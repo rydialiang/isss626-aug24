@@ -252,6 +252,10 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#weights-matrix-distance-based-neighbours" id="toc-weights-matrix-distance-based-neighbours" class="nav-link" data-scroll-target="#weights-matrix-distance-based-neighbours">2.3 Weights Matrix: Distance-based neighbours</a>
   <ul class="collapse">
   <li><a href="#weights-matrix-distance-based-neighbours-1" id="toc-weights-matrix-distance-based-neighbours-1" class="nav-link" data-scroll-target="#weights-matrix-distance-based-neighbours-1">Weights Matrix: Distance-based neighbours</a></li>
+  <li><a href="#row-standardisation" id="toc-row-standardisation" class="nav-link" data-scroll-target="#row-standardisation">Row standardisation</a></li>
+  <li><a href="#spatially-lagged-variables" id="toc-spatially-lagged-variables" class="nav-link" data-scroll-target="#spatially-lagged-variables">Spatially Lagged Variables</a></li>
+  <li><a href="#spatial-window-sum" id="toc-spatial-window-sum" class="nav-link" data-scroll-target="#spatial-window-sum">Spatial window sum</a></li>
+  <li><a href="#comparing-the-visualisation-to-actual-network" id="toc-comparing-the-visualisation-to-actual-network" class="nav-link" data-scroll-target="#comparing-the-visualisation-to-actual-network">Comparing the visualisation to actual network</a></li>
   </ul></li>
   </ul></li>
   </ul>
@@ -407,6 +411,63 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 </tbody>
 </table>
+</section>
+<section id="row-standardisation" class="level3">
+<h3 class="anchored" data-anchor-id="row-standardisation">Row standardisation</h3>
+<p>In practice, row-standardised weights instead of spatial weights will be used.</p>
+<p><img src="images/clipboard-3114063397.png" class="img-fluid"></p>
+</section>
+<section id="spatially-lagged-variables" class="level3">
+<h3 class="anchored" data-anchor-id="spatially-lagged-variables">Spatially Lagged Variables</h3>
+<p>Spatial lag with row-standardised weights.</p>
+<p><img src="images/clipboard-2194023446.png" class="img-fluid"></p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+GDPCC (left) vs lag GDPCC (right)
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><p>Lag GDPCC smooth out the value, and help us identify the difference of the lighter western region and the darker regions to the north-east.</p></li>
+<li><p>Ideally, we want to know which areas are with values that are statistically significant. Having 2 neighbours vs 6 neighbours? Next lesson!</p></li>
+</ul>
+</div>
+</div>
+</section>
+<section id="spatial-window-sum" class="level3">
+<h3 class="anchored" data-anchor-id="spatial-window-sum">Spatial window sum</h3>
+<p>The spatial window sum uses and includes the diagonal element. (Include self = lag_sum)</p>
+<p><img src="images/clipboard-2628551806.png" class="img-fluid"></p>
+</section>
+<section id="comparing-the-visualisation-to-actual-network" class="level3">
+<h3 class="anchored" data-anchor-id="comparing-the-visualisation-to-actual-network">Comparing the visualisation to actual network</h3>
+<p>Source: <a href="https://www.mdpi.com/2071-1050/14/13/7550">Analysis of Coupling Coordination Relationship between the Accessibility and Economic Linkage of a High-Speed Railway Network Case Study in Hunan, China</a></p>
+<p><img src="images/clipboard-2635178354.png" class="img-fluid"></p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Polygon Centroid Distance vs Network Distance
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><p>Centroid distance vs Network distance (e.g.&nbsp;shortest path)</p></li>
+<li><p>It may take longer time to compute all possible shortest path.</p></li>
+<li><p>Centroid distance generally simpler to calculate and it is quite similar to Network distance after aggregation.</p></li>
+<li><p>However, there are many cases that network distance is a better measure.</p>
+<ul>
+<li>i.e.&nbsp;Rail network.</li>
+</ul></li>
+</ul>
+</div>
+</div>
 
 
 </section>

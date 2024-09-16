@@ -71,3 +71,49 @@ Answer: (all distance, d \>650, will become 0 in value)
 |  **C** | 516 | 357 |   0 |   0 |   0 |
 |  **D** | 641 |   0 |   0 |   0 | 263 |
 |  **E** |   0 |   0 |   0 | 263 |   0 |
+
+### Row standardisation
+
+In practice, row-standardised weights instead of spatial weights will be used.
+
+![](images/clipboard-3114063397.png)
+
+### Spatially Lagged Variables
+
+Spatial lag with row-standardised weights.
+
+![](images/clipboard-2194023446.png)
+
+::: callout-note
+## GDPCC (left) vs lag GDPCC (right)
+
+-   Lag GDPCC smooth out the value, and help us identify the difference of the lighter western region and the darker regions to the north-east.
+
+-   Ideally, we want to know which areas are with values that are statistically significant. Having 2 neighbours vs 6 neighbours? Next lesson!
+:::
+
+### Spatial window sum
+
+The spatial window sum uses and includes the diagonal element. (Include self = lag_sum)
+
+![](images/clipboard-2628551806.png)
+
+### Comparing the visualisation to actual network
+
+Source: [Analysis of Coupling Coordination Relationship between the Accessibility and Economic Linkage of a High-Speed Railway Network Case Study in Hunan, China](https://www.mdpi.com/2071-1050/14/13/7550)
+
+![](images/clipboard-2635178354.png)
+
+::: callout-important
+## Polygon Centroid Distance vs Network Distance
+
+-   Centroid distance vs Network distance (e.g. shortest path)
+
+-   It may take longer time to compute all possible shortest path.
+
+-   Centroid distance generally simpler to calculate and it is quite similar to Network distance after aggregation.
+
+-   However, there are many cases that network distance is a better measure.
+
+    -   i.e. Rail network.
+:::
