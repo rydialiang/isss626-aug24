@@ -25,7 +25,7 @@
     "href": "index.html#in-class-exercise",
     "title": "Geospatial Analytics and Applications",
     "section": "In Class Exercise",
-    "text": "In Class Exercise\n\n\n\n\n\n\n\n\n\nIn-class Ex 01\n\n\n\nLiang Xiuhao Rydia\n\n\nAug 26, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nIn-class Ex 02\n\n\n\nLiang Xiuhao Rydia\n\n\nSep 2, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nIn-class Ex 03\n\n\n\nLiang Xiuhao Rydia\n\n\nSep 9, 2024\n\n\n\n\n\n\n\n\nNo matching items"
+    "text": "In Class Exercise\n\n\n\n\n\n\n\n\n\nIn-class Ex 01\n\n\n\nLiang Xiuhao Rydia\n\n\nAug 26, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nIn-class Ex 02\n\n\n\nLiang Xiuhao Rydia\n\n\nSep 2, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nIn-class Ex 03\n\n\n\nLiang Xiuhao Rydia\n\n\nSep 9, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nIn-class Ex 04\n\n\n\nLiang Xiuhao Rydia\n\n\nSep 16, 2024\n\n\n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "index.html#take-home-exercise",
@@ -544,5 +544,40 @@
     "title": "Take-home Ex01",
     "section": "1.0 Introduction & Objectives",
     "text": "1.0 Introduction & Objectives\nIn this Take-Home Exercise 1, we will be discovering factors affecting road traffic accidents in the Bangkok Metropolitan Region BMR by employing both spatial spatio-temporal point patterns analysis methods.\nThe specific objectives of this take-home exercise are as follows:\n\nTo visualize the spatio-temporal dynamics of road traffic accidents in BMR using appropriate statistical graphics and geovisualization methods.\nTo conduct detailed spatial analysis of road traffic accidents using appropriate Network Spatial Point Patterns Analysis methods.\nTo conduct detailed spatio-temporal analysis of road traffic accidents using appropriate Temporal Network Spatial Point Patterns Analysis methods.\n\n\n1.1 The Study Area\n\nThailand has four administrative level:\n\nLevel 1 - Provinces (Changwat) - Total: 76 provinces + Bangkok as special administrative area.\nLevel 2 - District (Amphoe)\nLevel 3 - Sub-district (Tambon)\nLevel 4 - Village (Muban)\n\nIn this exercise we will focus our analysis on the study area called the Bangkok Metropolitan Region (BMR), which consists of Bangkok and its five adjacent provinces, namely Nakhon Pathom, Pathum Thani, Nonthaburi, Samut Prakan, and Samut Sakhon.\nWGS 84 / UTM zone 47N\nEPSG code 32647"
+  },
+  {
+    "objectID": "In-class Exercise/In-class_Ex04/In-class_Ex04.html",
+    "href": "In-class Exercise/In-class_Ex04/In-class_Ex04.html",
+    "title": "In-class Ex 04",
+    "section": "",
+    "text": "It is a way to define spatial neighbourhood.\n\n\n\n\n\nRefer to Hands on Ex 4 - 8.5.3.1 and 8.5.3.2:\n\n\n\n\n\n\n\nQueen’s\nRook’s (differences in blue circle)\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nA better measure of spatial weights will be using the third method, a general spatial distance weight matrices, where no boundaries were set (like distance criterion).\n\n\n\nThe weight matrix below is constructed using Queen’s method.\n\nQuiz: With reference to the figure above, list down the neighbour(s) of area 1202 using Rook case.\nNeighbour of 1202 using Rook’s case:\n\n1201\n1302\n901\n1000\n1102\n\n\n\n\nAnswer: (all distance, d &gt;650, will become 0 in value)\n\n\n\n\nA\nB\nC\nD\nE\n\n\n\n\nA\n0\n353\n516\n641\n0\n\n\nB\n353\n0\n357\n0\n0\n\n\nC\n516\n357\n0\n0\n0\n\n\nD\n641\n0\n0\n0\n263\n\n\nE\n0\n0\n0\n263\n0"
+  },
+  {
+    "objectID": "In-class Exercise/In-class_Ex04/In-class_Ex04.html#what-are-spatial-weights-wij",
+    "href": "In-class Exercise/In-class_Ex04/In-class_Ex04.html#what-are-spatial-weights-wij",
+    "title": "In-class Ex 04",
+    "section": "",
+    "text": "It is a way to define spatial neighbourhood."
+  },
+  {
+    "objectID": "In-class Exercise/In-class_Ex04/In-class_Ex04.html#contiguity-neighbours",
+    "href": "In-class Exercise/In-class_Ex04/In-class_Ex04.html#contiguity-neighbours",
+    "title": "In-class Ex 04",
+    "section": "",
+    "text": "Refer to Hands on Ex 4 - 8.5.3.1 and 8.5.3.2:\n\n\n\n\n\n\n\nQueen’s\nRook’s (differences in blue circle)"
+  },
+  {
+    "objectID": "In-class Exercise/In-class_Ex04/In-class_Ex04.html#defining-spatial-weights",
+    "href": "In-class Exercise/In-class_Ex04/In-class_Ex04.html#defining-spatial-weights",
+    "title": "In-class Ex 04",
+    "section": "",
+    "text": "A better measure of spatial weights will be using the third method, a general spatial distance weight matrices, where no boundaries were set (like distance criterion)."
+  },
+  {
+    "objectID": "In-class Exercise/In-class_Ex04/In-class_Ex04.html#weights-matrix-distance-based-neighbours",
+    "href": "In-class Exercise/In-class_Ex04/In-class_Ex04.html#weights-matrix-distance-based-neighbours",
+    "title": "In-class Ex 04",
+    "section": "",
+    "text": "The weight matrix below is constructed using Queen’s method.\n\nQuiz: With reference to the figure above, list down the neighbour(s) of area 1202 using Rook case.\nNeighbour of 1202 using Rook’s case:\n\n1201\n1302\n901\n1000\n1102\n\n\n\n\nAnswer: (all distance, d &gt;650, will become 0 in value)\n\n\n\n\nA\nB\nC\nD\nE\n\n\n\n\nA\n0\n353\n516\n641\n0\n\n\nB\n353\n0\n357\n0\n0\n\n\nC\n516\n357\n0\n0\n0\n\n\nD\n641\n0\n0\n0\n263\n\n\nE\n0\n0\n0\n263\n0"
   }
 ]

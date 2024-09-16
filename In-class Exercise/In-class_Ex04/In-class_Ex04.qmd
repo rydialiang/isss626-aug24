@@ -1,0 +1,73 @@
+---
+title: "In-class Ex 04 "
+author: "Liang Xiuhao Rydia"
+date: "Sep 16, 2024"
+date-modified: "last-modified"
+execute:
+  eval: true
+  echo: true
+  warning: false
+  freeze: true
+format: 
+  html:
+    code-fold: true
+    code-summary: "Show the code"
+---
+
+# **Spatial Weights and Applications**
+
+## 1.0 What are Spatial Weights (wij)
+
+It is a way to define spatial neighbourhood.
+
+![](images/clipboard-4061349882.png)
+
+## 2.0 Contiguity Neighbours
+
+![](images/clipboard-3101433054.png)
+
+Refer to [Hands on Ex 4 - 8.5.3.1 and 8.5.3.2](https://ry-geog.netlify.app/hands-on%20exercise/hands-on_ex04/hands-on_ex04#plotting-queen-contiguity-based-neighbours-map):
+
+| Queen's                                           | Rook's (differences in blue circle)               |
+|---------------------------------------------------|---------------------------------------------------|
+| ![](images/clipboard-1338689405.png){width="340"} | ![](images/clipboard-3739373479.png){width="320"} |
+
+## 2.1 Lagged Contiguity
+
+![](images/clipboard-1340200063.png)
+
+## 2.2 Defining Spatial Weights
+
+![](images/clipboard-3036623236.png)
+
+A better measure of spatial weights will be using the third method, a general spatial distance weight matrices, where no boundaries were set (like distance criterion).
+
+## 2.3 Weights Matrix: Distance-based neighbours
+
+The weight matrix below is constructed using Queen's method.
+
+![](images/clipboard-257919302.png)
+
+**Quiz**: With reference to the figure above, list down the neighbour(s) of area 1202 using Rook case.
+
+Neighbour of 1202 using Rook's case:
+
+1.  1201
+2.  1302
+3.  901
+4.  1000
+5.  1102
+
+### Weights Matrix: Distance-based neighbours
+
+![](images/clipboard-3048454540.png)
+
+Answer: (all distance, d \>650, will become 0 in value)
+
+|        |   A |   B |   C |   D |   E |
+|-------:|----:|----:|----:|----:|----:|
+|  **A** |   0 | 353 | 516 | 641 |   0 |
+|  **B** | 353 |   0 | 357 |   0 |   0 |
+|  **C** | 516 | 357 |   0 |   0 |   0 |
+|  **D** | 641 |   0 |   0 |   0 | 263 |
+|  **E** |   0 |   0 |   0 | 263 |   0 |
