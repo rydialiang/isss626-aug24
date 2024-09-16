@@ -331,3 +331,15 @@ tm_shape(hunan_gstat) +
             frame = TRUE)
 
 ```
+
+Business Quesion: Is there any relationship between GDP per capita (GDPPC) and Gross Industry Output (GIO)?
+
+```{r}
+
+```
+
+### Visualising Local Correlation
+
+```{r}
+
+```
