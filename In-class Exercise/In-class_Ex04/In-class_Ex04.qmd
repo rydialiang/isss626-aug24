@@ -14,7 +14,9 @@ format:
     code-summary: "Show the code"
 ---
 
-# **Spatial Weights and Applications**
+Short cut to [In-class Ex 4]
+
+# **Theory Lession: Spatial Weights and Applications**
 
 ## 1.0 What are Spatial Weights (wij)
 
@@ -117,3 +119,215 @@ Source: [Analysis of Coupling Coordination Relationship between the Accessibilit
 
     -   i.e. Rail network.
 :::
+
+# In-class Ex 4
+
+## 3.0 Setting up the environment
+
+Loading required packages using the code chunk below:
+
+```{r}
+pacman::p_load(tidyverse,
+               sf,
+               ggstatsplot,
+               tmap,
+               knitr,
+               GWmodel)
+```
+
+## 3.1 Preparing the Data
+
+```{r}
+hunan_sf <- st_read(dsn = "data/geospatial", 
+                 layer = "Hunan")
+```
+
+::: callout-note
+## Geometry Type
+
+-   Usually in polygon.
+
+-   If there's island apart from mainland, there might be cases of multi-polygon.
+:::
+
+```{r}
+hunan2012 <- read_csv("data/aspatial/Hunan_2012.csv")
+```
+
+::: callout-note
+## Relational Join
+
+-   We need to final potential Unique Identifier to do the left_join().
+
+-   Usually we have to define the join field.
+
+-   For example, we can use NAME_3 for hunan_sf and County for hunan2012 to do the relational join.
+
+-    We need to make sure that the cells has the same values, including upper and lower case.
+
+-   The case below, it is already tidied up and we know exactly what information/columns we need to sift out, by using select().
+:::
+
+```{r}
+hunan_sf <- left_join(hunan_sf,hunan2012) %>% 
+  select(1:3,7,15,16,31,32)
+```
+
+## Converting to SpatialPolygonDataFrame
+
+GWmodel is presently built around the older sp and
+
+```{r}
+hunan_sp <- hunan_sf %>% 
+  as_Spatial()
+```
+
+## GWSS with adaptive bandwidth
+
+### Determine adaptive bandwidth ( adaptive = TRUE )
+
+Cross-validation:
+
+```{r}
+bw_CV <-bw.gwr(GDPPC ~ 1,
+               data = hunan_sp,
+               approach = "CV",
+               adaptive = TRUE,
+               kernel = "bisquare",
+               longlat = T)
+```
+
+::: callout-note
+## Results
+
+-   62 ..... 22 are number of neighbours.
+
+-   stop when the figure (GDPPC) don't change much.
+:::
+
+AIC
+
+```{r}
+bw_AIC <-bw.gwr(GDPPC ~ 1,
+               data = hunan_sp,
+               approach = "AIC",
+               adaptive = TRUE,
+               kernel = "bisquare",
+               longlat = T)
+```
+
+::: callout-note
+## Results
+
+-   AICc values in kilometers (?)
+
+-   both CV and AIC provide same results.
+:::
+
+### Fixed Kernal ( adaptive = FALSE )
+
+CV:
+
+```{r}
+bw_CV <-bw.gwr(GDPPC ~ 1,
+               data = hunan_sp,
+               approach = "CV",
+               adaptive = FALSE,
+               kernel = "bisquare",
+               longlat = T)
+```
+
+AIC
+
+```{r}
+bw_AIC <-bw.gwr(GDPPC ~ 1,
+               data = hunan_sp,
+               approach = "AIC",
+               adaptive = FALSE,
+               kernel = "bisquare",
+               longlat = T)
+```
+
+::: callout-note
+## Results Intepretation
+
+-   Fixed distance (kernel) produce vastly different results.
+
+-   Distance will provide more variability.
+
+-   Same location but different methods, bandwidth of neighbours differs.
+
+    -   We need to test different numbers of neighbours. In this case, use adaptive as the results for both CV and AIC are similar.
+:::
+
+```{r}
+gwstat <- gwss(data = hunan_sp,
+               vars = "GDPPC",
+               bw = bw_AIC,
+               kernel = "bisquare",
+               adaptive = TRUE,
+               longlat = T)
+```
+
+::: callout-important
+## gwss()
+
+-   remember to ensure the arguments for kernel, adaptive, longlat, must be the same as the chosen method, CV or AIC.
+
+-   the resulting object is gwss class.
+
+-   We can access the data table by clicking into the document icon to the right of the "data" attribute.
+
+-   
+:::
+
+Accessing gwstat:
+
+![](images/clipboard-207531247.png)
+
+Accessing SDF data table:
+
+![](images/clipboard-1032847310.png)
+
+This data table is calculated using 22 neighbour (based on AIC, adaptive kernel)
+
+Extracting the data table as df:
+
+```{r}
+gwstat_df <- as.data.frame(gwstat$SDF)
+```
+
+cbind() is used to append the newly derived data.frame onto hunan_sf sf data.frame.
+
+```{r}
+hunan_gstat <- cbind(hunan_sf, gwstat_df)
+```
+
+::: callout-important
+## cbind()
+
+-   cannot work if we do sorting prior to this step.
+
+-   works without unique identifier, given that the sequence of the data did not change.
+:::
+
+### Visualising geographically weighted summary statistics
+
+The Geographically Weighted Mean
+
+```{r}
+tmap_mode("plot")
+tm_shape(hunan_gstat) +
+  tm_fill("GDPPC_LM",
+          n = 5,
+          style = "quantile") +
+  tm_borders(alpha = 0.5 ) +
+  tm_layout(main.title = "Distribution of geographically weighted mean",
+            main.title.position = "center",
+            main.title.size = 0.9,
+            legend.text.size = 0.5,
+            legend.height = 1.0,
+            legend.width = 1.0,
+            frame = TRUE)
+
+```

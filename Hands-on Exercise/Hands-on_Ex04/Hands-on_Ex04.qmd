@@ -70,7 +70,8 @@ hunan2012 <- read_csv("data/aspatial/Hunan_2012.csv")
 The code chunk below will be used to update the attribute table of *hunan*’s SpatialPolygonsDataFrame with the attribute fields of *hunan2012* dataframe. This is performed by using *left_join()* of **dplyr** package.
 
 ```{r}
-hunan <- left_join(hunan,hunan2012)
+hunan <- left_join(hunan,hunan2012) %>% 
+  select(1:3,7,15,16,31,32)
 
 ```
 
