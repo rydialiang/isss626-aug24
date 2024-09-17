@@ -8,10 +8,6 @@ execute:
   echo: true
   warning: false
   freeze: true
-format: 
-  html:
-    code-fold: true
-    code-summary: "Show the code"
 ---
 
 ![](images/A_detailed_illustration_of_a_study_on_road_traffic_landscape.jpeg)
@@ -74,7 +70,7 @@ We will be using Geodetic CRS **WGS 84** as it is a global standard. It leaves u
 Considering Bangkok's Coordinate (13.7563° N, 100.5018° E), we will use [WGS 84 / UTM zone 47N](https://epsg.io/32647) - EPSG 32647, as its Northing of 13.7563° falls between the Equator and 84°N, and its Easting of 100.5018° falls between 96°E and 102°E, which are both in the area of use as indicated in the table above.
 :::
 
-## 1.2 The Datasets
+### 1.2 The Datasets
 
 The following datasets are provided as part of the Take Home Exercise 1:
 
@@ -112,7 +108,7 @@ pacman::p_load(leaflet,
 ```
 
 | Packages  | Description                                                              |
-|--------------------|----------------------------------------------------|
+|------------------------|-----------------------------------------------|
 | leaflet   | For interactive map                                                      |
 | lubridate | Functions to work with date-times and time-spans                         |
 | raster    | Reading, writing, manipulating, analyzing and modeling of spatial data.  |
@@ -137,12 +133,14 @@ set.seed(12345)
 Importing the data without filtering:
 
 ```{r}
+#| eval: False
 acc <- read_csv("data/rawdata/thai_road_accident_2019_2022.csv")
 ```
 
 Importing the data, and conducting necessary filter, conversion to sf, transformation of CRS, and get the days component of the `incident_datetime`:
 
 ```{r}
+#| eval: False
 acc_sf <- read_csv("data/rawdata/thai_road_accident_2019_2022.csv") %>%   
   filter(!is.na(longitude) &longitude != "",!is.na(latitude) & latitude != "") %>%    
   st_as_sf(coords = c("longitude", "latitude"),            crs = 4326) %>%    
@@ -154,7 +152,7 @@ acc_sf <- read_csv("data/rawdata/thai_road_accident_2019_2022.csv") %>%
   mutate(Year = year(incident_datetime)) %>% 
   mutate(DaysOfWeek = wday(incident_datetime,
                            week_start = 1)) %>% 
-  dplyr::select(c(2,5,8:21))
+  dplyr::select(c(2,5,7:21))
 ```
 
 ::: callout-note
@@ -202,6 +200,7 @@ Before proceeding to filter the data, we observe that there is a total of 81,735
 After the wrangling the data, we will save them for future use, using the write_rds() of readr package. The step will help us save time of re-running the codes for importing and wrangling the raw data.
 
 ```{r}
+#| eval: False
 write_rds(acc_sf, "data/rds/acc_sf.rds")
 ```
 
@@ -213,7 +212,7 @@ acc_sf <- read_rds("data/rds/acc_sf.rds")
 
 ### 3.2 Importing Spatial Data
 
-### 3.2.1 Importing the Administraive Boundaries
+#### 3.2.1 Importing the Administrative Boundaries
 
 Importing the [Thailand - Subnational Administrative Boundaries](https://data.humdata.org/dataset/cod-ab-tha?) using st_read() of sf package. Since we are only interested in the Bangkok Metropolitan Region (BMR) as our study area, we will extract only the six provinces by using filter(). We will use the layer name "tha_admbnda_adm1_rtsd_20220121" as ADM1 refers to the province level boundaries. Note: Thailand administrative level 0 (country), 1 (province), 2 (district), and 3 (sub-district, tambon) boundaries.
 
@@ -283,7 +282,7 @@ sab_C <- sab_C %>%
   st_transform(crs = 32647)
 ```
 
-### 3.2.2 Creating owin object for BMR boundaries
+#### 3.2.2 Creating owin object for BMR boundaries
 
 ```{r}
 bmr_owin <- as.owin(sab_P)
@@ -307,11 +306,12 @@ summary(bmr_owin)
     -   Window Area of BMR = \~7,668.99 km^2^
 :::
 
-### 3.2.3 Importing the Road Networks
+#### 3.2.3 Importing the Road Networks
 
 In this code chunk, we will import the [Thailand Roads (OpenStreetMap Export)](https://data.humdata.org/dataset/hotosm_tha_roads) downloaded from HDX.
 
 ```{r}
+#| eval: False
 roads <- st_read(dsn ="data/rawdata",
                  layer = "hotosm_tha_roads_lines_shp") 
 ```
@@ -319,16 +319,42 @@ roads <- st_read(dsn ="data/rawdata",
 Assigning EPSG code 4326 as the geometry shows longlat decimal degree between (-180 to 180). Next, we use st_transform() to re-project from Geographic CRS of WGS84 to Projected CRS of UTM Zone 47N.
 
 ```{r}
-roads <- roads %>% 
-  st_set_crs(4326) %>% 
+#| eval: False
+roads_clean <- roads %>% 
+  filter(highway %in% c("motorway", "trunk", "primary", "secondary", "tertiary", "unclassified")) %>% 
+  st_set_crs(4326) %>%
   st_transform(crs = 32647)
 ```
 
 ```{r}
-roads_bmr <- st_intersection(sab_P,roads)
+roads_clean <- roads_clean %>% 
+  st_transform(crs = 32647)
 ```
 
-### 3.2.4 Combining the bmr_owin with the data points
+Saving road_clean as .rds:
+
+```{r}
+#| eval: False
+write_rds(roads_clean, "data/rds/roads_clean.rds")
+```
+
+```{r}
+roads_clean <- read_rds("data/rds/roads_clean.rds")
+
+roads_bmr <- st_intersection(sab_P,roads_clean)
+```
+
+Saving the roads network in BMR:
+
+```{r}
+write_rds(roads_bmr, "data/rds/roads_bmr.rds")
+```
+
+```{r}
+plot(st_geometry(roads_bmr))
+```
+
+#### 3.2.4 Combining the bmr_owin with the data points
 
 Converting the acc_sf and roads data into ppp.
 
@@ -390,6 +416,137 @@ plot(accBMR_ppp_jit)
 ::: callout-important
 -   Notably, the plot of accBMR_ppp_jit represents road network within the BMR area, since the accidents can only happen along the road network, and not outside of it.
 :::
+
+```{r}
+write_rds(accBMR_ppp_jit,"data/rds/accBMR_ppp_jit.rds")
+```
+
+#### 3.2.5 Extracting the accidents records within BMR
+
+```{r}
+acc_sf <- read_rds("data/rds/acc_sf.rds")
+
+acc_bmr <- st_intersection(sab_P,acc_sf)
+```
+
+Saving the accidents records within BMR:
+
+```{r}
+write_rds(acc_bmr,"data/rds/acc_bmr.rds")
+```
+
+### 3.3 Visualising the Geospatial Data
+
+Before jumping into the analysis, we will use plot(), ggplot() and tmap() to take a quick look.
+
+```{r}
+acc_bmr <-read_rds("data/rds/acc_bmr.rds")
+
+plot(st_geometry(roads_bmr),
+     col = "grey")
+plot(acc_bmr, add = T, 
+     col = "red", 
+     pch = 19,
+     cex = 0.1)
+plot(st_geometry(sab_C), add = T)
+```
+
+```{r}
+highway_color = c("motorway" = "#FF00FF",
+           "trunk" = "#00FF00",
+           "primary" = "#FFFF00",
+           "secondary" = "#0000FF",
+           "tertiary" = "#33AABB",
+           "unclassified" = "#5500FF")
+
+ggplot() +
+  geom_sf(data = sab_C, 
+          color = "black",
+          size = 1.0) +
+  geom_sf(data = roads_bmr, 
+          aes(color = highway), 
+          size = 1) + 
+  geom_sf(data = acc_bmr, 
+          color = "red", 
+          size = 0.1) + 
+  labs(title = "Road Network and Accident Points", 
+       x = "Longitude", 
+       y = "Latitude") +
+  scale_color_manual(values = highway_color) 
+```
+
+```{r}
+tmap_mode('view')
+
+tm_shape(acc_bmr) + 
+  tm_dots(col ="red",
+          alpha = 0.5,
+          size = 0.1) +
+  tm_shape(roads_bmr) +
+  tm_lines(col = "highway", 
+           palette = highway_color,  
+           lwd = 2)
+
+```
+
+```{r}
+tmap_mode("plot")
+```
+
+Using tmap's view mode to explore, we are able to see that the motorway, primary, secondary and trunk highway types have higher accident records. Instead of using tmap to physically track where are the accidents happening, we can also choose to extract these information from the "route" column in acc_bmr.
+
+### 3.4 Converting "route" to "highway" type
+
+Creating a dictionary for Thai-to-English translation. The reference Thai words are drawn from [Thai Highway Classification](https://wiki.openstreetmap.org/wiki/WikiProject_Thailand#Highway_classification).
+
+```{r}
+acc_bmr$route <- str_trim(acc_bmr$route) 
+```
+
+```{r}
+translation_dict <- c("ทางพิเศษศรีรัชรัช" = "expressway",
+                      "ถนนกรุงเทพฯ-ชลบุรีง" = "motorway",
+                      "ถนนกาญจนาภิเษกน" = "trunk",
+                      "ถนนมิตรภาพค์" = "trunk",
+                      "ถนนชยางกูร" = "trunk",
+                      "ถนนสุรนารายณ์" = "primary",
+                      "ถนนอุบล-ตระการ" = "primary",
+                      "ถนนบางกรวย-ไทรน้อย" = "secondary",
+                      "ถนนลาดบัวหลวง-ไม้ตรา"= "secondary",
+                      "ถนนทุ่งกลม-ตาลหมัน" = "tertiary")
+```
+
+```{r}
+acc_bmr$route <- str_trim(acc_bmr$route) 
+```
+
+```{r}
+acc_bmr$route <- str_replace_all(acc_bmr$route, translation_dict)
+```
+
+```{r}
+grep("สะพานภูมิพลที่", acc_bmr$route)
+```
+
+After troubleshooting, the above method did not work as intended. After checking a few route lines using Google Translate, we observe that the route is a description of the route (e.g. Bhumibol II Bridge to Bhumibol I Bridge), rather than the classification of the higway that the accident happened on. Nonetheless, there are certain helpful words to derive the possible highway classification.
+
+## 4.0 Network Constrained Spatial Point Pattern Analysis
+
+### 4.1 Preparing the lixel objects
+
+Before computing NKDE, the SpatialLines object need to be cut into lixels with a specified minimal distance. This task can be performed by using with [lixelize_lines()](https://jeremygelb.github.io/spNetwork/reference/lixelize_lines.html) of **spNetwork** as shown in the code chunk below.
+
+As there some of the geometry in roads_bmr are "MULTILINESTRING", we will not be able to process it using [lixelize_lines()](https://jeremygelb.github.io/spNetwork/reference/lixelize_lines.html) directly. [lixelize_lines()](https://jeremygelb.github.io/spNetwork/reference/lixelize_lines.html) requires the all geometries to be "LINESTRING", thus, we will use st_cast() to cast all the "MULTILINESTRING" into "LINESTRING" geometry.
+
+```{r}
+roads <- st_cast(roads_bmr, "LINESTRING")
+```
+
+```{r}
+lixels <- lixelize_lines(roads, 
+                         500, 
+                         mindist = 250)
+```
 
 ## References
 
