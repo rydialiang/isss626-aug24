@@ -282,11 +282,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#the-study-area" id="toc-the-study-area" class="nav-link" data-scroll-target="#the-study-area">1.1 The Study Area</a></li>
   </ul></li>
   <li><a href="#the-datasets" id="toc-the-datasets" class="nav-link" data-scroll-target="#the-datasets">1.2 The Datasets</a></li>
-  <li><a href="#loading-library-and-importing-traffic-accident-data" id="toc-loading-library-and-importing-traffic-accident-data" class="nav-link" data-scroll-target="#loading-library-and-importing-traffic-accident-data">2.0 Loading Library and Importing Traffic Accident Data</a></li>
-  <li><a href="#importing-data" id="toc-importing-data" class="nav-link" data-scroll-target="#importing-data">3.0 Importing Data</a>
+  <li><a href="#setting-up-the-environment" id="toc-setting-up-the-environment" class="nav-link" data-scroll-target="#setting-up-the-environment">2.0 Setting up the Environment</a>
+  <ul class="collapse">
+  <li><a href="#installing-and-loading-the-required-libraries" id="toc-installing-and-loading-the-required-libraries" class="nav-link" data-scroll-target="#installing-and-loading-the-required-libraries">2.1 Installing and loading the required libraries</a></li>
+  <li><a href="#setting-seeds-to-ensure-reproducibility" id="toc-setting-seeds-to-ensure-reproducibility" class="nav-link" data-scroll-target="#setting-seeds-to-ensure-reproducibility">2.2 Setting Seeds to Ensure Reproducibility</a></li>
+  </ul></li>
+  <li><a href="#importing-and-wrangling-the-data" id="toc-importing-and-wrangling-the-data" class="nav-link" data-scroll-target="#importing-and-wrangling-the-data">3.0 Importing and Wrangling the Data</a>
   <ul class="collapse">
   <li><a href="#importing-aspatial-data-and-converting-it-into-spatial-data" id="toc-importing-aspatial-data-and-converting-it-into-spatial-data" class="nav-link" data-scroll-target="#importing-aspatial-data-and-converting-it-into-spatial-data">3.1 Importing Aspatial Data and Converting it into Spatial Data</a></li>
-  <li><a href="#wrangling-the-date-fields" id="toc-wrangling-the-date-fields" class="nav-link" data-scroll-target="#wrangling-the-date-fields">3.1.1 Wrangling the Date Fields</a></li>
   <li><a href="#importing-spatial-data" id="toc-importing-spatial-data" class="nav-link" data-scroll-target="#importing-spatial-data">3.2 Importing Spatial Data</a></li>
   </ul></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
@@ -381,64 +384,141 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 </tbody>
 </table>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Projected CRS
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <p>Considering Bangkok’s Coordinate (13.7563° N, 100.5018° E), we will use <a href="https://epsg.io/32647">WGS 84 / UTM zone 47N</a> - EPSG 32647, as its Northing of 13.7563° falls between the Equator and 84°N, and its Easting of 100.5018° falls between 96°E and 102°E, which are both in the area of use as indicated in the table above.</p>
+</div>
+</div>
 </section>
 </section>
 <section id="the-datasets" class="level2">
 <h2 class="anchored" data-anchor-id="the-datasets">1.2 The Datasets</h2>
+<p>The following datasets are provided as part of the Take Home Exercise 1:</p>
+<p><u><strong>Aspatial</strong></u></p>
 <ul>
-<li><p><a href="https://www.kaggle.com/datasets/thaweewatboy/thailand-road-accident-2019-2022">Thailand Road Accident [2019-2022]</a> on Kaggle</p></li>
-<li><p><a href="https://data.humdata.org/dataset/hotosm_tha_roads">Thailand Roads (OpenStreetMap Export)</a> on HDX.</p></li>
-<li><p><a href="https://data.humdata.org/dataset/cod-ab-tha?">Thailand - Subnational Administrative Boundaries</a> on HDX.</p></li>
-<li></li>
-</ul>
-<div class="callout callout-style-default callout-caution callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-On Projection
-</div>
-</div>
-<div class="callout-body-container callout-body">
+<li><p><a href="https://www.kaggle.com/datasets/thaweewatboy/thailand-road-accident-2019-2022">Thailand Road Accident [2019-2022]</a> on Kaggle</p>
 <ul>
-<li><p>to check on the following:</p>
-<ul>
-<li><p>WGS 84 / UTM zone 47N</p></li>
-<li><p>EPSG code 32647</p></li>
+<li>This dataset is a list of Thailand Road Accident between 2019 to 2022 in .csv format, where details like province, date/time of accident, cause of accident, type of vehicles and weather conditions are provided. The variables in this dataset will be used for analysis of the factors that contributes to the road traffic accidents.</li>
 </ul></li>
 </ul>
-</div>
-</div>
+<p><u><strong>Geospatial</strong></u></p>
+<ul>
+<li><p><a href="https://data.humdata.org/dataset/hotosm_tha_roads">Thailand Roads (OpenStreetMap Export)</a> on HDX.</p>
+<ul>
+<li>This dataset contains all the Thailand Road network which we will use to extract relevant roads within the study area.</li>
+</ul></li>
+<li><p><a href="https://data.humdata.org/dataset/cod-ab-tha?">Thailand - Subnational Administrative Boundaries</a> on HDX.</p>
+<ul>
+<li>This dataset will be used to set the boundaries for the study area, so as to exclude the data points that are irrelevant for this study.</li>
+</ul></li>
+</ul>
 </section>
-<section id="loading-library-and-importing-traffic-accident-data" class="level2">
-<h2 class="anchored" data-anchor-id="loading-library-and-importing-traffic-accident-data">2.0 Loading Library and Importing Traffic Accident Data</h2>
+<section id="setting-up-the-environment" class="level2">
+<h2 class="anchored" data-anchor-id="setting-up-the-environment">2.0 Setting up the Environment</h2>
+<section id="installing-and-loading-the-required-libraries" class="level3">
+<h3 class="anchored" data-anchor-id="installing-and-loading-the-required-libraries">2.1 Installing and loading the required libraries</h3>
+<p>The code chunk below checks if the packages are installed. If the packages are not yet installed, it will proceed to install and subsequently load the libraries. If the packages are already installed, it will proceed to launch into the R environment.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(sf, </span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>               raster,</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>               spNetwork,</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>               tmap, </span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>               tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(leaflet,</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>               lubridate,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>               raster,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>               sf,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>               spNetwork,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>               tidyverse,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>               tmap)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<table class="table">
+<colgroup>
+<col style="width: 26%">
+<col style="width: 73%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Packages</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>leaflet</td>
+<td>For interactive map</td>
+</tr>
+<tr class="even">
+<td>lubridate</td>
+<td>Functions to work with date-times and time-spans</td>
+</tr>
+<tr class="odd">
+<td>raster</td>
+<td>Reading, writing, manipulating, analyzing and modeling of spatial data.&nbsp;</td>
+</tr>
+<tr class="even">
+<td>sf</td>
+<td>For importing, managing, ad handling geospatial data</td>
+</tr>
+<tr class="odd">
+<td>spNetwork</td>
+<td>Perform spatial analysis on network</td>
+</tr>
+<tr class="even">
+<td>tidyverse</td>
+<td>For aspatial data wrangling</td>
+</tr>
+<tr class="odd">
+<td>tmap</td>
+<td>For thematic mapping</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="setting-seeds-to-ensure-reproducibility" class="level3">
+<h3 class="anchored" data-anchor-id="setting-seeds-to-ensure-reproducibility">2.2 Setting Seeds to Ensure Reproducibility</h3>
+<p>The set. seed() function is used to set a Random seed which Pseudorandom number generators use when generating “random” numbers. By using this function, we ensure that the randomly generated numbers remain the same when the code are reproduced.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">12345</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section>
-<section id="importing-data" class="level2">
-<h2 class="anchored" data-anchor-id="importing-data">3.0 Importing Data</h2>
+</section>
+<section id="importing-and-wrangling-the-data" class="level2">
+<h2 class="anchored" data-anchor-id="importing-and-wrangling-the-data">3.0 Importing and Wrangling the Data</h2>
 <section id="importing-aspatial-data-and-converting-it-into-spatial-data" class="level3">
 <h3 class="anchored" data-anchor-id="importing-aspatial-data-and-converting-it-into-spatial-data">3.1 Importing Aspatial Data and Converting it into Spatial Data</h3>
-<p>Since the <code>Thailand Road Accident [2019-2022]</code> is data set is in csv file format, we will use <a href="https://readr.tidyverse.org/reference/read_delim.html">read_csv()</a> of readr package to import <code>Thailand Road Accident [2019-2022]</code>.Following which, we use the pipe function and dplyr::filter() to filter out rows that has “na” or is empty in value. Next, we use st_as_sf to combine the longitude and latitude in the csv file can combine it into “geometry” column. Lastly, we use st_transform to change the Coordinate Reference System (CRS) to 32647, which is Thailand’s <a href="https://epsg.io/map#srs=32647&amp;x=769964.9694806639&amp;y=1455180.7056970089&amp;z=5&amp;layer=streets">ESPG code</a>. The output R object is called rdacc_sf and it is a sf data frame.</p>
+<p>Importing the data without filtering:</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>rdacc_sf <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/rawdata/thai_road_accident_2019_2022.csv"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(longitude) <span class="sc">&amp;</span>longitude <span class="sc">!=</span> <span class="st">""</span>,</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>         <span class="sc">!</span><span class="fu">is.na</span>(latitude) <span class="sc">&amp;</span> latitude <span class="sc">!=</span> <span class="st">""</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_as_sf</span>(<span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"longitude"</span>, <span class="st">"latitude"</span>),</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>           <span class="at">crs =</span> <span class="dv">4326</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(<span class="at">crs =</span> <span class="dv">32647</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>acc <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/rawdata/thai_road_accident_2019_2022.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Importing the data, and conducting necessary filter, conversion to sf, transformation of CRS, and get the days component of the <code>incident_datetime</code>:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>acc_sf <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/rawdata/thai_road_accident_2019_2022.csv"</span>) <span class="sc">%&gt;%</span>   </span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(longitude) <span class="sc">&amp;</span>longitude <span class="sc">!=</span> <span class="st">""</span>,<span class="sc">!</span><span class="fu">is.na</span>(latitude) <span class="sc">&amp;</span> latitude <span class="sc">!=</span> <span class="st">""</span>) <span class="sc">%&gt;%</span>    </span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_as_sf</span>(<span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"longitude"</span>, <span class="st">"latitude"</span>),            <span class="at">crs =</span> <span class="dv">4326</span>) <span class="sc">%&gt;%</span>    </span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(<span class="at">crs =</span> <span class="dv">32647</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Day =</span> <span class="fu">day</span>(incident_datetime)) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Month =</span> <span class="fu">month</span>(incident_datetime,</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>                       <span class="at">label =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>                       <span class="at">abbr =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Year =</span> <span class="fu">year</span>(incident_datetime)) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">DaysOfWeek =</span> <span class="fu">wday</span>(incident_datetime,</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>                           <span class="at">week_start =</span> <span class="dv">1</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">5</span>,<span class="dv">8</span><span class="sc">:</span><span class="dv">21</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="callout callout-style-default callout-note callout-titled">
@@ -447,61 +527,53 @@ On Projection
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Notes on rdacc_sf
+Thailand Road Accident [ 2019-2022]
 </div>
 </div>
 <div class="callout-body-container callout-body">
 <ul>
-<li><p>incident_datetime is datetime format of POSIXct.</p></li>
-<li><p>st_as_sf(coords = c(“longitude”, “latitude”), crs = 4326) combines and longitude and latitude columns into geometry column</p></li>
-<li><p>Thai projection code is 32647, hence we use this code chunk: st_transform(crs = 32647)</p></li>
-<li><p>Filter is used to remove the longitude and latitude that has na as value.</p></li>
-<li><p>Check what is the number of data lost after removing na. Make sure the study region, the data lost is not significant. (not more than 5% lost)</p></li>
-<li><p>use readr::read_csv() to ensure the data is imported as tibble data frame. Do not use read.csv().</p></li>
-<li><p>Check the data.</p></li>
+<li><a href="https://readr.tidyverse.org/reference/read_delim.html">read_csv()</a> of readr package to import the data in .csv format as tibble dataframe.</li>
 </ul>
-</div>
-</div>
-</section>
-<section id="wrangling-the-date-fields" class="level3">
-<h3 class="anchored" data-anchor-id="wrangling-the-date-fields">3.1.1 Wrangling the Date Fields</h3>
-<p>Using tidyverse::lubridate</p>
-<div class="cell">
-<details class="code-fold">
-<summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>rdacc_sf <span class="ot">&lt;-</span> rdacc_sf <span class="sc">%&gt;%</span> </span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">DayOfWeek =</span> <span class="fu">day</span>(incident_datetime)) <span class="sc">%&gt;%</span> </span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Month =</span> <span class="fu">month</span>(incident_datetime,</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>                       <span class="at">label =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>                       <span class="at">abbr =</span> <span class="cn">TRUE</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
-<div class="cell">
-<details class="code-fold">
-<summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write_rds</span>(rdacc_sf, <span class="st">"data/rds/rdacc_sf.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
-<div class="cell">
-<details class="code-fold">
-<summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>rdacc_sf <span class="ot">&lt;-</span> <span class="fu">read_rds</span>(<span class="st">"data/rds/rdacc_sf.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Lubridate
-</div>
-</div>
-<div class="callout-body-container callout-body">
+<pre><code>Before proceeding to filter the data, we observe that there is a total of 81,735 observations.
+
+-   ![](images/clipboard-3840017767.png)</code></pre>
 <ul>
-<li>lubridate::month(): label = TRUE -&gt; change it into factor. If we do not use label = TRUE, it will be sorted using alphabetical logic. If it is a factor, it will be sorted according to date/month logic from Jan to Dec.</li>
+<li><p>dplyr::filter() to filter out rows that has “na” or is empty in value.</p>
+<ul>
+<li><p>After filtering “na” and empty values, we are left with 81,376 observations. This means that we have lost about 0.44% of the data. This will not affect our analysis as 0.44% a small proportion of the total number of observations. (Rule of Thumb, not &gt;5% lost)</p>
+<p><img src="images/clipboard-38131559.png" class="img-fluid"></p></li>
+</ul></li>
+<li><p>st_as_sf(coords = c(“longitude”, “latitude”), crs = 4326) combines and longitude and latitude columns into geometry column.</p>
+<ul>
+<li><p>before applying st_as_sf() function, we observe that the latitude and longitude are in decimal degrees, therefore, we assume it is WGS84 datum, with the EPSG code of 4326.</p>
+<p><img src="images/clipboard-1253609898.png" class="img-fluid"></p></li>
+<li><p>Notice that the number of variables changed from 18 to 17. This is because st_as_sf() function has combined the longitude and latitude columns in the original dataset into one column name geometry. The columns named longitude and latitude are no longer found in the data.</p>
+<p><img src="images/clipboard-3803839872.png" class="img-fluid"></p></li>
+</ul></li>
+<li><p>st_transform() to change the Coordinate Reference System (CRS) to the correct EPSG code of 32647.</p></li>
+<li><p>lubridate() is used to wrangle the incident_datetime, which is in datetime format of POSIXct.</p>
+<ul>
+<li><p>lubridate::month(): label = TRUE -&gt; change it into factor. If we do not use label = TRUE, it will be sorted using alphabetical logic. If it is a factor, it will be sorted according to date/month logic from Jan to Dec.</p></li>
+<li><p>The columns of Day, Month, Year, and DaysOfWeek are created.</p>
+<p><img src="images/clipboard-1275594911.png" class="img-fluid"></p></li>
+</ul></li>
+<li><p>Use dplyr::select() to select the relevant columns to retain.</p></li>
+<li><p>The output R object is called acc_sf and it is a sf data frame.</p></li>
 </ul>
 </div>
+</div>
+<p>After the</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write_rds</span>(acc_sf, <span class="st">"data/rds/acc_sf.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>acc_sf <span class="ot">&lt;-</span> <span class="fu">read_rds</span>(<span class="st">"data/rds/acc_sf.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
 </section>
 <section id="importing-spatial-data" class="level3">

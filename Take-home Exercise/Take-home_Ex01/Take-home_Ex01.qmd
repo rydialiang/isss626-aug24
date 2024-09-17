@@ -63,108 +63,151 @@ The specific objectives of this take-home exercise are as follows:
 We will be using Geodetic CRS **WGS 84** as it is a global standard. It leaves us with the last three options. As will click into each result, we will observe that [WGS 84 / PDC Mercator](https://epsg.io/3832) covers wide area of use, and perhaps, more suitable for seafare. Whereas for [WGS 84 / UTM zone 47N](https://epsg.io/32647) and [WGS 84 / UTM zone 48N](https://epsg.io/32648), the area are more precise, defined by the Easting and Northing.
 
 | [WGS 84 / UTM zone 47N](https://epsg.io/32647) - EPSG 32647                                                                                                                                                                                                                                                                                                                                   | [WGS 84 / UTM zone 48N](https://epsg.io/32648) - EPSG 32648                                                                                                                                                                                                                                                                                                                                                            |
-|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|-----------------------------------|-------------------------------------|
 | **Area of use:** [Between 96°E and 102°E, northern hemisphere between equator and 84°N, onshore and offshore. China. Indonesia. Laos. Malaysia - West Malaysia. Mongolia. Myanmar (Burma). Russian Federation. Thailand.](https://epsg.io/?q=Between+96%C2%B0E+and+102%C2%B0E%2C+northern+hemisphere+between+equator+and+84%C2%B0N%2C+onshore+and+offshore.+China.+Indonesia.+Laos.+Malaysia) | **Area of use:** [Between 102°E and 108°E, northern hemisphere between equator and 84°N, onshore and offshore. Cambodia. China. Indonesia. Laos. Malaysia - West Malaysia. Mongolia. Russian Federation. Singapore. Thailand. Vietnam.](https://epsg.io/?q=Between+102%C2%B0E+and+108%C2%B0E%2C+northern+hemisphere+between+equator+and+84%C2%B0N%2C+onshore+and+offshore.+Cambodia.+China.+Indonesia.+Laos.+Malaysia) |
 
+::: callout-important
+## Projected CRS
+
 Considering Bangkok's Coordinate (13.7563° N, 100.5018° E), we will use [WGS 84 / UTM zone 47N](https://epsg.io/32647) - EPSG 32647, as its Northing of 13.7563° falls between the Equator and 84°N, and its Easting of 100.5018° falls between 96°E and 102°E, which are both in the area of use as indicated in the table above.
+:::
 
 ## 1.2 The Datasets
 
+The following datasets are provided as part of the Take Home Exercise 1:
+
+[**Aspatial**]{.underline}
+
 -   [Thailand Road Accident \[2019-2022\]](https://www.kaggle.com/datasets/thaweewatboy/thailand-road-accident-2019-2022) on Kaggle
+
+    -   This dataset is a list of Thailand Road Accident between 2019 to 2022 in .csv format, where details like province, date/time of accident, cause of accident, type of vehicles and weather conditions are provided. The variables in this dataset will be used for analysis of the factors that contributes to the road traffic accidents.
+
+[**Geospatial**]{.underline}
 
 -   [Thailand Roads (OpenStreetMap Export)](https://data.humdata.org/dataset/hotosm_tha_roads) on HDX.
 
+    -   This dataset contains all the Thailand Road network which we will use to extract relevant roads within the study area.
+
 -   [Thailand - Subnational Administrative Boundaries](https://data.humdata.org/dataset/cod-ab-tha?) on HDX.
 
--   
+    -   This dataset will be used to set the boundaries for the study area, so as to exclude the data points that are irrelevant for this study.
 
-::: callout-caution
-## On Projection
+## 2.0 Setting up the Environment
 
--   to check on the following:
+### 2.1 Installing and loading the required libraries
 
-    -   WGS 84 / UTM zone 47N
-
-    -   EPSG code 32647
-:::
-
-## 2.0 Loading Library and Importing Traffic Accident Data
+The code chunk below checks if the packages are installed. If the packages are not yet installed, it will proceed to install and subsequently load the libraries. If the packages are already installed, it will proceed to launch into the R environment.
 
 ```{r}
-pacman::p_load(sf, 
+pacman::p_load(leaflet,
+               lubridate,
                raster,
+               sf,
                spNetwork,
-               tmap, 
-               tidyverse)
+               tidyverse,
+               tmap)
 ```
 
-## 3.0 Importing Data
+| Packages  | Description                                                              |
+|-------------------|-----------------------------------------------------|
+| leaflet   | For interactive map                                                      |
+| lubridate | Functions to work with date-times and time-spans                         |
+| raster    | Reading, writing, manipulating, analyzing and modeling of spatial data.  |
+| sf        | For importing, managing, ad handling geospatial data                     |
+| spNetwork | Perform spatial analysis on network                                      |
+| tidyverse | For aspatial data wrangling                                              |
+| tmap      | For thematic mapping                                                     |
+
+### 2.2 Setting Seeds to Ensure Reproducibility
+
+The set. seed() function is used to set a Random seed which Pseudorandom number generators use when generating "random" numbers. By using this function, we ensure that the randomly generated numbers remain the same when the code are reproduced.
+
+```{r}
+set.seed(12345)
+```
+
+## 3.0 Importing and Wrangling the Data
 
 ### 3.1 Importing Aspatial Data and Converting it into Spatial Data
 
-Since the `Thailand Road Accident [2019-2022]` is data set is in csv file format, we will use [read_csv()](https://readr.tidyverse.org/reference/read_delim.html) of readr package to import `Thailand Road Accident [2019-2022]`.Following which, we use the pipe function and dplyr::filter() to filter out rows that has "na" or is empty in value. Next, we use st_as_sf to combine the longitude and latitude in the csv file can combine it into "geometry" column. Lastly, we use st_transform to change the Coordinate Reference System (CRS) to 32647, which is Thailand's [ESPG code](https://epsg.io/map#srs=32647&x=769964.9694806639&y=1455180.7056970089&z=5&layer=streets). The output R object is called rdacc_sf and it is a sf data frame.
+Importing the data without filtering:
 
 ```{r}
-rdacc_sf <- read_csv("data/rawdata/thai_road_accident_2019_2022.csv") %>%
-  filter(!is.na(longitude) &longitude != "",
-         !is.na(latitude) & latitude != "") %>% 
-  st_as_sf(coords = c("longitude", "latitude"),
-           crs = 4326) %>% 
-  st_transform(crs = 32647)
+acc <- read_csv("data/rawdata/thai_road_accident_2019_2022.csv")
 ```
 
-::: callout-note
-## Notes on rdacc_sf
-
--   incident_datetime is datetime format of POSIXct.
-
--   st_as_sf(coords = c("longitude", "latitude"), crs = 4326) combines and longitude and latitude columns into geometry column
-
--   Thai projection code is 32647, hence we use this code chunk: st_transform(crs = 32647)
-
--   Filter is used to remove the longitude and latitude that has na as value.
-
--   Check what is the number of data lost after removing na. Make sure the study region, the data lost is not significant. (not more than 5% lost)
-
--   use readr::read_csv() to ensure the data is imported as tibble data frame. Do not use read.csv().
-
--   Check the data.
-:::
-
-### 3.1.1 Wrangling the Date Fields
-
-Using tidyverse::lubridate
+Importing the data, and conducting necessary filter, conversion to sf, transformation of CRS, and get the days component of the `incident_datetime`:
 
 ```{r}
-#| eval: False
-rdacc_sf <- rdacc_sf %>% 
-  mutate(DayOfWeek = day(incident_datetime)) %>% 
+acc_sf <- read_csv("data/rawdata/thai_road_accident_2019_2022.csv") %>%   
+  filter(!is.na(longitude) &longitude != "",!is.na(latitude) & latitude != "") %>%    
+  st_as_sf(coords = c("longitude", "latitude"),            crs = 4326) %>%    
+  st_transform(crs = 32647) %>% 
+  mutate(Day = day(incident_datetime)) %>% 
   mutate(Month = month(incident_datetime,
                        label = TRUE,
-                       abbr = TRUE))
-```
-
-```{r}
-write_rds(rdacc_sf, "data/rds/rdacc_sf.rds")
-```
-
-```{r}
-rdacc_sf <- read_rds("data/rds/rdacc_sf.rds")
+                       abbr = TRUE)) %>% 
+  mutate(Year = year(incident_datetime)) %>% 
+  mutate(DaysOfWeek = wday(incident_datetime,
+                           week_start = 1)) %>% 
+  dplyr::select(c(2,5,8:21))
 ```
 
 ::: callout-note
-## Lubridate
+## Thailand Road Accident \[ 2019-2022\]
 
--   lubridate::month(): label = TRUE -\> change it into factor. If we do not use label = TRUE, it will be sorted using alphabetical logic. If it is a factor, it will be sorted according to date/month logic from Jan to Dec.
+-   [read_csv()](https://readr.tidyverse.org/reference/read_delim.html) of readr package to import the data in .csv format as tibble dataframe.
+
+```         
+Before proceeding to filter the data, we observe that there is a total of 81,735 observations.
+
+-   ![](images/clipboard-3840017767.png)
+```
+
+-   dplyr::filter() to filter out rows that has "na" or is empty in value.
+
+    -   After filtering "na" and empty values, we are left with 81,376 observations. This means that we have lost about 0.44% of the data. This will not affect our analysis as 0.44% a small proportion of the total number of observations. (Rule of Thumb, not \>5% lost)
+
+        ![](images/clipboard-38131559.png)
+
+-   st_as_sf(coords = c("longitude", "latitude"), crs = 4326) combines and longitude and latitude columns into geometry column.
+
+    -   before applying st_as_sf() function, we observe that the latitude and longitude are in decimal degrees, therefore, we assume it is WGS84 datum, with the EPSG code of 4326.
+
+        ![](images/clipboard-1253609898.png)
+
+    -   Notice that the number of variables changed from 18 to 17. This is because st_as_sf() function has combined the longitude and latitude columns in the original dataset into one column name geometry. The columns named longitude and latitude are no longer found in the data.
+
+        ![](images/clipboard-3803839872.png)
+
+-   st_transform() to change the Coordinate Reference System (CRS) to the correct EPSG code of 32647.
+
+-   lubridate() is used to wrangle the incident_datetime, which is in datetime format of POSIXct.
+
+    -   lubridate::month(): label = TRUE -\> change it into factor. If we do not use label = TRUE, it will be sorted using alphabetical logic. If it is a factor, it will be sorted according to date/month logic from Jan to Dec.
+
+    -   The columns of Day, Month, Year, and DaysOfWeek are created.
+
+        ![](images/clipboard-1275594911.png)
+
+-   Use dplyr::select() to select the relevant columns to retain.
+
+-   The output R object is called acc_sf and it is a sf data frame.
 :::
+
+After the
+
+```{r}
+write_rds(acc_sf, "data/rds/acc_sf.rds")
+```
+
+```{r}
+acc_sf <- read_rds("data/rds/acc_sf.rds")
+```
 
 ### 3.2 Importing Spatial Data
 
 Importing the [Thailand - Subnational Administrative Boundaries](https://data.humdata.org/dataset/cod-ab-tha?)
-
-```{r}
-
-```
 
 ## References
 
