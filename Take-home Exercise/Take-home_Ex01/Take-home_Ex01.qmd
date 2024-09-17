@@ -108,7 +108,7 @@ pacman::p_load(leaflet,
 ```
 
 | Packages  | Description                                                              |
-|------------------------|-----------------------------------------------|
+|-------------------------|-----------------------------------------------|
 | leaflet   | For interactive map                                                      |
 | lubridate | Functions to work with date-times and time-spans                         |
 | raster    | Reading, writing, manipulating, analyzing and modeling of spatial data.  |
@@ -326,11 +326,6 @@ roads_clean <- roads %>%
   st_transform(crs = 32647)
 ```
 
-```{r}
-roads_clean <- roads_clean %>% 
-  st_transform(crs = 32647)
-```
-
 Saving road_clean as .rds:
 
 ```{r}
@@ -339,6 +334,7 @@ write_rds(roads_clean, "data/rds/roads_clean.rds")
 ```
 
 ```{r}
+#| eval: False
 roads_clean <- read_rds("data/rds/roads_clean.rds")
 
 roads_bmr <- st_intersection(sab_P,roads_clean)
@@ -347,10 +343,12 @@ roads_bmr <- st_intersection(sab_P,roads_clean)
 Saving the roads network in BMR:
 
 ```{r}
+#| eval: False
 write_rds(roads_bmr, "data/rds/roads_bmr.rds")
 ```
 
 ```{r}
+#| eval: False
 plot(st_geometry(roads_bmr))
 ```
 
@@ -440,6 +438,7 @@ write_rds(acc_bmr,"data/rds/acc_bmr.rds")
 Before jumping into the analysis, we will use plot(), ggplot() and tmap() to take a quick look.
 
 ```{r}
+#| eval: False
 acc_bmr <-read_rds("data/rds/acc_bmr.rds")
 
 plot(st_geometry(roads_bmr),
@@ -452,6 +451,7 @@ plot(st_geometry(sab_C), add = T)
 ```
 
 ```{r}
+#| eval: False
 highway_color = c("motorway" = "#FF00FF",
            "trunk" = "#00FF00",
            "primary" = "#FFFF00",
@@ -476,6 +476,7 @@ ggplot() +
 ```
 
 ```{r}
+#| eval: False
 tmap_mode('view')
 
 tm_shape(acc_bmr) + 
@@ -500,6 +501,7 @@ Using tmap's view mode to explore, we are able to see that the motorway, primary
 Creating a dictionary for Thai-to-English translation. The reference Thai words are drawn from [Thai Highway Classification](https://wiki.openstreetmap.org/wiki/WikiProject_Thailand#Highway_classification).
 
 ```{r}
+#| eval: False
 acc_bmr$route <- str_trim(acc_bmr$route) 
 ```
 
@@ -517,14 +519,17 @@ translation_dict <- c("ทางพิเศษศรีรัชรัช" = "e
 ```
 
 ```{r}
+#| eval: False
 acc_bmr$route <- str_trim(acc_bmr$route) 
 ```
 
 ```{r}
+#| eval: False
 acc_bmr$route <- str_replace_all(acc_bmr$route, translation_dict)
 ```
 
 ```{r}
+#| eval: False
 grep("สะพานภูมิพลที่", acc_bmr$route)
 ```
 
@@ -542,10 +547,78 @@ As there some of the geometry in roads_bmr are "MULTILINESTRING", we will not be
 roads <- st_cast(roads_bmr, "LINESTRING")
 ```
 
+::: callout-tip
+## Choosing the cell size
+
+-   recall that Window Area of BMR = \~7,668.99 km^2^
+
+-   
+:::
+
 ```{r}
 lixels <- lixelize_lines(roads, 
                          500, 
                          mindist = 250)
+```
+
+### 4.2 Generating line centre points
+
+Next, *lines_center()* of **spNetwork** will be used to generate a SpatialPointsDataFrame (i.e. samples) with line centre points as shown in the code chunk below.
+
+```{r}
+samples <- lines_center(lixels) 
+```
+
+### 4.3 Performing NKDE
+
+```{r}
+densities <- nkde(roads, 
+                  events = acc_bmr,
+                  w = rep(1, nrow(acc_bmr)),
+                  samples = samples,
+                  kernel_name = "quartic",
+                  bw = 500, 
+                  div= "bw", 
+                  method = "simple", 
+                  digits = 1, 
+                  tol = 1,
+                  grid_shape = c(10,10), 
+                  max_depth = 8,
+                  agg = 1000, 
+                  sparse = TRUE,
+                  verbose = FALSE)
+```
+
+#### 4.3.1 Visualising NKDE
+
+```{r}
+
+samples$density <- densities
+lixels$density <- densities
+```
+
+Rescaling to per 100 kilometers
+
+```{r}
+
+samples$density <- samples$density*1000
+lixels$density <- lixels$density*1000
+```
+
+Using tmap for visualisation
+
+```{r}
+
+tmap_mode('view')
+tm_shape(lixels)+
+  tm_lines(col="density")+
+tm_shape(acc_bmr)+
+  tm_dots()
+tmap_mode('plot')
+```
+
+```{r}
+densities
 ```
 
 ## References
