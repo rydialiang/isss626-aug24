@@ -32,7 +32,9 @@ The specific objectives of this take-home exercise are as follows:
 
 -   Thailand has four administrative levels:
 
-    -   Level 1 - Provinces (Changwat) - Total: 76 provinces + Bangkok as special administrative area.
+    -   Level 0 - Country - Whole of Thailand
+
+    -   Level 1 - Provinces (Changwat) - Total: 76 provinces, with Bangkok as special administrative area.
 
     -   Level 2 - District (Amphoe)
 
@@ -103,17 +105,19 @@ pacman::p_load(leaflet,
                lubridate,
                raster,
                sf,
+               spatstat,
                spNetwork,
                tidyverse,
                tmap)
 ```
 
 | Packages  | Description                                                              |
-|-------------------|-----------------------------------------------------|
+|--------------------|----------------------------------------------------|
 | leaflet   | For interactive map                                                      |
 | lubridate | Functions to work with date-times and time-spans                         |
 | raster    | Reading, writing, manipulating, analyzing and modeling of spatial data.  |
 | sf        | For importing, managing, ad handling geospatial data                     |
+| spatstat  | For Spatial Point Pattern Analysis (SPPA)                                |
 | spNetwork | Perform spatial analysis on network                                      |
 | tidyverse | For aspatial data wrangling                                              |
 | tmap      | For thematic mapping                                                     |
@@ -195,11 +199,13 @@ Before proceeding to filter the data, we observe that there is a total of 81,735
 -   The output R object is called acc_sf and it is a sf data frame.
 :::
 
-After the
+After the wrangling the data, we will save them for future use, using the write_rds() of readr package. The step will help us save time of re-running the codes for importing and wrangling the raw data.
 
 ```{r}
 write_rds(acc_sf, "data/rds/acc_sf.rds")
 ```
+
+We can import the data using the read_rds() of the readr package:
 
 ```{r}
 acc_sf <- read_rds("data/rds/acc_sf.rds")
@@ -207,7 +213,183 @@ acc_sf <- read_rds("data/rds/acc_sf.rds")
 
 ### 3.2 Importing Spatial Data
 
-Importing the [Thailand - Subnational Administrative Boundaries](https://data.humdata.org/dataset/cod-ab-tha?)
+### 3.2.1 Importing the Administraive Boundaries
+
+Importing the [Thailand - Subnational Administrative Boundaries](https://data.humdata.org/dataset/cod-ab-tha?) using st_read() of sf package. Since we are only interested in the Bangkok Metropolitan Region (BMR) as our study area, we will extract only the six provinces by using filter(). We will use the layer name "tha_admbnda_adm1_rtsd_20220121" as ADM1 refers to the province level boundaries. Note: Thailand administrative level 0 (country), 1 (province), 2 (district), and 3 (sub-district, tambon) boundaries.
+
+```{r}
+sab_P <- st_read(dsn = "data/rawdata",
+               layer = "tha_admbnda_adm1_rtsd_20220121") %>% filter(ADM1_EN %in% c("Bangkok","Nakhon Pathom", "Pathum Thani", "Nonthaburi", "Samut Prakan", "Samut Sakhon"))
+```
+
+We will use the following code chunk to take a quick look at selected BMR boundaries.
+
+```{r}
+plot(st_geometry(sab_P))
+```
+
+Since we are not very familiar with the Thailand map, we may want to double check the correctness by including the label with name of the six province and the coordinates.
+
+```{r}
+# setting the colors for each Province
+colors = c("Bangkok" = "#FF0000",
+           "Nakhon Pathom" = "#55FF00",
+           "Pathum Thani" = "#FFAA00",
+           "Nonthaburi" = "#0000FF",
+           "Samut Prakan" = "#7F00FF",
+           "Samut Sakhon" = "#00FFFF")
+
+ggplot(data = sab_P) +
+  geom_sf(aes(fill = ADM1_EN)) + 
+  scale_fill_manual(values = colors, 
+                    name = "Province") +
+  geom_text(aes(label = ADM1_EN,
+                geometry = geometry), 
+            stat = "sf_coordinates", 
+            size = 3)
+```
+
+If we wish to go to the district-level granularity, we may choose to import the ADM2 layer instead.
+
+```{r}
+sab_C <- st_read(dsn = "data/rawdata",
+               layer = "tha_admbnda_adm2_rtsd_20220121") %>% filter(ADM1_EN %in% c("Bangkok","Nakhon Pathom", "Pathum Thani", "Nonthaburi", "Samut Prakan", "Samut Sakhon"))
+```
+
+Similarly, we will use ggplot2() to visualise the using the Level 2 - District (Amphoe) boundaries.
+
+```{r}
+ggplot(data = sab_C) +
+  geom_sf(aes(fill = ADM1_EN)) +
+  scale_fill_manual(values = colors, 
+                    name = "Province")
+```
+
+::: callout-tip
+## Boundaries
+
+-   For creating the boundaries for the study area, ADM1_EN would be sufficient.
+
+-   However, we may want to have ADM2_EN for detailed study for each districts within the BMR.
+:::
+
+The code chunk below re-project the boundaries into the correct CRS.
+
+```{r}
+sab_P <- sab_P %>% 
+  st_transform(crs = 32647)
+
+sab_C <- sab_C %>% 
+  st_transform(crs = 32647)
+```
+
+### 3.2.2 Creating owin object for BMR boundaries
+
+```{r}
+bmr_owin <- as.owin(sab_P)
+```
+
+```{r}
+plot(bmr_owin)
+```
+
+```{r}
+summary(bmr_owin)
+```
+
+::: callout-important
+## WIndow Area / Size of the Area
+
+-   Window Area = 7,668,990,000 square units (m^2^)
+
+    -   converting to km^2^ by dividing it by 1,000,000.
+
+    -   Window Area of BMR = \~7,668.99 km^2^
+:::
+
+### 3.2.3 Importing the Road Networks
+
+In this code chunk, we will import the [Thailand Roads (OpenStreetMap Export)](https://data.humdata.org/dataset/hotosm_tha_roads) downloaded from HDX.
+
+```{r}
+roads <- st_read(dsn ="data/rawdata",
+                 layer = "hotosm_tha_roads_lines_shp") 
+```
+
+Assigning EPSG code 4326 as the geometry shows longlat decimal degree between (-180 to 180). Next, we use st_transform() to re-project from Geographic CRS of WGS84 to Projected CRS of UTM Zone 47N.
+
+```{r}
+roads <- roads %>% 
+  st_set_crs(4326) %>% 
+  st_transform(crs = 32647)
+```
+
+```{r}
+roads_bmr <- st_intersection(sab_P,roads)
+```
+
+### 3.2.4 Combining the bmr_owin with the data points
+
+Converting the acc_sf and roads data into ppp.
+
+```{r}
+acc_ppp = as.ppp(acc_sf)
+```
+
+Extracting accident events located within BMR:
+
+```{r}
+accBMR_ppp = acc_ppp[bmr_owin]
+```
+
+```{r}
+summary(accBMR_ppp)
+```
+
+Handling duplicated points.
+
+```{r}
+any(duplicated(accBMR_ppp))
+```
+
+To count the number of co-incidence point, we will use the *multiplicity()* function as shown in the code chunk below.
+
+```{r}
+multiplicity(accBMR_ppp)
+```
+
+```{r}
+sum(multiplicity(acc_ppp) > 1)
+```
+
+The output shows there are 15 duplicate point events (Accidents).
+
+::: callout-important
+## Treatment of duplicates
+
+-   We will use jittering approach to add a small perturbation to the duplicate points so that they do not occupy the exact same space.
+
+-   The reason to use this approach is because we do not want to delete any accidents that overlaps in the same area.
+:::
+
+```{r}
+accBMR_ppp_jit <- rjitter(accBMR_ppp, 
+                             retry=TRUE, 
+                             nsim=1, 
+                             drop=TRUE)
+```
+
+```{r}
+any(duplicated(accBMR_ppp_jit))
+```
+
+```{r}
+plot(accBMR_ppp_jit)
+```
+
+::: callout-important
+-   Notably, the plot of accBMR_ppp_jit represents road network within the BMR area, since the accidents can only happen along the road network, and not outside of it.
+:::
 
 ## References
 
