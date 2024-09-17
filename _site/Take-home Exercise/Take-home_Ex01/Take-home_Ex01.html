@@ -197,7 +197,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="dropdown-text">In-class Exercise 3</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="../../In-class Exercise/In-class_Ex04/In-class_Ex04.qmd">
+    <a class="dropdown-item" href="../../In-class Exercise/In-class_Ex04/In-class_Ex04.html">
  <span class="dropdown-text">In-class Exercise 4</span></a>
   </li>  
         <li>
@@ -322,7 +322,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">September 13, 2024</p>
+      <p class="date-modified">September 17, 2024</p>
     </div>
   </div>
     
@@ -336,7 +336,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><img src="images/A_detailed_illustration_of_a_study_on_road_traffic_landscape.jpeg" class="img-fluid"></p>
 <section id="introduction-objectives" class="level2">
 <h2 class="anchored" data-anchor-id="introduction-objectives">1.0 Introduction &amp; Objectives</h2>
-<p>In this Take-Home Exercise 1, we will be discovering factors affecting road traffic accidents in the <a href="https://en.wikipedia.org/wiki/Bangkok_Metropolitan_Region">Bangkok Metropolitan Region BMR</a> by employing both spatial spatio-temporal point patterns analysis methods.</p>
+<p>In this Take-Home Exercise 1, we will be discovering factors affecting road traffic accidents in the <a href="https://en.wikipedia.org/wiki/Bangkok_Metropolitan_Region">Bangkok Metropolitan Region BMR</a> by employing both spatial and spatio-temporal point patterns analysis methods.</p>
 <p>The specific objectives of this take-home exercise are as follows:</p>
 <ul>
 <li><p>To visualize the spatio-temporal dynamics of road traffic accidents in BMR using appropriate statistical graphics and geovisualization methods.</p></li>
@@ -346,7 +346,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="the-study-area" class="level3">
 <h3 class="anchored" data-anchor-id="the-study-area">1.1 The Study Area</h3>
 <ul>
-<li><p>Thailand has four administrative level:</p>
+<li><p>Thailand has four administrative levels:</p>
 <ul>
 <li><p>Level 1 - Provinces (Changwat) - Total: 76 provinces + Bangkok as special administrative area.</p></li>
 <li><p>Level 2 - District (Amphoe)</p></li>
@@ -354,9 +354,34 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><p>Level 4 - Village (Muban)</p></li>
 </ul></li>
 <li><p>In this exercise we will focus our analysis on the study area called the <a href="https://en.wikipedia.org/wiki/Bangkok_Metropolitan_Region">Bangkok Metropolitan Region (BMR)</a>, which consists of <a href="https://en.wikipedia.org/wiki/Bangkok">Bangkok</a> and its five adjacent provinces, namely <a href="https://en.wikipedia.org/wiki/Nakhon_Pathom_Province" title="Nakhon Pathom Province">Nakhon Pathom</a>, <a href="#0" title="Pathum Thani Province">Pathum Thani</a>, <a href="#0" title="Nonthaburi Province">Nonthaburi</a>, <a href="#0" title="Samut Prakan Province">Samut Prakan</a>, and <a href="#0" title="Samut Sakhon Province">Samut Sakhon</a>.</p></li>
-<li><p>WGS 84 / UTM zone 47N</p></li>
-<li><p>EPSG code 32647</p></li>
+<li><p>To confirm the EPSG code for the study area, we can check it on <a href="https://epsg.io/">epsg.io</a>. Enter “Thailand” and we will yield several results under Projected CRS:</p>
+<ul>
+<li><p><a href="https://epsg.io/23946">Indian 1954 / UTM zone 46N</a> - EPSG 23946 with transformation: 1153</p></li>
+<li><p><a href="https://epsg.io/23947">Indian 1954 / UTM zone 47N</a> - EPSG 23947 with transformation 1153</p></li>
+<li><p><a href="https://epsg.io/23948">Indian 1954 / UTM zone 48N</a> - EPSG 23948 with transformation 1153</p></li>
+<li><p><a href="https://epsg.io/24047">Indian 1975 / UTM zone 47N</a> - EPSG 24047 with transformation 1812</p></li>
+<li><p><a href="https://epsg.io/24048">Indian 1975 / UTM zone 48N</a> - EPSG 24048 with transformation 1812</p></li>
+<li><p><a href="https://epsg.io/32647">WGS 84 / UTM zone 47N</a> - EPSG 32647</p></li>
+<li><p><a href="https://epsg.io/32648">WGS 84 / UTM zone 48N</a> - EPSG 32648</p></li>
+<li><p><a href="https://epsg.io/3832">WGS 84 / PDC Mercator</a> - EPSG 3832</p></li>
+</ul></li>
 </ul>
+<p>We will be using Geodetic CRS <strong>WGS 84</strong> as it is a global standard. It leaves us with the last three options. As will click into each result, we will observe that <a href="https://epsg.io/3832">WGS 84 / PDC Mercator</a> covers wide area of use, and perhaps, more suitable for seafare. Whereas for <a href="https://epsg.io/32647">WGS 84 / UTM zone 47N</a> and <a href="https://epsg.io/32648">WGS 84 / UTM zone 48N</a>, the area are more precise, defined by the Easting and Northing.</p>
+<table class="table">
+<thead>
+<tr class="header">
+<th><a href="https://epsg.io/32647">WGS 84 / UTM zone 47N</a> - EPSG 32647</th>
+<th><a href="https://epsg.io/32648">WGS 84 / UTM zone 48N</a> - EPSG 32648</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Area of use:</strong> <a href="https://epsg.io/?q=Between+96%C2%B0E+and+102%C2%B0E%2C+northern+hemisphere+between+equator+and+84%C2%B0N%2C+onshore+and+offshore.+China.+Indonesia.+Laos.+Malaysia">Between 96°E and 102°E, northern hemisphere between equator and 84°N, onshore and offshore. China. Indonesia. Laos. Malaysia - West Malaysia. Mongolia. Myanmar (Burma). Russian Federation. Thailand.</a></td>
+<td><strong>Area of use:</strong> <a href="https://epsg.io/?q=Between+102%C2%B0E+and+108%C2%B0E%2C+northern+hemisphere+between+equator+and+84%C2%B0N%2C+onshore+and+offshore.+Cambodia.+China.+Indonesia.+Laos.+Malaysia">Between 102°E and 108°E, northern hemisphere between equator and 84°N, onshore and offshore. Cambodia. China. Indonesia. Laos. Malaysia - West Malaysia. Mongolia. Russian Federation. Singapore. Thailand. Vietnam.</a></td>
+</tr>
+</tbody>
+</table>
+<p>Considering Bangkok’s Coordinate (13.7563° N, 100.5018° E), we will use <a href="https://epsg.io/32647">WGS 84 / UTM zone 47N</a> - EPSG 32647, as its Northing of 13.7563° falls between the Equator and 84°N, and its Easting of 100.5018° falls between 96°E and 102°E, which are both in the area of use as indicated in the table above.</p>
 </section>
 </section>
 <section id="the-datasets" class="level2">
@@ -481,6 +506,7 @@ Lubridate
 </section>
 <section id="importing-spatial-data" class="level3">
 <h3 class="anchored" data-anchor-id="importing-spatial-data">3.2 Importing Spatial Data</h3>
+<p>Importing the <a href="https://data.humdata.org/dataset/cod-ab-tha?">Thailand - Subnational Administrative Boundaries</a></p>
 </section>
 </section>
 <section id="references" class="level2">
