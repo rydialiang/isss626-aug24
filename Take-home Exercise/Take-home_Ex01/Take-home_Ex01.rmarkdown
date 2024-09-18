@@ -10,6 +10,7 @@ execute:
   freeze: true
 ---
 
+
 ![](images/A_detailed_illustration_of_a_study_on_road_traffic_landscape.jpeg)
 
 ## 1.0 Introduction & Objectives
@@ -96,9 +97,9 @@ The following datasets are provided as part of the Take Home Exercise 1:
 
 The code chunk below checks if the packages are installed. If the packages are not yet installed, it will proceed to install and subsequently load the libraries. If the packages are already installed, it will proceed to launch into the R environment.
 
+
 ```{r}
-pacman::p_load(knitr,
-               leaflet,
+pacman::p_load(leaflet,
                lubridate,
                raster,
                sf,
@@ -108,9 +109,9 @@ pacman::p_load(knitr,
                tmap)
 ```
 
+
 | Packages  | Description                                                              |
 |--------------------------|----------------------------------------------|
-| knitr     | For dynamic report generation                                            |
 | leaflet   | For interactive map                                                      |
 | lubridate | Functions to work with date-times and time-spans                         |
 | raster    | Reading, writing, manipulating, analyzing and modeling of spatial data.  |
@@ -124,9 +125,11 @@ pacman::p_load(knitr,
 
 The set. seed() function is used to set a Random seed which Pseudorandom number generators use when generating "random" numbers. By using this function, we ensure that the randomly generated numbers remain the same when the code are reproduced.
 
+
 ```{r}
 set.seed(12345)
 ```
+
 
 ## 3.0 Importing and Wrangling the Data
 
@@ -134,12 +137,15 @@ set.seed(12345)
 
 Importing the data without filtering:
 
+
 ```{r}
 #| eval: False
 acc <- read_csv("data/rawdata/thai_road_accident_2019_2022.csv")
 ```
 
+
 Importing the data, and conducting necessary filter, conversion to sf, transformation of CRS, and get the days component of the `incident_datetime`:
+
 
 ```{r}
 #| eval: False
@@ -156,6 +162,7 @@ acc_sf <- read_csv("data/rawdata/thai_road_accident_2019_2022.csv") %>%
                            week_start = 1)) %>% 
   dplyr::select(c(2,5,7:21))
 ```
+
 
 ::: callout-note
 ## Thailand Road Accident \[ 2019-2022\]
@@ -201,22 +208,27 @@ Before proceeding to filter the data, we observe that there is a total of 81,735
 
 After the wrangling the data, we will save them for future use, using the write_rds() of readr package. The step will help us save time of re-running the codes for importing and wrangling the raw data.
 
+
 ```{r}
 #| eval: False
 write_rds(acc_sf, "data/rds/acc_sf.rds")
 ```
 
+
 We can import the data using the read_rds() of the readr package:
+
 
 ```{r}
 acc_sf <- read_rds("data/rds/acc_sf.rds")
 ```
+
 
 ### 3.2 Importing Spatial Data
 
 #### 3.2.1 Importing the Administrative Boundaries
 
 Importing the [Thailand - Subnational Administrative Boundaries](https://data.humdata.org/dataset/cod-ab-tha?) using st_read() of sf package. Since we are only interested in the Bangkok Metropolitan Region (BMR) as our study area, we will extract only the six provinces by using filter(). We will use the layer name "tha_admbnda_adm1_rtsd_20220121" as ADM1 refers to the province level boundaries. Note: Thailand administrative level 0 (country), 1 (province), 2 (district), and 3 (sub-district, tambon) boundaries.
+
 
 ```{r}
 sab_P <- st_read(dsn = "data/rawdata",
@@ -226,13 +238,17 @@ sab_P <- st_read(dsn = "data/rawdata",
 write_rds(sab_P, "data/rds/sab_P.rds")
 ```
 
+
 We will use the following code chunk to take a quick look at selected BMR boundaries.
+
 
 ```{r}
 plot(st_geometry(sab_P))
 ```
 
+
 Since we are not very familiar with the Thailand map, we may want to double check the correctness by including the label with name of the six province and the coordinates.
+
 
 ```{r}
 # setting the colors for each Province
@@ -253,7 +269,9 @@ ggplot(data = sab_P) +
             size = 3)
 ```
 
+
 If we wish to go to the district-level granularity, we may choose to import the ADM2 layer instead.
+
 
 ```{r}
 sab_C <- st_read(dsn = "data/rawdata",
@@ -263,7 +281,9 @@ sab_C <- st_read(dsn = "data/rawdata",
 write_rds(sab_C, "data/rds/sab_C.rds")
 ```
 
+
 Similarly, we will use ggplot2() to visualise the using the Level 2 - District (Amphoe) boundaries.
+
 
 ```{r}
 ggplot(data = sab_C) +
@@ -271,6 +291,7 @@ ggplot(data = sab_C) +
   scale_fill_manual(values = colors, 
                     name = "Province")
 ```
+
 
 ::: callout-tip
 ## Boundaries
@@ -280,9 +301,21 @@ ggplot(data = sab_C) +
 -   However, we may want to have ADM2_EN for detailed study for each districts within the BMR.
 :::
 
+#### 3.2.2 Creating owin object for BMR boundaries
+
+
 ```{r}
-summarise(sab_P)
+bmr_owin <- as.owin(sab_P)
 ```
+
+```{r}
+plot(bmr_owin)
+```
+
+```{r}
+summary(bmr_owin)
+```
+
 
 ::: callout-important
 ## WIndow Area / Size of the Area
@@ -294,16 +327,19 @@ summarise(sab_P)
     -   Window Area of BMR = \~7,668.99 km^2^
 :::
 
-#### 3.2.2 Importing the Road Networks
+#### 3.2.3 Importing the Road Networks
 
 In this code chunk, we will import the [Thailand Roads (OpenStreetMap Export)](https://data.humdata.org/dataset/hotosm_tha_roads) downloaded from HDX.
+
 
 ```{r}
 roads <- st_read(dsn ="data/rawdata",
                  layer = "hotosm_tha_roads_lines_shp") 
 ```
 
+
 Assigning EPSG code 4326 as the geometry shows longlat decimal degree between (-180 to 180). Next, we use st_transform() to re-project from Geographic CRS of WGS84 to Projected CRS of UTM Zone 47N.
+
 
 ```{r}
 roads_clean <- roads %>% 
@@ -312,7 +348,9 @@ roads_clean <- roads %>%
   st_transform(crs = 32647)
 ```
 
+
 Saving road_clean as .rds:
+
 
 ```{r}
 #| eval: False
@@ -327,7 +365,9 @@ roads_clean <- read_rds("data/rds/roads_clean.rds")
 roads_bmr <- st_intersection(sab_P,roads_clean)
 ```
 
+
 Saving the roads network in BMR:
+
 
 ```{r}
 #| eval: False
@@ -339,7 +379,88 @@ roads_bmr <- read_rds("data/rds/roads_bmr.rds")
 plot(st_geometry(roads_bmr))
 ```
 
+
+#### 3.2.4 Combining the bmr_owin with the data points
+
+Converting the acc_sf and roads data into ppp.
+
+
+```{r}
+acc_ppp = as.ppp(acc_sf)
+```
+
+
+Extracting accident events located within BMR:
+
+
+```{r}
+accBMR_ppp = acc_ppp[bmr_owin]
+```
+
+```{r}
+summary(accBMR_ppp)
+```
+
+
+Handling duplicated points.
+
+
+```{r}
+any(duplicated(accBMR_ppp))
+```
+
+
+To count the number of co-incidence point, we will use the *multiplicity()* function as shown in the code chunk below.
+
+
+```{r}
+multiplicity(accBMR_ppp)
+```
+
+```{r}
+sum(multiplicity(acc_ppp) > 1)
+```
+
+
+The output shows there are 15 duplicate point events (Accidents).
+
+::: callout-important
+## Treatment of duplicates
+
+-   We will use jittering approach to add a small perturbation to the duplicate points so that they do not occupy the exact same space.
+
+-   The reason to use this approach is because we do not want to delete any accidents that overlaps in the same area.
+:::
+
+
+```{r}
+accBMR_ppp_jit <- rjitter(accBMR_ppp, 
+                             retry=TRUE, 
+                             nsim=1, 
+                             drop=TRUE)
+```
+
+```{r}
+any(duplicated(accBMR_ppp_jit))
+```
+
+```{r}
+plot(accBMR_ppp_jit)
+```
+
+
+::: callout-important
+-   Notably, the plot of accBMR_ppp_jit represents road network within the BMR area, since the accidents can only happen along the road network, and not outside of it.
+:::
+
+
+```{r}
+write_rds(accBMR_ppp_jit,"data/rds/accBMR_ppp_jit.rds")
+```
+
+
 #### 3.2.5 Extracting the accidents records within BMR
+
 
 ```{r}
 #| eval: False
@@ -348,16 +469,20 @@ acc_sf <- read_rds("data/rds/acc_sf.rds")
 acc_bmr <- st_intersection(sab_P,acc_sf)
 ```
 
+
 Saving the accidents records within BMR:
+
 
 ```{r}
 #| eval: False
 write_rds(acc_bmr,"data/rds/acc_bmr.rds")
 ```
 
+
 ### 3.3 Visualising the Geospatial Data
 
 Before jumping into the analysis, we will use plot(), ggplot() and tmap() to take a quick look.
+
 
 ```{r}
 sab_C <- read_rds("data/rds/sab_C.rds")
@@ -416,26 +541,17 @@ tm_shape(acc_bmr) +
 tmap_mode("plot")
 ```
 
+
 Using tmap's view mode to explore, we are able to see that the motorway, primary, secondary and trunk highway types have higher accident records. There is significantly lesser incidents along tertiary and unclassified road.
 
 Since most of the accidents happens in just four categories mentioned, we will further filter the accident data for those that happened in the relevant highway types, so that we can save on computation time.
-
-```{r}
-roads_bmr <-read_rds("data/rds/roads_bmr.rds")
-roads_bmr_4 <- roads_bmr %>% 
-  filter(highway %in% c("motorway", "trunk", "primary", "secondary")) %>% 
-  select(3,14,18,19,31)
-```
-
-```{r}
-write_rds(roads_bmr_4, "data/rds/roads_bmr_4.rds")
-```
 
 Instead of using tmap to physically track where are the accidents happening, we can also choose to extract these information from the "route" column in acc_bmr.
 
 ### 3.4 Attempted: Converting "route" to "highway" type
 
 Creating a dictionary for Thai-to-English translation. The reference Thai words are drawn from [Thai Highway Classification](https://wiki.openstreetmap.org/wiki/WikiProject_Thailand#Highway_classification).
+
 
 ```{r}
 #| eval: False
@@ -470,6 +586,7 @@ acc_bmr$route <- str_replace_all(acc_bmr$route, translation_dict)
 grep("สะพานภูมิพลที่", acc_bmr$route)
 ```
 
+
 After troubleshooting, the above method did not work as intended. After checking a few route lines using Google Translate, we observe that the route is a description of the route (e.g. Bhumibol II Bridge to Bhumibol I Bridge), rather than the classification of the higway that the accident happened on. Nonetheless, there are certain helpful words to derive the possible highway classification.
 
 ## 4.0 Network Constrained Spatial Point Pattern Analysis
@@ -480,10 +597,11 @@ Before computing NKDE, the SpatialLines object need to be cut into lixels with a
 
 As there some of the geometry in roads_bmr are "MULTILINESTRING", we will not be able to process it using [lixelize_lines()](https://jeremygelb.github.io/spNetwork/reference/lixelize_lines.html) directly. [lixelize_lines()](https://jeremygelb.github.io/spNetwork/reference/lixelize_lines.html) requires the all geometries to be "LINESTRING", thus, we will use st_cast() to cast all the "MULTILINESTRING" into "LINESTRING" geometry.
 
+
 ```{r}
 roads_ls <- st_cast(roads_bmr, "LINESTRING")
-write_rds(roads_ls, "data/rds/roads_ls.rds")
 ```
+
 
 ::: callout-tip
 ## Choosing the cell size
@@ -493,21 +611,23 @@ write_rds(roads_ls, "data/rds/roads_ls.rds")
 -   we will set the length of each lixel to be 500, which is equals to 500m on the map
 :::
 
+
 ```{r}
 lixels <- lixelize_lines(roads_ls, 
-                         5000, 
-                         mindist = 3000)
-write_rds(lixels,"data/rds/lixels")
+                         500, 
+                         mindist = 300)
 ```
+
 
 ### 4.2 Generating line centre points
 
 Next, *lines_center()* of **spNetwork** will be used to generate a SpatialPointsDataFrame (i.e. samples) with line centre points as shown in the code chunk below.
 
+
 ```{r}
 samples <- lines_center(lixels) 
-write_rds(samples, "data/rds/samples.rds")
 ```
+
 
 ### 4.3 Performing NKDE
 
@@ -518,13 +638,14 @@ write_rds(samples, "data/rds/samples.rds")
 -   We will set bandwidth (bw) as 10,000, which is equivalent to 10km
 :::
 
+
 ```{r}
 densities <- nkde(roads_ls, 
                   events = acc_bmr,
                   w = rep(1, nrow(acc_bmr)),
                   samples = samples,
                   kernel_name = "quartic",
-                  bw = 50000,
+                  bw = 10000,
                   div= "bw", 
                   method = "simple", 
                   digits = 1, 
@@ -537,24 +658,30 @@ densities <- nkde(roads_ls,
 ```
 
 ```{r}
-write_rds(densities_bw50000,"data/rds/densities.rds")
+write_rds(densities,"data/rds/densities.rds")
 ```
 
+
 #### 4.3.1 Visualising NKDE
+
 
 ```{r}
 samples$density <- densities
 lixels$density <- densities
 ```
 
+
 Rescaling to per 1 kilometers
+
 
 ```{r}
 samples$density <- samples$density*1000
 lixels$density <- lixels$density*1000
 ```
 
+
 Using tmap for visualisation
+
 
 ```{r}
 
@@ -566,27 +693,6 @@ tm_shape(acc_bmr)+
 tmap_mode('plot')
 ```
 
-::: callout-note
-## Hotspots
-
--   Hotspot 1 is at the highway along Suvarnabhumi International Airport.
-
-    -   This is one of the busiest areas due to heavy traffic associated with the airport. Possible accident due to tourists who are driving in unfamiliar places.
-
--   Hotspot 2 is along highway 338, Borommaratchachonnani Rd.
-
-    -   This highway is a major route leading out of Bangkok.
-
--   Hotspot 3 is along highway 8, Kanchanaphisek Road.
-
-    -   This highway is a major route leading out of Bangkok.
-:::
-
-lixels = 5,000, mindist = 3,000.
-
-bw = 10,000
-
-![](images/clipboard-1347560788.png)
 
 ## 5.0 Temporal Network Kernel Density Estimate (TNKDE)
 
@@ -596,141 +702,31 @@ The spatio-temporal kernel is calculated as the product of the network kernel de
 
 ### 5.1 Temporal Dimension
 
+
 ```{r}
-acc_bmr <- read_rds("data/rds/acc_bmr.rds")
+data(acc_bmr)
 
 # converting the Date field to a numeric field (counting days)
-acc_bmr$Time <- as.POSIXct(acc_bmr$incident_datetime, format = "%Y/%m/%d")
+acc_bmr$Time <- as.POSIXct(acc_bmr$date, format = "%Y/%m/%d")
 start <- as.POSIXct("2019/01/01", format = "%Y/%m/%d")
-
 acc_bmr$Time <- difftime(acc_bmr$Time, start, units = "days")
 acc_bmr$Time <- as.numeric(acc_bmr$Time)
 
-years <- as.character(2019:2022)
 months <- as.character(1:12)
-months <- ifelse(nchar(months) == 1, paste0("0", months), months)
-
-months_starts_labs <- expand.grid(years, months)
-months_starts_labs <- paste(months_starts_labs$Var1, "/", months_starts_labs$Var2, "/01", sep = "")
-
+months <- ifelse(nchar(months)==1, paste0("0", months), months)
+months_starts_labs <- paste("2019/",months,"/01", sep = "")
 months_starts_num <- as.POSIXct(months_starts_labs, format = "%Y/%m/%d")
 months_starts_num <- difftime(months_starts_num, start, units = "days")
 months_starts_num <- as.numeric(months_starts_num)
-months_starts_labs <- gsub("/01","", months_starts_labs)
+months_starts_labs <- gsub("2019/", "", months_starts_labs, fixed = TRUE)
 
 ggplot(acc_bmr) + 
   geom_histogram(aes(x = Time), bins = 30, color = "white") + 
-  scale_x_continuous(breaks = months_starts_num, labels = months_starts_labs) +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+  scale_x_continuous(breaks = months_starts_num, labels = months_starts_labs)
 ```
 
-### 5.1.1 Calculate the kernel density values in time for several bandwidths
-
-```{r}
-w <- rep(1,nrow(acc_bmr))
-samples <- seq(0, max(acc_bmr$Time), 0.5)
-
-time_kernel_values <- data.frame(
-  bw_10 = tkde(acc_bmr$Time, w = w, samples = samples, bw = 10, kernel_name = "quartic"),
-  bw_20 = tkde(acc_bmr$Time, w = w, samples = samples, bw = 20, kernel_name = "quartic"),
-  bw_30 = tkde(acc_bmr$Time, w = w, samples = samples, bw = 30, kernel_name = "quartic"),
-  bw_40 = tkde(acc_bmr$Time, w = w, samples = samples, bw = 40, kernel_name = "quartic"),
-  bw_50 = tkde(acc_bmr$Time, w = w, samples = samples, bw = 50, kernel_name = "quartic"),
-  bw_60 = tkde(acc_bmr$Time, w = w, samples = samples, bw = 60, kernel_name = "quartic"),
-  bw_70 = tkde(acc_bmr$Time, w = w, samples = samples, bw = 70, kernel_name = "quartic"),
-  bw_80 = tkde(acc_bmr$Time, w = w, samples = samples, bw = 80, kernel_name = "quartic"),
-  time = samples
-)
-
-df_time <- reshape2::melt(time_kernel_values,id.vars = "time")
-df_time$variable <- as.factor(df_time$variable)
-
-ggplot(data = df_time) + 
-  geom_line(aes(x = time, y = value)) +
-  scale_x_continuous(breaks = months_starts_num, labels = months_starts_labs) +
-  facet_wrap(vars(variable), ncol=2, scales = "free") + 
-  theme(axis.text = element_text(size = 5, angle = 90))
-  
-```
-
-::: callout-important
-## Intepreting the tkde()
-
--   Cyclical pattern - Higher number of road traffic incidents in December period, which is the start of Thailand's peak tourist season.
-
--   Songkran festival - between 2019 and 2022, we can observe peak in Apr for year 2019, 2021 and 2022 using the bw_10 and bw_20 time series charts. In year 2020, Songkran was officially postponed due to COVID-19.
-
--   Lowest through - around April-July 2021 (bw_30 to bw_80), which coincides with Thailand's ban on all passengers flights landing in Thailand till July 2021 due to third wave of COVID-19 in the country.
-:::
-
-![](images/clipboard-1002896018.png)
-
-Source: <https://ourworldindata.org/coronavirus/country/thailand>
-
-### 5.2 Spatial Dimension
-
-Before considering the spatio-temporal case, we can also investigate the spatial dimension.
-
-```{r}
-tm_shape(roads_bmr) + 
-  tm_lines(col = "black") + 
-  tm_shape(acc_bmr) + 
-  tm_dots(col = "red", size = 0.1)
-```
-
-```{r}
-densities <- read_rds("data/rds/densities.rds")
-
-samples$density <- densities
-lixels$density <- densities
-samples$density <- samples$density*1000
-lixels$density <- lixels$density*1000
-```
-
-Plotting with tmap:
-
-```{r}
-tmap_mode('view')
-tm_shape(lixels)+
-  tm_lines(col="density")+
-tm_shape(acc_bmr)+
-  tm_dots()
-tmap_mode('plot')
-```
-
-![](images/clipboard-1395387298.png)
-
-### 5.3 Spatio-Temporal
-
-```{r}
-cv_scores <- bw_tnkde_cv_likelihood_calc(
-  bw_net_range = c(100,500),
-  bw_net_step = 100,
-  bw_time_range = c(10,80),
-  bw_time_step = 10,
-  lines = roads_bmr,
-  events = acc_bmr,
-  time_field = "Time",
-  w = rep(1, nrow(acc_bmr)),
-  kernel_name = "quartic",
-  method = "simple",
-  diggle_correction = FALSE,
-  study_area = NULL,
-  max_depth = 10,
-  digits = 2,
-  tol = 0.1,
-  agg = 10,
-  sparse=TRUE,
-  grid_shape=c(1,1),
-  sub_sample=1,
-  verbose = FALSE,
-  check = TRUE)
-```
-
-```{r}
-knitr::kable(cv_scores)
-```
 
 ## References
 
 News: <https://www.who.int/news-room/fact-sheets/detail/road-traffic-injuries>
+
