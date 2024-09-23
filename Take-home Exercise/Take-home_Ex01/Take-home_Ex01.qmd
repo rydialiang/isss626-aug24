@@ -108,6 +108,7 @@ pacman::p_load(knitr,
                tmap)
 ```
 
+<<<<<<< HEAD
 | Packages  | Description                                                              |
 |-----------------|-------------------------------------------------------|
 | knitr     | For dynamic report generation                                            |
@@ -119,6 +120,17 @@ pacman::p_load(knitr,
 | spNetwork | Perform spatial analysis on network                                      |
 | tidyverse | For aspatial data wrangling                                              |
 | tmap      | For thematic mapping                                                     |
+=======
+| Packages  | Description                                          |
+|-----------|------------------------------------------------------|
+| knitr     | For dynamic report generation                        |
+| leaflet   | For interactive map                                  |
+| lubridate | Functions to work with date-times and time-spans     |
+| sf        | For importing, managing, ad handling geospatial data |
+| spNetwork | Perform spatial analysis on network                  |
+| tidyverse | For aspatial data wrangling                          |
+| tmap      | For thematic mapping                                 |
+>>>>>>> f82822e93feb617dbf96f0a40570f27c98c30775
 
 ### 2.2 Setting Seeds to Ensure Reproducibility
 
@@ -154,7 +166,7 @@ acc_sf <- read_csv("data/rawdata/thai_road_accident_2019_2022.csv") %>%
   mutate(Year = year(incident_datetime)) %>% 
   mutate(DaysOfWeek = wday(incident_datetime,
                            week_start = 1)) %>% 
-  dplyr::select(c(2,5,7:21))
+  dplyr::select(c(2,5,8:21))
 ```
 
 ::: callout-note
@@ -219,8 +231,11 @@ acc_sf <- read_rds("data/rds/acc_sf.rds")
 Importing the [Thailand - Subnational Administrative Boundaries](https://data.humdata.org/dataset/cod-ab-tha?) using st_read() of sf package. Since we are only interested in the Bangkok Metropolitan Region (BMR) as our study area, we will extract only the six provinces by using filter(). We will use the layer name "tha_admbnda_adm1_rtsd_20220121" as ADM1 refers to the province level boundaries. Note: Thailand administrative level 0 (country), 1 (province), 2 (district), and 3 (sub-district, tambon) boundaries.
 
 ```{r}
+#| eval: False
 sab_P <- st_read(dsn = "data/rawdata",
-               layer = "tha_admbnda_adm1_rtsd_20220121") %>% filter(ADM1_EN %in% c("Bangkok","Nakhon Pathom", "Pathum Thani", "Nonthaburi", "Samut Prakan", "Samut Sakhon")) %>% 
+               layer = "tha_admbnda_adm1_rtsd_20220121") %>% 
+  filter(ADM1_EN %in% c("Bangkok","Nakhon Pathom", "Pathum Thani", "Nonthaburi", "Samut Prakan", "Samut Sakhon")) %>% 
+  select(3,17) %>% 
   st_transform(crs = 32647) 
 
 write_rds(sab_P, "data/rds/sab_P.rds")
@@ -229,6 +244,7 @@ write_rds(sab_P, "data/rds/sab_P.rds")
 We will use the following code chunk to take a quick look at selected BMR boundaries.
 
 ```{r}
+sab_P <- read_rds("data/rds/sab_P.rds")
 plot(st_geometry(sab_P))
 ```
 
@@ -256,8 +272,10 @@ ggplot(data = sab_P) +
 If we wish to go to the district-level granularity, we may choose to import the ADM2 layer instead.
 
 ```{r}
+#| eval: False
 sab_C <- st_read(dsn = "data/rawdata",
                layer = "tha_admbnda_adm2_rtsd_20220121") %>% filter(ADM1_EN %in% c("Bangkok","Nakhon Pathom", "Pathum Thani", "Nonthaburi", "Samut Prakan", "Samut Sakhon")) %>% 
+  select(3,11,20) %>% 
   st_transform(crs = 32647) 
 
 write_rds(sab_C, "data/rds/sab_C.rds")
@@ -266,6 +284,7 @@ write_rds(sab_C, "data/rds/sab_C.rds")
 Similarly, we will use ggplot2() to visualise the using the Level 2 - District (Amphoe) boundaries.
 
 ```{r}
+sab_C <- read_rds("data/rds/sab_C.rds")
 ggplot(data = sab_C) +
   geom_sf(aes(fill = ADM1_EN)) +
   scale_fill_manual(values = colors, 
@@ -280,13 +299,26 @@ ggplot(data = sab_C) +
 -   However, we may want to have ADM2_EN for detailed study for each districts within the BMR.
 :::
 
+### **3.2.2 Creating owin object for BMR boundaries**
+
 ```{r}
-summarise(sab_P)
+#| eval: False
+bmr_owin <- as.owin(sab_P)
+write_rds(bmr_owin, "data/rds/bmr_owin.rds")
 ```
 
-::: callout-important
-## WIndow Area / Size of the Area
+```{r}
+bmr_owin <- read_rds("data/rds/bmr_owin.rds")
+plot(bmr_owin)
+```
 
+```{r}
+summary(bmr_owin)
+```
+
+## Window Area / Size of the Area
+
+::: callout-important
 -   Window Area = 7,668,990,000 square units (m^2^)
 
     -   converting to km^2^ by dividing it by 1,000,000.
@@ -294,20 +326,23 @@ summarise(sab_P)
     -   Window Area of BMR = \~7,668.99 km^2^
 :::
 
-#### 3.2.2 Importing the Road Networks
+#### 3.2.3 Importing the Road Networks
 
 In this code chunk, we will import the [Thailand Roads (OpenStreetMap Export)](https://data.humdata.org/dataset/hotosm_tha_roads) downloaded from HDX.
 
 ```{r}
-roads <- st_read(dsn ="data/rawdata",
+#| eval: False
+road <- st_read(dsn ="data/rawdata",
                  layer = "hotosm_tha_roads_lines_shp") 
 ```
 
-Assigning EPSG code 4326 as the geometry shows longlat decimal degree between (-180 to 180). Next, we use st_transform() to re-project from Geographic CRS of WGS84 to Projected CRS of UTM Zone 47N.
+Assigning EPSG code 4326 as the geometry shows longlat decimal degree between (-180 to 180). Next, we use st_transform() to re-project from Geographic CRS of WGS84 to Projected CRS of UTM Zone 47N. After exploring the data, we can see that most of the accidents occur on the four types of highway: "motorway", "trunk", "primary","secondary".
 
 ```{r}
-roads_clean <- roads %>% 
-  filter(highway %in% c("motorway", "trunk", "primary", "secondary", "tertiary", "unclassified")) %>% 
+#| eval: False
+roads_clean <- road %>% 
+  filter(highway %in% c("motorway", "trunk", "primary","secondary")) %>% 
+  select(2:4,15) %>% 
   st_set_crs(4326) %>%
   st_transform(crs = 32647)
 ```
@@ -336,7 +371,9 @@ write_rds(roads_bmr, "data/rds/roads_bmr.rds")
 
 ```{r}
 roads_bmr <- read_rds("data/rds/roads_bmr.rds")
+
 plot(st_geometry(roads_bmr))
+plot(st_geometry(sab_P), add = T)
 ```
 
 #### 3.2.5 Extracting the accidents records within BMR
@@ -380,7 +417,7 @@ highway_color = c("motorway" = "#FF00FF",
            "secondary" = "#0000FF",
            "tertiary" = "#33AABB",
            "unclassified" = "#5500FF")
-
+  
 ggplot() +
   geom_sf(data = sab_C, 
           color = "black",
@@ -418,6 +455,7 @@ tmap_mode("plot")
 
 Using tmap's view mode to explore, we are able to see that the motorway, primary, secondary and trunk highway types have higher accident records. There is significantly lesser incidents along tertiary and unclassified road.
 
+<<<<<<< HEAD
 Since most of the accidents happens in just four categories mentioned, we will further filter the accident data for those that happened in the relevant highway types, so that we can save on computation time.
 
 ```{r}
