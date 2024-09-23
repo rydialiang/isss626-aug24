@@ -7,9 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Liang Xiuhao Rydia">
-<meta name="dcterms.date" content="2024-09-02">
+<meta name="dcterms.date" content="2024-09-23">
 
-<title>ISSS626: GAA - Take-home Ex01</title>
+<title>ISSS626: GAA - In-class Ex 05: Global and Local Measures of Spatial Autocorrelation:sfdep methods</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -146,16 +146,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="dropdown-text">2b: 2nd Order Spatial Point Patterns Analysis Methods</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="../../Hands-on Exercise/Hands-on_Ex03/Hands-on_Ex03.qmd">
- <span class="dropdown-text">Hands-on Exercise 3</span></a>
+    <a class="dropdown-item" href="../../Hands-on Exercise/Hands-on_Ex03/Hands-on_Ex03.html">
+ <span class="dropdown-text">3: Network Constrained Spatial Point Patterns Analysis</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="../../Hands-on Exercise/Hands-on_Ex04/Hands-on_Ex04.qmd">
- <span class="dropdown-text">Hands-on Exercise 4</span></a>
+    <a class="dropdown-item" href="../../Hands-on Exercise/Hands-on_Ex04/Hands-on_Ex04.html">
+ <span class="dropdown-text">4: Spatial Weights and Applications</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="../../Hands-on Exercise/Hands-on_Ex05/Hands-on_Ex05.qmd">
- <span class="dropdown-text">Hands-on Exercise 5</span></a>
+    <a class="dropdown-item" href="../../Hands-on Exercise/Hands-on_Ex05a/Hands-on_Ex05a.html">
+ <span class="dropdown-text">5a: Global Measures of Spatial Autocorrelation</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on Exercise/Hands-on_Ex05b/Hands-on_Ex05b.html">
+ <span class="dropdown-text">5b: Local Measures of Spatial Autocorrelation</span></a>
   </li>  
         <li>
     <a class="dropdown-item" href="../../Hands-on Exercise/Hands-on_Ex06/Hands-on_Ex06.qmd">
@@ -193,15 +197,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="dropdown-text">In-class Exercise 2</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="../../In-class Exercise/In-class_Ex03/In-class_Ex03.qmd">
+    <a class="dropdown-item" href="../../In-class Exercise/In-class_Ex03/In-class_Ex03.html">
  <span class="dropdown-text">In-class Exercise 3</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="../../In-class Exercise/In-class_Ex04/In-class_Ex04.qmd">
+    <a class="dropdown-item" href="../../In-class Exercise/In-class_Ex04/In-class_Ex04.html">
  <span class="dropdown-text">In-class Exercise 4</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="../../In-class Exercise/In-class_Ex05/In-class_Ex05.qmd">
+    <a class="dropdown-item" href="../../In-class Exercise/In-class_Ex05/In-class_Ex05.html">
  <span class="dropdown-text">In-class Exercise 5</span></a>
   </li>  
         <li>
@@ -277,9 +281,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#the-study-area" id="toc-the-study-area" class="nav-link active" data-scroll-target="#the-study-area">The Study Area</a></li>
-  <li><a href="#loading-library-and-importing-traffic-accident-data" id="toc-loading-library-and-importing-traffic-accident-data" class="nav-link" data-scroll-target="#loading-library-and-importing-traffic-accident-data">1.0 Loading Library and Importing Traffic Accident Data</a></li>
-  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  <li><a href="#toblers-first-law-of-geography" id="toc-toblers-first-law-of-geography" class="nav-link active" data-scroll-target="#toblers-first-law-of-geography">Tobler’s First law of Geography</a></li>
+  <li><a href="#measures-of-global-spatial-autocorrelation" id="toc-measures-of-global-spatial-autocorrelation" class="nav-link" data-scroll-target="#measures-of-global-spatial-autocorrelation">1.0 Measures of Global Spatial Autocorrelation</a>
+  <ul class="collapse">
+  <li><a href="#morans-i" id="toc-morans-i" class="nav-link" data-scroll-target="#morans-i">1.1 Moran’s I</a></li>
+  </ul></li>
+  <li><a href="#gearys-c" id="toc-gearys-c" class="nav-link" data-scroll-target="#gearys-c">1.2 Geary’s c</a></li>
+  <li><a href="#measures-of-global-highlow-clustering-getis-ord-global-g" id="toc-measures-of-global-highlow-clustering-getis-ord-global-g" class="nav-link" data-scroll-target="#measures-of-global-highlow-clustering-getis-ord-global-g">Measures of Global High/Low Clustering: Getis-Ord Global G</a></li>
+  <li><a href="#differences-from-lesson-2-3" id="toc-differences-from-lesson-2-3" class="nav-link" data-scroll-target="#differences-from-lesson-2-3">1.3 Differences from lesson 2 &amp; 3</a></li>
+  <li><a href="#in-class-exercise-with-sfdep" id="toc-in-class-exercise-with-sfdep" class="nav-link" data-scroll-target="#in-class-exercise-with-sfdep">2.0 In-class Exercise with sfdep</a>
+  <ul class="collapse">
+  <li><a href="#getting-started" id="toc-getting-started" class="nav-link" data-scroll-target="#getting-started">2.1 Getting started</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -288,7 +301,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Take-home Ex01</h1>
+<h1 class="title">In-class Ex 05: Global and Local Measures of Spatial Autocorrelation:sfdep methods</h1>
 </div>
 
 
@@ -305,14 +318,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">September 2, 2024</p>
+      <p class="date">September 23, 2024</p>
     </div>
   </div>
   
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">September 4, 2024</p>
+      <p class="date-modified">September 23, 2024</p>
     </div>
   </div>
     
@@ -323,56 +336,176 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="the-study-area" class="level2">
-<h2 class="anchored" data-anchor-id="the-study-area">The Study Area</h2>
-<p>The study area is Bangkok Metropolitan Area.</p>
-<p>WGS 84 / UTM zone 47N</p>
-<p>EPSG code 32647</p>
+<section id="toblers-first-law-of-geography" class="level3">
+<h3 class="anchored" data-anchor-id="toblers-first-law-of-geography">Tobler’s First law of Geography</h3>
+<p><strong>“Everything is related to everything else, but near things are more related than distant things.”</strong></p>
 </section>
-<section id="loading-library-and-importing-traffic-accident-data" class="level2">
-<h2 class="anchored" data-anchor-id="loading-library-and-importing-traffic-accident-data">1.0 Loading Library and Importing Traffic Accident Data</h2>
-<div class="cell">
-<details class="code-fold">
-<summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(sf, raster, spatstat, tmap, tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
-<div class="cell">
-<details class="code-fold">
-<summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>rdacc_sf <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/thai_road_accident_2019_2022.csv"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(longitude) <span class="sc">&amp;</span>longitude <span class="sc">!=</span> <span class="st">""</span>,</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>         <span class="sc">!</span><span class="fu">is.na</span>(latitude) <span class="sc">&amp;</span> latitude <span class="sc">!=</span> <span class="st">""</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_as_sf</span>(<span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"longitude"</span>, <span class="st">"latitude"</span>),</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>           <span class="at">crs =</span> <span class="dv">4326</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(<span class="at">crs =</span> <span class="dv">32647</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Notes on rdacc_sf
-</div>
-</div>
-<div class="callout-body-container callout-body">
+<section id="measures-of-global-spatial-autocorrelation" class="level2">
+<h2 class="anchored" data-anchor-id="measures-of-global-spatial-autocorrelation">1.0 Measures of Global Spatial Autocorrelation</h2>
+<section id="morans-i" class="level3">
+<h3 class="anchored" data-anchor-id="morans-i">1.1 Moran’s I</h3>
+<p>Describe how features differ from the values in the study area as a whole.</p>
+<p><img src="images/clipboard-697053390.png" class="img-fluid"></p>
+<p>x<sub>i</sub> = observed value</p>
+<p>x-bar = whole study area</p>
+<p>x<sub>j</sub> = neighbour (affected by weight, W<sub>ij</sub>)</p>
 <ul>
-<li><p>incident_datetime is datetime format of POSIXct.</p></li>
-<li><p>st_as_sf(coords = c(“longitude”, “latitude”), crs = 4326) combines and longitude and latitude columns into geometry column</p></li>
-<li><p>Thai projection code is 32647, hence we use this code chunk: st_transform(crs = 32647)</p></li>
-<li><p>Filter is used to remove the longitude and latitude that has na as value.</p></li>
-<li><p>Check what is the number of data lost after removing na. Make sure the study region, the data lost is not significant. (not more than 5% lost)</p></li>
+<li><p>Moran I (Z value) is:</p>
+<ul>
+<li><p>positive (I&gt;0): Clustered, observations tend to be similar;</p></li>
+<li><p>negative(I&lt;0): Dispersed, observations tend to be dissimilar;</p></li>
+<li><p>approximately zero: observations are arranged randomly over space.</p></li>
+</ul></li>
 </ul>
-</div>
-</div>
 </section>
-<section id="references" class="level2">
-<h2 class="anchored" data-anchor-id="references">References</h2>
-<p>News: <a href="https://www.who.int/news-room/fact-sheets/detail/road-traffic-injuries" class="uri">https://www.who.int/news-room/fact-sheets/detail/road-traffic-injuries</a></p>
+</section>
+<section id="gearys-c" class="level2">
+<h2 class="anchored" data-anchor-id="gearys-c">1.2 Geary’s c</h2>
+<p>Describing how features differ from their immediate neighbours.</p>
+<p><img src="images/clipboard-1913619110.png" class="img-fluid"></p>
+<ul>
+<li><p>Geary c (Z value) is:</p>
+<ul>
+<li><p>Large c value (&gt;1) : Dispersed, observations tend to be dissimilar;</p></li>
+<li><p>Small c value (&lt;1) : Clustered, observations tend to be similar;</p></li>
+<li><p>c = 1: observations are arranged randomly over space.</p></li>
+</ul></li>
+</ul>
+</section>
+<section id="measures-of-global-highlow-clustering-getis-ord-global-g" class="level2">
+<h2 class="anchored" data-anchor-id="measures-of-global-highlow-clustering-getis-ord-global-g">Measures of Global High/Low Clustering: Getis-Ord Global G</h2>
+<ul>
+<li><p>Getis-Ord Global G statistic is concerned with the overall concentration or lack of concentration in all pairs that are neighbours given the definition of neighbouring areas.</p></li>
+<li><p>The variable must contain only positive values to be used.</p></li>
+</ul>
+<p><img src="images/clipboard-3148702620.png" class="img-fluid"></p>
+<ul>
+<li>G(d) is a distance-based matrix. Do not use contiguity matrix.</li>
+</ul>
+</section>
+<section id="differences-from-lesson-2-3" class="level2">
+<h2 class="anchored" data-anchor-id="differences-from-lesson-2-3">1.3 Differences from lesson 2 &amp; 3</h2>
+<ul>
+<li>Only look at point events (accidents) -&gt; spatial point pattern analysis.</li>
+</ul>
+</section>
+<section id="in-class-exercise-with-sfdep" class="level2">
+<h2 class="anchored" data-anchor-id="in-class-exercise-with-sfdep">2.0 In-class Exercise with sfdep</h2>
+<ul>
+<li><p>sfdep() is based on sf dataframe.</p></li>
+<li><p>tidyverse framework.</p></li>
+<li><p>sfdep() is wrapper of spdep()</p></li>
+</ul>
+<section id="getting-started" class="level3">
+<h3 class="anchored" data-anchor-id="getting-started">2.1 Getting started</h3>
+<p>Installing and Loading the R Packages</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(sf,</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>               sfdep,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>               tmap,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>               tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>hunan <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="at">dsn =</span> <span class="st">"data/geospatial"</span>, </span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>                 <span class="at">layer =</span> <span class="st">"Hunan"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Reading layer `Hunan' from data source 
+  `C:\rydialiang\isss626-aug24\In-class Exercise\In-class_Ex05\data\geospatial' 
+  using driver `ESRI Shapefile'
+Simple feature collection with 88 features and 7 fields
+Geometry type: POLYGON
+Dimension:     XY
+Bounding box:  xmin: 108.7831 ymin: 24.6342 xmax: 114.2544 ymax: 30.12812
+Geodetic CRS:  WGS 84</code></pre>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>hunan2012 <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/aspatial/Hunan_2012.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>hunan <span class="ot">&lt;-</span> <span class="fu">left_join</span>(hunan,hunan2012) <span class="sc">%&gt;%</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>, <span class="dv">7</span>, <span class="dv">15</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>equal <span class="ot">&lt;-</span> <span class="fu">tm_shape</span>(hunan) <span class="sc">+</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="st">"GDPPC"</span>,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">n =</span> <span class="dv">5</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>          <span class="at">style =</span> <span class="st">"equal"</span>) <span class="sc">+</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="st">"Equal interval classification"</span>)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>quantile <span class="ot">&lt;-</span> <span class="fu">tm_shape</span>(hunan) <span class="sc">+</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="st">"GDPPC"</span>,</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>          <span class="at">n =</span> <span class="dv">5</span>,</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>          <span class="at">style =</span> <span class="st">"quantile"</span>) <span class="sc">+</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="st">"Equal quantile classification"</span>)</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_arrange</span>(equal, </span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>             quantile, </span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>             <span class="at">asp=</span><span class="dv">1</span>, </span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>             <span class="at">ncol=</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="In-class_Ex05_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>wm_q <span class="ot">&lt;-</span> hunan <span class="sc">%&gt;%</span> </span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">nb =</span> <span class="fu">st_contiguity</span>(geometry),</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">wt =</span> <span class="fu">st_weights</span>(nb,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>                         <span class="at">style =</span> <span class="st">"W"</span>),</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">.before =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>moranI <span class="ot">&lt;-</span> <span class="fu">global_moran_test</span>(wm_q<span class="sc">$</span>GDPPC,</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>                       wm_q<span class="sc">$</span>nb,</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>                       wm_q<span class="sc">$</span>wt)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(moranI)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>List of 6
+ $ statistic  : Named num 4.74
+  ..- attr(*, "names")= chr "Moran I statistic standard deviate"
+ $ p.value    : num 1.09e-06
+ $ estimate   : Named num [1:3] 0.30075 -0.01149 0.00435
+  ..- attr(*, "names")= chr [1:3] "Moran I statistic" "Expectation" "Variance"
+ $ alternative: chr "greater"
+ $ method     : chr "Moran I test under randomisation"
+ $ data.name  : chr "x  \nweights: listw    \n"
+ - attr(*, "class")= chr [1:2] "htest" "list"</code></pre>
+</div>
+</div>
+<p>Use global Moran I to test for randomisation.</p>
+<p>Check compare p-value with alpha. If p-value is smaller than alpha, we reject Null hypothesis and there is statistical significance.</p>
+<p>Moran I statistic is 0.300749970, positive undefined</p>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->

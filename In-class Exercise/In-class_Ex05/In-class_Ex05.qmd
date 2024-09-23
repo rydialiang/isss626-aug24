@@ -1,0 +1,145 @@
+---
+title: "In-class Ex 05: Global and Local Measures of Spatial Autocorrelation:sfdep methods"
+author: "Liang Xiuhao Rydia"
+date: "Sep 23, 2024"
+date-modified: "last-modified"
+execute:
+  eval: true
+  echo: true
+  warning: false
+  freeze: true
+format: 
+  html:
+    code-fold: true
+    code-summary: "Show the code"
+---
+
+### Tobler’s First law of Geography
+
+**"Everything is related to everything else, but near things are more related than distant things."**
+
+## 1.0 Measures of Global Spatial Autocorrelation
+
+### 1.1 Moran’s I
+
+Describe how features differ from the values in the study area as a whole.
+
+![](images/clipboard-697053390.png)
+
+x~i~ = observed value
+
+x-bar = whole study area
+
+x~j~ = neighbour (affected by weight, W~ij~)
+
+-   Moran I (Z value) is:
+
+    -   positive (I\>0): Clustered, observations tend to be similar;
+
+    -   negative(I\<0): Dispersed, observations tend to be dissimilar;
+
+    -   approximately zero: observations are arranged randomly over space.
+
+## 1.2 Geary’s c
+
+Describing how features differ from their immediate neighbours.
+
+![](images/clipboard-1913619110.png)
+
+-   Geary c (Z value) is:
+
+    -   Large c value (\>1) : Dispersed, observations tend to be dissimilar;
+
+    -   Small c value (\<1) : Clustered, observations tend to be similar;
+
+    -   c = 1: observations are arranged randomly over space.
+
+## Measures of Global High/Low Clustering: Getis-Ord Global G
+
+-   Getis-Ord Global G statistic is concerned with the overall concentration or lack of concentration in all pairs that are neighbours given the definition of neighbouring areas.
+
+-   The variable must contain only positive values to be used.
+
+![](images/clipboard-3148702620.png)
+
+-   G(d) is a distance-based matrix. Do not use contiguity matrix.
+
+## 1.3 Differences from lesson 2 & 3
+
+-   Only look at point events (accidents) -\> spatial point pattern analysis.
+
+## 2.0 In-class Exercise with sfdep
+
+-   sfdep() is based on sf dataframe.
+
+-   tidyverse framework.
+
+-   sfdep() is wrapper of spdep()
+
+### 2.1 Getting started
+
+Installing and Loading the R Packages
+
+```{r}
+pacman::p_load(sf,
+               sfdep,
+               tmap,
+               tidyverse)
+```
+
+```{r}
+hunan <- st_read(dsn = "data/geospatial", 
+                 layer = "Hunan")
+```
+
+```{r}
+hunan2012 <- read_csv("data/aspatial/Hunan_2012.csv")
+```
+
+```{r}
+hunan <- left_join(hunan,hunan2012) %>%
+  dplyr::select(1:4, 7, 15)
+```
+
+```{r}
+equal <- tm_shape(hunan) +
+  tm_fill("GDPPC",
+          n = 5,
+          style = "equal") +
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "Equal interval classification")
+
+quantile <- tm_shape(hunan) +
+  tm_fill("GDPPC",
+          n = 5,
+          style = "quantile") +
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "Equal quantile classification")
+
+tmap_arrange(equal, 
+             quantile, 
+             asp=1, 
+             ncol=2)
+```
+
+```{r}
+wm_q <- hunan %>% 
+  mutate(nb = st_contiguity(geometry),
+         wt = st_weights(nb,
+                         style = "W"),
+         .before = 1)
+```
+
+```{r}
+moranI <- global_moran_test(wm_q$GDPPC,
+                       wm_q$nb,
+                       wm_q$wt)
+
+glimpse(moranI)
+```
+
+Use global Moran I to test for randomisation.
+
+Check compare p-value with alpha. If p-value is smaller than alpha, we reject Null hypothesis and there is statistical significance.
+
+Moran I statistic is 0.300749970, positive undefined

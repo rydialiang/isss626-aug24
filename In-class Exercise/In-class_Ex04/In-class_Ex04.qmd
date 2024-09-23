@@ -66,13 +66,13 @@ Neighbour of 1202 using Rook's case:
 
 Answer: (all distance, d \>650, will become 0 in value)
 
-|        |   A |   B |   C |   D |   E |
-|-------:|----:|----:|----:|----:|----:|
-|  **A** |   0 | 353 | 516 | 641 |   0 |
-|  **B** | 353 |   0 | 357 |   0 |   0 |
-|  **C** | 516 | 357 |   0 |   0 |   0 |
-|  **D** | 641 |   0 |   0 |   0 | 263 |
-|  **E** |   0 |   0 |   0 | 263 |   0 |
+|       |   A |   B |   C |   D |   E |
+|------:|----:|----:|----:|----:|----:|
+| **A** |   0 | 353 | 516 | 641 |   0 |
+| **B** | 353 |   0 | 357 |   0 |   0 |
+| **C** | 516 | 357 |   0 |   0 |   0 |
+| **D** | 641 |   0 |   0 |   0 | 263 |
+| **E** |   0 |   0 |   0 | 263 |   0 |
 
 ### Row standardisation
 
@@ -163,7 +163,7 @@ hunan2012 <- read_csv("data/aspatial/Hunan_2012.csv")
 
 -   For example, we can use NAME_3 for hunan_sf and County for hunan2012 to do the relational join.
 
--    We need to make sure that the cells has the same values, including upper and lower case.
+-   We need to make sure that the cells has the same values, including upper and lower case.
 
 -   The case below, it is already tidied up and we know exactly what information/columns we need to sift out, by using select().
 :::

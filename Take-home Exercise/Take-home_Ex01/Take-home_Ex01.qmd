@@ -108,9 +108,8 @@ pacman::p_load(knitr,
                tmap)
 ```
 
-<<<<<<< HEAD
 | Packages  | Description                                                              |
-|-----------------|-------------------------------------------------------|
+|------------------------|------------------------------------------------|
 | knitr     | For dynamic report generation                                            |
 | leaflet   | For interactive map                                                      |
 | lubridate | Functions to work with date-times and time-spans                         |
@@ -120,17 +119,6 @@ pacman::p_load(knitr,
 | spNetwork | Perform spatial analysis on network                                      |
 | tidyverse | For aspatial data wrangling                                              |
 | tmap      | For thematic mapping                                                     |
-=======
-| Packages  | Description                                          |
-|-----------|------------------------------------------------------|
-| knitr     | For dynamic report generation                        |
-| leaflet   | For interactive map                                  |
-| lubridate | Functions to work with date-times and time-spans     |
-| sf        | For importing, managing, ad handling geospatial data |
-| spNetwork | Perform spatial analysis on network                  |
-| tidyverse | For aspatial data wrangling                          |
-| tmap      | For thematic mapping                                 |
->>>>>>> f82822e93feb617dbf96f0a40570f27c98c30775
 
 ### 2.2 Setting Seeds to Ensure Reproducibility
 
@@ -147,7 +135,6 @@ set.seed(12345)
 Importing the data without filtering:
 
 ```{r}
-#| eval: False
 acc <- read_csv("data/rawdata/thai_road_accident_2019_2022.csv")
 ```
 
@@ -233,9 +220,9 @@ Importing the [Thailand - Subnational Administrative Boundaries](https://data.hu
 ```{r}
 #| eval: False
 sab_P <- st_read(dsn = "data/rawdata",
-               layer = "tha_admbnda_adm1_rtsd_20220121") %>% 
+               layer = "tha_admbnda_adm1_rtsd_20220121") %>%
   filter(ADM1_EN %in% c("Bangkok","Nakhon Pathom", "Pathum Thani", "Nonthaburi", "Samut Prakan", "Samut Sakhon")) %>% 
-  select(3,17) %>% 
+  dplyr::select(3,17) %>% 
   st_transform(crs = 32647) 
 
 write_rds(sab_P, "data/rds/sab_P.rds")
@@ -274,8 +261,9 @@ If we wish to go to the district-level granularity, we may choose to import the 
 ```{r}
 #| eval: False
 sab_C <- st_read(dsn = "data/rawdata",
-               layer = "tha_admbnda_adm2_rtsd_20220121") %>% filter(ADM1_EN %in% c("Bangkok","Nakhon Pathom", "Pathum Thani", "Nonthaburi", "Samut Prakan", "Samut Sakhon")) %>% 
-  select(3,11,20) %>% 
+                 layer = "tha_admbnda_adm2_rtsd_20220121") %>%  
+  filter(ADM1_EN %in% c("Bangkok","Nakhon Pathom", "Pathum Thani", "Nonthaburi", "Samut Prakan", "Samut Sakhon")) %>% 
+  dplyr::select(3,11,20) %>% 
   st_transform(crs = 32647) 
 
 write_rds(sab_C, "data/rds/sab_C.rds")
@@ -455,7 +443,6 @@ tmap_mode("plot")
 
 Using tmap's view mode to explore, we are able to see that the motorway, primary, secondary and trunk highway types have higher accident records. There is significantly lesser incidents along tertiary and unclassified road.
 
-<<<<<<< HEAD
 Since most of the accidents happens in just four categories mentioned, we will further filter the accident data for those that happened in the relevant highway types, so that we can save on computation time.
 
 ```{r}
