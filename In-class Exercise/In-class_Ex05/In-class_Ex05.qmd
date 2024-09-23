@@ -142,4 +142,104 @@ Use global Moran I to test for randomisation.
 
 Check compare p-value with alpha. If p-value is smaller than alpha, we reject Null hypothesis and there is statistical significance.
 
-Moran I statistic is 0.300749970, positive undefined
+Moran I statistic is 0.300749970, positive.
+
+## Performing Global Moran I permutation test
+
+In practice,
+
+```{r}
+set.seed(12345)
+global_moran_perm(wm_q$GDPPC,
+                  wm_q$nb,
+                  wm_q$wt,
+                  nsim =99)
+```
+
+```{r}
+lisa <- wm_q %>% 
+  mutate(local_moran = local_moran(GDPPC,
+                                   nb,wt,
+                                   nsim = 99),
+         .before = 1) %>% 
+  unnest(local_moran)
+```
+
+-   unnest the table, write back to tibble data frame instead of one object.
+
+Visualising local Moran I and p-value
+
+```{r}
+tmap_mode("plot")
+tm_shape(lisa) +
+  tm_fill("p_ii_sim") +
+  tm_borders(alpha = 0.5) +
+    tm_layout(main.title = "p-value of local Moran's I",
+            main.title.size = 2)
+```
+
+Visualising local Moran's I
+
+```{r}
+tmap_mode("plot")
+tm_shape(lisa) +
+  tm_fill("ii") +
+  tm_borders(alpha = 0.5) +
+  tm_view(set.zoom.limits = c(6,8)) +
+    tm_layout(main.title = "Local Moran's I of GDPPC",
+            main.title.size = .9)
+```
+
+```{r}
+tmap_mode("plot")
+tm_shape(lisa) +
+  tm_fill("ii") +
+  tm_borders(alpha = 0.5) +
+  tm_view(set.zoom.limits = c(6,8)) +
+    tm_layout(main.title = "Local Moran's I of GDPPC",
+            main.title.size = 2)
+```
+
+LISA Map
+
+```{r}
+lisa_sig <- lisa %>% 
+  filter(p_ii < 0.05)
+
+tmap_mode("plot")
+tm_shape(lisa) +
+  tm_polygons() +
+  tm_borders(alpha = 0.5) +
+tm_shape(lisa_sig) +
+  tm_fill("mean") +
+  tm_borders(alpha = 0.4)
+```
+
+```{r}
+#| eval: False
+wm_idw <- hunan_GDPPC %>% 
+  mutate(st_contiguity())
+  
+```
+
+```{r}
+#| eval: False
+HCSA <- wm_idw %>% 
+  mutate(local_Gi = local_gstar_perm(
+    GDPPC, nb,wt, nsim =99),
+    .before = 1) %>% 
+  unnest(local_Gi)
+```
+
+```{r}
+#| eval: False
+HCSA_sig <- HCSA %>% 
+  filter(p_sim < 0.05)
+tmap_mode("plot")
+tm_shape(HCSA) +
+  tm_polygons() +
+  tm_borders(alpha = 0.5) +
+tm_shape(HCSA_sig) +
+  tm_fill("cluster") +
+  tm_borders(alpha = 0.4)
+```
