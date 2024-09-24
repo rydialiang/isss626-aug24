@@ -109,7 +109,7 @@ pacman::p_load(knitr,
 ```
 
 | Packages  | Description                                                              |
-|------------------------|------------------------------------------------|
+|-------------------------|------------------------------------------------|
 | knitr     | For dynamic report generation                                            |
 | leaflet   | For interactive map                                                      |
 | lubridate | Functions to work with date-times and time-spans                         |
@@ -330,7 +330,7 @@ Assigning EPSG code 4326 as the geometry shows longlat decimal degree between (-
 #| eval: False
 roads_clean <- road %>% 
   filter(highway %in% c("motorway", "trunk", "primary","secondary")) %>% 
-  select(2:4,15) %>% 
+  dplyr::select(2:4,15) %>% 
   st_set_crs(4326) %>%
   st_transform(crs = 32647)
 ```
@@ -434,70 +434,14 @@ tm_shape(acc_bmr) +
   tm_lines(col = "highway", 
            palette = highway_color,  
            lwd = 2)
-
-```
-
-```{r}
 tmap_mode("plot")
 ```
 
 Using tmap's view mode to explore, we are able to see that the motorway, primary, secondary and trunk highway types have higher accident records. There is significantly lesser incidents along tertiary and unclassified road.
 
-Since most of the accidents happens in just four categories mentioned, we will further filter the accident data for those that happened in the relevant highway types, so that we can save on computation time.
-
-```{r}
-#| eval: False
-roads_bmr <-read_rds("data/rds/roads_bmr.rds")
-roads_bmr_4 <- roads_bmr %>% 
-  filter(highway %in% c("motorway", "trunk", "primary", "secondary")) %>% 
-  select(3,14,18,19,31)
-```
-
-```{r}
-#| eval: False
-write_rds(roads_bmr_4, "data/rds/roads_bmr_4.rds")
-```
+Since most of the accidents happens in just four categories mentioned, we had filter the accident data for those that happened in the relevant highway types, so that we can save on computation time.
 
 Instead of using tmap to physically track where are the accidents happening, we can also choose to extract these information from the "route" column in acc_bmr.
-
-### 3.4 Attempted: Converting "route" to "highway" type
-
-Creating a dictionary for Thai-to-English translation. The reference Thai words are drawn from [Thai Highway Classification](https://wiki.openstreetmap.org/wiki/WikiProject_Thailand#Highway_classification).
-
-```{r}
-#| eval: False
-acc_bmr$route <- str_trim(acc_bmr$route) 
-```
-
-```{r}
-translation_dict <- c("ทางพิเศษศรีรัชรัช" = "expressway",
-                      "ถนนกรุงเทพฯ-ชลบุรีง" = "motorway",
-                      "ถนนกาญจนาภิเษกน" = "trunk",
-                      "ถนนมิตรภาพค์" = "trunk",
-                      "ถนนชยางกูร" = "trunk",
-                      "ถนนสุรนารายณ์" = "primary",
-                      "ถนนอุบล-ตระการ" = "primary",
-                      "ถนนบางกรวย-ไทรน้อย" = "secondary",
-                      "ถนนลาดบัวหลวง-ไม้ตรา"= "secondary",
-                      "ถนนทุ่งกลม-ตาลหมัน" = "tertiary")
-```
-
-```{r}
-#| eval: False
-acc_bmr$route <- str_trim(acc_bmr$route) 
-```
-
-```{r}
-#| eval: False
-acc_bmr$route <- str_replace_all(acc_bmr$route, translation_dict)
-```
-
-```{r}
-#| eval: False
-grep("สะพานภูมิพลที่", acc_bmr$route)
-```
-
-After troubleshooting, the above method did not work as intended. After checking a few route lines using Google Translate, we observe that the route is a description of the route (e.g. Bhumibol II Bridge to Bhumibol I Bridge), rather than the classification of the higway that the accident happened on. Nonetheless, there are certain helpful words to derive the possible highway classification.
 
 ## 4.0 Network Constrained Spatial Point Pattern Analysis
 
