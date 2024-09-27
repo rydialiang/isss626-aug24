@@ -312,6 +312,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#min-max-standardisation" id="toc-min-max-standardisation" class="nav-link" data-scroll-target="#min-max-standardisation"><strong>12.7.3 Min-Max standardisation</strong></a></li>
   <li><a href="#z-score-standardisation" id="toc-z-score-standardisation" class="nav-link" data-scroll-target="#z-score-standardisation"><strong>12.7.4 Z-score standardisation</strong></a></li>
   <li><a href="#visualising-the-standardised-clustering-variables" id="toc-visualising-the-standardised-clustering-variables" class="nav-link" data-scroll-target="#visualising-the-standardised-clustering-variables"><strong>12.7.5 Visualising the standardised clustering variables</strong></a></li>
+  <li><a href="#computing-proximity-matrix" id="toc-computing-proximity-matrix" class="nav-link" data-scroll-target="#computing-proximity-matrix"><strong>12.7.6 Computing proximity matrix</strong></a></li>
   </ul></li>
   </ul>
 </nav>
@@ -1105,6 +1106,12 @@ COMPUTER_PR 0.13</code></pre>
 </div>
 </div>
 </div>
+</section>
+<section id="computing-proximity-matrix" class="level3">
+<h3 class="anchored" data-anchor-id="computing-proximity-matrix"><strong>12.7.6 Computing proximity matrix</strong></h3>
+<p>In R, many packages provide functions to calculate distance matrix. We will compute the proximity matrix by using <a href="https://stat.ethz.ch/R-manual/R-devel/library/stats/html/dist.html"><em>dist()</em></a> of R.</p>
+<p><em>dist()</em> supports six distance proximity calculations, they are: <strong>euclidean, maximum, manhattan, canberra, binary and minkowski</strong>. The default is <em>euclidean</em> proximity matrix.</p>
+<p>The code chunk below is used to compute the proximity matrix using <em>euclidean</em> method.</p>
 
 
 </section>
