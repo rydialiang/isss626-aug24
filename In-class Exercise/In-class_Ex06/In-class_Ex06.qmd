@@ -1,0 +1,154 @@
+---
+title: "In-class Ex 06"
+author: "Liang Xiuhao Rydia"
+date: "Sep 30, 2024"
+date-modified: "last-modified"
+execute:
+  eval: true
+  echo: true
+  warning: false
+  freeze: true
+format: 
+  html:
+    code-fold: true
+    code-summary: "Show the code"
+---
+
+## Overview
+
+Emerging Hot Spot Analysis (EHSA) is spatio-temporal analysis method for revealing and describing how hot spot and cold spot areas evolve over time. The analysis consist of four main stepsL
+
+1.  Building a space-time cube,
+2.  Calculating Getis-Ord local Gi\* statistic for each bin by using an FDR correction,
+3.  Evaluating these hot and cold spot trends by using Mann-Kendall trend test,
+4.  Categorising each study area location by referring to the resultant trend z-score and p-value for each location with data, and with the hot spot z-score and p-value for each bin.
+
+### Interpretation of EHSA classes
+
+## 1.0 Getting Started
+
+Installing and Loading the R Packages
+
+```{r}
+pacman::p_load(sfdep, tmap, 
+               sf, plotly, 
+               tidyverse)
+```
+
+Importing Geospatial Data
+
+```{r}
+hunan <- st_read(dsn = "data/geospatial",
+                 layer = "Hunan")
+```
+
+Importing attribute table
+
+```{r}
+GDPPC <- read_csv("data/aspatial/Hunan_GDPPC.csv")
+```
+
+Creating a Time Series Cube
+
+```{r}
+GDPPC_st <- spacetime(GDPPC, hunan,
+                      .loc_col = "County",
+                      .time_col = "Year")
+```
+
+Reference: [sfdep](https://sfdep.josiahparry.com/articles/spacetime-s3.html)
+
+### Spacetime Cubes
+
+A spacetime object is a spacetime cube if every location has a value for every time index. Another way of saying this is that each location contains a regular time-series.
+
+In ESRI terminology, the basic unit of a spacetime cube is a *bin*. A bin is the unique combination of a location and time index. For each time index, the collection of every location is called a *time slice*. In every location, the collection of every bin at each time index is referred to as a a *bin time-series*.
+
+![](images/clipboard-431442936.png)
+
+::: callout-important
+## Space-Time Cube
+
+1.  Boundary cannot change. It cannot be dynamic.
+2.  Dynamic boundaries like forest fire etc, requires another model.
+3.  Analysis grid needs to be the same. Only it's attribute may change.
+4.  We cannot use continuous date/time format. i.e. POSITX format. It needs to be an integer.
+5.  To get month, we need to use lubridate() to sieve out the month in numerical form (01-12) for correct order
+:::
+
+::: callout-important
+Remember to check if the data is indeed a space-time cube object.
+:::
+
+```{r}
+is_spacetime_cube(GDPPC_st)
+```
+
+## 2.0 Computing Gi\*
+
+```{r}
+GDPPC_nb <- GDPPC_st %>% 
+  activate("geometry") %>% 
+  mutate(nb = include_self(
+    st_contiguity(geometry)),
+    wt = st_inverse_distance(nb,
+                             geometry,
+                             scale = 1,
+                             alpha = 1),
+    .before = 1) %>% 
+  set_nbs("nb") %>% 
+  set_wts("wt")
+```
+
+::: callout-note
+## Computing Gi\*
+
+-   row order using set_nbs() and set_wts()
+:::
+
+Using new columns to manually calculate the local Gi\* for each location:
+
+```{r}
+gi_stars <- GDPPC_nb %>% 
+  group_by(Year) %>% 
+  mutate(gi_star = local_gstar_perm(
+    GDPPC, nb,wt)) %>% 
+  tidyr:: unnest(gi_star)
+```
+
+## 3.0 Mann-Kendall Test
+
+A monotonic series or function is one that only increases (or decreases) and never changes direction. So long as the function either stays flat or continues to increase, it is monotonic.
+
+H0: No monotonic trend
+
+H1: Monotonic trend is present
+
+Interpretation:
+
+```{r}
+cbg <- gi_stars %>% 
+  ungroup() %>% 
+  filter(County == "Changsha") %>% 
+  select(County, Year, gi_star)
+```
+
+```{r}
+ggplot(data = cbg,
+       aes(x = Year,
+           y = gi_star)) +
+  geom_line() +
+  theme_light()
+```
+
+### 3.1 Interactive Mann-Kendall Plot
+
+```{r}
+p <- ggplot(data = cbg,
+       aes(x = Year,
+           y = gi_star)) +
+  geom_line() +
+  theme_light()
+
+ggplotly(p)
+```
