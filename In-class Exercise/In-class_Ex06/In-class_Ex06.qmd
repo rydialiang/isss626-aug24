@@ -32,7 +32,8 @@ Installing and Loading the R Packages
 ```{r}
 pacman::p_load(sfdep, tmap, 
                sf, plotly, 
-               tidyverse)
+               tidyverse,
+               Kendall)
 ```
 
 Importing Geospatial Data
@@ -152,3 +153,110 @@ p <- ggplot(data = cbg,
 
 ggplotly(p)
 ```
+
+```{r}
+cbg %>% 
+  summarise(mk = list(
+    unclass(
+      Kendall::MannKendall(gi_star)))) %>% 
+  tidyr::unnest_wider(mk)
+```
+
+### 3.2 Mann-Kendall test data.frame
+
+We can replicate this for each location by using group_by() of dplyr package.
+
+```{r}
+ehsa <- gi_stars %>% 
+  group_by(County) %>% 
+  summarise(mk = list(
+    unclass(
+      Kendall::MannKendall(gi_star)))) %>% 
+  tidyr::unnest_wider(mk)
+head(ehsa)
+```
+
+sl is significant level.
+
+![](images/clipboard-3791375147.png)
+
+```{r}
+#| eval: False
+emerging <- ehsa %>% 
+  arrange(sl)
+```
+
+We should have sample for one high and one low, to compare positive increasing trend or negative increasing trend. Strong, moderate or weak.
+
+### 3.3 Performing Emerging Hotspot Analysis
+
+Lastly, we will perform EHSA by using emerging_hotspot_analysis() of sfdep package. It takes a spacetime object x (i.e. GDPPC_st), and the quoted name of the variable of interest (i.e. GDPPC) for .var argument. The k argument is used to specify the number of time lags which is set to 1 by default. Lastly, nsim map numbers of simulation to be performed.
+
+```{r}
+ehsa <- emerging_hotspot_analysis(
+  x = GDPPC_st,
+  .var = "GDPPC",
+  k = 1,
+  nsim = 99
+)
+```
+
+Note that the below data has not been filtered out based on those that are statistically significant:
+
+```{r}
+ggplot(data = ehsa,
+       aes(x = classification)) +
+  geom_bar()
+```
+
+## 4.0 Visualising EHSA
+
+```{r}
+hunan_ehsa <- hunan %>% 
+  left_join(ehsa,
+            by = join_by(County == location))
+```
+
+```{r}
+ehsa_sig <- hunan_ehsa %>% 
+  filter(p_value < 0.05) 
+tmap_mode("plot")
+tm_shape(hunan_ehsa) +
+  tm_polygons() +
+  tm_borders(alpha = 0.5) +
+tm_shape(ehsa_sig) +
+  tm_fill("classification") +
+  tm_borders(alpha = 0.4)
+```
+
+Using EHSA with simulations allow us to be sure of the classification. Mann-Kendall only shows results of a specific time point.
+
+## Lesson 6 Recapitulation
+
+### Geographic Segmentation with Spatially Constrained Cluster Analysis
+
+Proximity matrix:
+
+1.  Distance matrix: Euclidean distance. City-block distance = Manhattan, minkowski, etc
+2.  Algomerative Hierarchical clustering Algorithms
+    1.  Single linkage (min algorithm)
+    2.  MAX
+    3.  Group Average
+    4.  Distance between Centroids
+    5.  Ward's minimum variance
+
+### 
+
+### 6.1 Variable Standardisation Techniques
+
+1.  Z-Score: useful when the distribution resemble normal distribution. If distribution is highly skewed, we will use Min-Max for standardisation
+2.  Min-Max: Not affected if the distribution is normal or not. The range of the value will always be between 0 to 1.
+3.  Decimal scaling: satellite images. data range will be 0 to 255, total of 256 values. Using binary. Commonly use for remotely sensed data.
+
+-   checking distribution of the cluster variables
+
+-   if there's no great disparity in range, we will not need to standardise.
+
+### 6.2 Use Correlation Matrix to check
+
+Cor plot to visually check correlations between variables. Highly correlated variables should not be chosen together.
