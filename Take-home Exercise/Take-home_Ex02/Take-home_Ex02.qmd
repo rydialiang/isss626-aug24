@@ -1,0 +1,11 @@
+---
+title: "Take-home Ex02"
+author: "Liang Xiuhao Rydia"
+date: "Oct 3, 2024"
+date-modified: "last-modified"
+execute:
+  eval: true
+  echo: true
+  warning: false
+  freeze: true
+---
