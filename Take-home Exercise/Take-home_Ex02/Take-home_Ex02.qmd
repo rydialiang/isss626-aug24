@@ -1,5 +1,5 @@
 ---
-title: "Take-home Ex02"
+title: "Take-home Ex 2"
 author: "Liang Xiuhao Rydia"
 date: "Oct 3, 2024"
 date-modified: "last-modified"
@@ -9,3 +9,47 @@ execute:
   warning: false
   freeze: true
 ---
+
+## Take-home Exercise 2: Discovering impacts of COVID-19 on Thailand tourism economy at the province level using spatial and spatio-temporal statistics
+
+## 1.0 Background
+
+### **1.1 Objectives**
+
+We aim to discover:
+
+-   If the key indicators of tourism economy of Thailand are independent from space and space and time.
+
+-   If the tourism economy is indeed spatial and spatio-temporal dependent, then, you would like to detect where are the clusters and outliers, and the emerging hot spot/cold spot areas.
+
+### **1.2 The Task**
+
+The specific tasks of this take-home exercise are as follows:
+
+-   Using appropriate function of **sf** and **tidyverse**, preparing the following geospatial data layer:
+
+    -   a study area layer in sf polygon features. It must be at [province level](https://en.wikipedia.org/wiki/Provinces_of_Thailand) (including Bangkok) of Thailand.
+
+    -   a tourism economy indicators layer within the study area in sf polygon features.
+
+    -   a derived tourism economy indicator layer in [**spacetime s3 class of sfdep**](https://sfdep.josiahparry.com/articles/spacetime-s3). Keep the time series at **month and year levels**.
+
+-   Using the extracted data, perform global spatial autocorrelation analysis by using [sfdep methods](https://is415-gaa-tskam.netlify.app/in-class_ex/in-class_ex05/in-class_ex05-glsa).
+
+-   Using the extracted data, perform local spatial autocorrelation analysis by using [sfdep methods](https://r4gdsa.netlify.app/chap10.html).
+
+-   Using the extracted data, perform emerging hotspot analysis by using [sfdep methods](https://is415-gaa-tskam.netlify.app/in-class_ex/in-class_ex05/in-class_ex05-ehsa).
+
+-   Describe the spatial patterns revealed by the analysis above.
+
+### **1.3 The Data**
+
+For the purpose of this take-home exercise, two data sets shall be used, they are:
+
+-   [Thailand Domestic Tourism Statistics](https://www.kaggle.com/datasets/thaweewatboy/thailand-domestic-tourism-statistics) at Kaggle. You are required to use **version 2** of the data set.
+
+-   [Thailand - Subnational Administrative Boundaries](https://data.humdata.org/dataset/cod-ab-tha?) at HDX. You are required to use the province boundary data set.
+
+## 2.0 Getting Started
+
+### 2.1 Setting up the R environment

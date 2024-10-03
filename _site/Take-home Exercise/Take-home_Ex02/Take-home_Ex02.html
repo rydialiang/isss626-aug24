@@ -9,7 +9,7 @@
 <meta name="author" content="Liang Xiuhao Rydia">
 <meta name="dcterms.date" content="2024-10-03">
 
-<title>ISSS626: GAA - Take-home Ex02</title>
+<title>ISSS626: GAA - Take-home Ex 2</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -243,14 +243,30 @@ ul.task-list li input[type="checkbox"] {
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#take-home-exercise-2-discovering-impacts-of-covid-19-on-thailand-tourism-economy-at-the-province-level-using-spatial-and-spatio-temporal-statistics" id="toc-take-home-exercise-2-discovering-impacts-of-covid-19-on-thailand-tourism-economy-at-the-province-level-using-spatial-and-spatio-temporal-statistics" class="nav-link active" data-scroll-target="#take-home-exercise-2-discovering-impacts-of-covid-19-on-thailand-tourism-economy-at-the-province-level-using-spatial-and-spatio-temporal-statistics">Take-home Exercise 2: Discovering impacts of COVID-19 on Thailand tourism economy at the province level using spatial and spatio-temporal statistics</a></li>
+  <li><a href="#background" id="toc-background" class="nav-link" data-scroll-target="#background">1.0 Background</a>
+  <ul class="collapse">
+  <li><a href="#objectives" id="toc-objectives" class="nav-link" data-scroll-target="#objectives"><strong>1.1 Objectives</strong></a></li>
+  <li><a href="#the-task" id="toc-the-task" class="nav-link" data-scroll-target="#the-task"><strong>1.2 The Task</strong></a></li>
+  <li><a href="#the-data" id="toc-the-data" class="nav-link" data-scroll-target="#the-data"><strong>1.3 The Data</strong></a></li>
+  </ul></li>
+  <li><a href="#getting-started" id="toc-getting-started" class="nav-link" data-scroll-target="#getting-started">2.0 Getting Started</a>
+  <ul class="collapse">
+  <li><a href="#setting-up-the-r-environment" id="toc-setting-up-the-r-environment" class="nav-link" data-scroll-target="#setting-up-the-r-environment">2.1 Setting up the R environment</a></li>
+  </ul></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Take-home Ex02</h1>
+<h1 class="title">Take-home Ex 2</h1>
 </div>
 
 
@@ -285,8 +301,52 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<section id="take-home-exercise-2-discovering-impacts-of-covid-19-on-thailand-tourism-economy-at-the-province-level-using-spatial-and-spatio-temporal-statistics" class="level2">
+<h2 class="anchored" data-anchor-id="take-home-exercise-2-discovering-impacts-of-covid-19-on-thailand-tourism-economy-at-the-province-level-using-spatial-and-spatio-temporal-statistics">Take-home Exercise 2: Discovering impacts of COVID-19 on Thailand tourism economy at the province level using spatial and spatio-temporal statistics</h2>
+</section>
+<section id="background" class="level2">
+<h2 class="anchored" data-anchor-id="background">1.0 Background</h2>
+<section id="objectives" class="level3">
+<h3 class="anchored" data-anchor-id="objectives"><strong>1.1 Objectives</strong></h3>
+<p>We aim to discover:</p>
+<ul>
+<li><p>If the key indicators of tourism economy of Thailand are independent from space and space and time.</p></li>
+<li><p>If the tourism economy is indeed spatial and spatio-temporal dependent, then, you would like to detect where are the clusters and outliers, and the emerging hot spot/cold spot areas.</p></li>
+</ul>
+</section>
+<section id="the-task" class="level3">
+<h3 class="anchored" data-anchor-id="the-task"><strong>1.2 The Task</strong></h3>
+<p>The specific tasks of this take-home exercise are as follows:</p>
+<ul>
+<li><p>Using appropriate function of <strong>sf</strong> and <strong>tidyverse</strong>, preparing the following geospatial data layer:</p>
+<ul>
+<li><p>a study area layer in sf polygon features. It must be at <a href="https://en.wikipedia.org/wiki/Provinces_of_Thailand">province level</a> (including Bangkok) of Thailand.</p></li>
+<li><p>a tourism economy indicators layer within the study area in sf polygon features.</p></li>
+<li><p>a derived tourism economy indicator layer in <a href="https://sfdep.josiahparry.com/articles/spacetime-s3"><strong>spacetime s3 class of sfdep</strong></a>. Keep the time series at <strong>month and year levels</strong>.</p></li>
+</ul></li>
+<li><p>Using the extracted data, perform global spatial autocorrelation analysis by using <a href="https://is415-gaa-tskam.netlify.app/in-class_ex/in-class_ex05/in-class_ex05-glsa">sfdep methods</a>.</p></li>
+<li><p>Using the extracted data, perform local spatial autocorrelation analysis by using <a href="https://r4gdsa.netlify.app/chap10.html">sfdep methods</a>.</p></li>
+<li><p>Using the extracted data, perform emerging hotspot analysis by using <a href="https://is415-gaa-tskam.netlify.app/in-class_ex/in-class_ex05/in-class_ex05-ehsa">sfdep methods</a>.</p></li>
+<li><p>Describe the spatial patterns revealed by the analysis above.</p></li>
+</ul>
+</section>
+<section id="the-data" class="level3">
+<h3 class="anchored" data-anchor-id="the-data"><strong>1.3 The Data</strong></h3>
+<p>For the purpose of this take-home exercise, two data sets shall be used, they are:</p>
+<ul>
+<li><p><a href="https://www.kaggle.com/datasets/thaweewatboy/thailand-domestic-tourism-statistics">Thailand Domestic Tourism Statistics</a> at Kaggle. You are required to use <strong>version 2</strong> of the data set.</p></li>
+<li><p><a href="https://data.humdata.org/dataset/cod-ab-tha?">Thailand - Subnational Administrative Boundaries</a> at HDX. You are required to use the province boundary data set.</p></li>
+</ul>
+</section>
+</section>
+<section id="getting-started" class="level2">
+<h2 class="anchored" data-anchor-id="getting-started">2.0 Getting Started</h2>
+<section id="setting-up-the-r-environment" class="level3">
+<h3 class="anchored" data-anchor-id="setting-up-the-r-environment">2.1 Setting up the R environment</h3>
 
 
+</section>
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

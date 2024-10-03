@@ -32,7 +32,7 @@
     "href": "index.html#take-home-exercise",
     "title": "Geospatial Analytics and Applications",
     "section": "Take Home Exercise",
-    "text": "Take Home Exercise\n\n\n\n\n\n\n\n\n\nTake-home Ex01\n\n\n\nLiang Xiuhao Rydia\n\n\nSep 2, 2024\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nTake-home Ex02\n\n\n\nLiang Xiuhao Rydia\n\n\nOct 3, 2024\n\n\n\n\n\n\n\n\nNo matching items"
+    "text": "Take Home Exercise\n\n\n\n\n\n\n\n\n\nTake-home Ex01\n\n\n\nLiang Xiuhao Rydia\n\n\nSep 2, 2024\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nTake-home Ex 2\n\n\n\nLiang Xiuhao Rydia\n\n\nOct 3, 2024\n\n\n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "Hands-on Exercise/Hands-on_Ex03/Hands-on_Ex03.html",
@@ -929,5 +929,19 @@
     "title": "In-class Ex 06",
     "section": "Lesson 6 Recapitulation",
     "text": "Lesson 6 Recapitulation\n\nGeographic Segmentation with Spatially Constrained Cluster Analysis\nProximity matrix:\n\nDistance matrix: Euclidean distance. City-block distance = Manhattan, minkowski, etc\nAlgomerative Hierarchical clustering Algorithms\n\nSingle linkage (min algorithm)\nMAX\nGroup Average\nDistance between Centroids\nWard’s minimum variance\n\n\n\n\n\n\n\n6.1 Variable Standardisation Techniques\n\nZ-Score: useful when the distribution resemble normal distribution. If distribution is highly skewed, we will use Min-Max for standardisation\nMin-Max: Not affected if the distribution is normal or not. The range of the value will always be between 0 to 1.\nDecimal scaling: satellite images. data range will be 0 to 255, total of 256 values. Using binary. Commonly use for remotely sensed data.\n\n\nchecking distribution of the cluster variables\nif there’s no great disparity in range, we will not need to standardise.\n\n\n\n6.2 Use Correlation Matrix to check\nCor plot to visually check correlations between variables. Highly correlated variables should not be chosen together."
+  },
+  {
+    "objectID": "Take-home Exercise/Take-home_Ex02/Take-home_Ex02.html#background",
+    "href": "Take-home Exercise/Take-home_Ex02/Take-home_Ex02.html#background",
+    "title": "Take-home Ex 2",
+    "section": "1.0 Background",
+    "text": "1.0 Background\n\n1.1 Objectives\nWe aim to discover:\n\nIf the key indicators of tourism economy of Thailand are independent from space and space and time.\nIf the tourism economy is indeed spatial and spatio-temporal dependent, then, you would like to detect where are the clusters and outliers, and the emerging hot spot/cold spot areas.\n\n\n\n1.2 The Task\nThe specific tasks of this take-home exercise are as follows:\n\nUsing appropriate function of sf and tidyverse, preparing the following geospatial data layer:\n\na study area layer in sf polygon features. It must be at province level (including Bangkok) of Thailand.\na tourism economy indicators layer within the study area in sf polygon features.\na derived tourism economy indicator layer in spacetime s3 class of sfdep. Keep the time series at month and year levels.\n\nUsing the extracted data, perform global spatial autocorrelation analysis by using sfdep methods.\nUsing the extracted data, perform local spatial autocorrelation analysis by using sfdep methods.\nUsing the extracted data, perform emerging hotspot analysis by using sfdep methods.\nDescribe the spatial patterns revealed by the analysis above.\n\n\n\n1.3 The Data\nFor the purpose of this take-home exercise, two data sets shall be used, they are:\n\nThailand Domestic Tourism Statistics at Kaggle. You are required to use version 2 of the data set.\nThailand - Subnational Administrative Boundaries at HDX. You are required to use the province boundary data set."
+  },
+  {
+    "objectID": "Take-home Exercise/Take-home_Ex02/Take-home_Ex02.html#getting-started",
+    "href": "Take-home Exercise/Take-home_Ex02/Take-home_Ex02.html#getting-started",
+    "title": "Take-home Ex 2",
+    "section": "2.0 Getting Started",
+    "text": "2.0 Getting Started\n\n2.1 Setting up the R environment"
   }
 ]
