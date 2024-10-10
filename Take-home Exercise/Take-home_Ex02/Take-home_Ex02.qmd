@@ -46,9 +46,9 @@ The specific tasks of this take-home exercise are as follows:
 
 For the purpose of this take-home exercise, two data sets shall be used, they are:
 
--   [Thailand Domestic Tourism Statistics](https://www.kaggle.com/datasets/thaweewatboy/thailand-domestic-tourism-statistics) at Kaggle. You are required to use **version 2** of the data set.
+-   [Thailand Domestic Tourism Statistics](https://www.kaggle.com/datasets/thaweewatboy/thailand-domestic-tourism-statistics) at Kaggle. We will use **version 2** of the data set.
 
--   [Thailand - Subnational Administrative Boundaries](https://data.humdata.org/dataset/cod-ab-tha?) at HDX. You are required to use the province boundary data set.
+-   [Thailand - Subnational Administrative Boundaries](https://data.humdata.org/dataset/cod-ab-tha?) at HDX. We will use the province boundary data set.
 
 ## 2.0 Getting Started
 
@@ -58,8 +58,7 @@ For the purpose of this take-home exercise, two data sets shall be used, they ar
 pacman::p_load(sfdep, tmap, 
                sf, plotly, 
                tidyverse,
-               Kendall,
-               patchwork)
+               Kendall)
 ```
 
 ### 2.2 Loading and Wrangling the Data
@@ -97,7 +96,7 @@ Joining the dataset using the province column.
 ```{r}
 data <- left_join(tourism, 
                   province) %>% 
-  st_as_sf %>% 
+  st_as_sf() %>% 
   st_transform(crs = 32647)
   
 write_rds(data, "data/rds/data.rds")
@@ -136,7 +135,7 @@ rev_all_2b <- data %>%
 Taking a look at the revenue distribution:
 
 ```{r}
-a <- ggplot(data = rev_all_1b) +
+ggplot(data = rev_all_2b) +
   geom_bar(aes(x = reorder(province, -value), y = value, fill = province), stat = "identity") +
   labs(title = "Total Revenue from Foreigner by Province", x = "Province", y = "Total Revenue") +
   theme_minimal() +
@@ -144,7 +143,6 @@ a <- ggplot(data = rev_all_1b) +
     axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),  
     plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
     legend.position = "none")
-a
 ```
 
 ::: callout-note
@@ -185,7 +183,7 @@ rev_for_1b <- data %>%
 ```
 
 ```{r}
-b <- ggplot(data = rev_for_1b) +
+ggplot(data = rev_for_1b) +
   geom_bar(aes(x = reorder(province, -value), y = value, fill = province), stat = "identity") +
   labs(title = "Total Revenue from Foreigner by Province", x = "Province", y = "Total Revenue") +
   theme_minimal() +
@@ -193,7 +191,6 @@ b <- ggplot(data = rev_for_1b) +
     axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),  
     plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
     legend.position = "none")
-b
 ```
 
 ### 3.3 Understanding the share of Revenue from Thai across Provinces
@@ -208,7 +205,7 @@ rev_thai_1b <- data %>%
 ```
 
 ```{r}
-c <- ggplot(data = rev_thai_1b) +
+ggplot(data = rev_thai_1b) +
   geom_bar(aes(x = reorder(province, -value), y = value, fill = province), stat = "identity") +
   labs(title = "Total Revenue from Thai by Province", x = "Province", y = "Total Revenue") +
   theme_minimal() +
@@ -216,7 +213,6 @@ c <- ggplot(data = rev_thai_1b) +
     axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),  
     plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
     legend.position = "none")
-c
 ```
 
 ### 3.4 Comparing the Top 10
@@ -256,3 +252,7 @@ ggplot(data = tourist_all) +
 ```
 
 ## 4.0 
+
+```{r}
+
+```
