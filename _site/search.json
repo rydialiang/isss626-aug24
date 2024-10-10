@@ -942,6 +942,13 @@
     "href": "Take-home Exercise/Take-home_Ex02/Take-home_Ex02.html#getting-started",
     "title": "Take-home Ex 2",
     "section": "2.0 Getting Started",
-    "text": "2.0 Getting Started\n\n2.1 Setting up the R environment"
+    "text": "2.0 Getting Started\n\n2.1 Setting up the R environment\n\npacman::p_load(sfdep, tmap, \n               sf, plotly, \n               tidyverse,\n               Kendall)\n\n\n\n2.2 Loading and Wrangling the Data\nLoading the tourism economy indicators data:\n\ntourism &lt;- read_csv(\"data/rawdata/thailand_domestic_tourism_2019_2023_ver2.csv\") %&gt;% \n  select(1,3,5:7) %&gt;% \n  rename(province = province_eng)\n\nwrite_rds(tourism, \"data/rds/tourism.rds\")\n\nLoading the geospatial data:\n\nprovince &lt;- st_read(\"data/rawdata\",\n                    layer = \"tha_admbnda_adm1_rtsd_20220121\" ) %&gt;% \n  dplyr::select(3,17) %&gt;% \n  st_transform(crs = 32647) %&gt;% \n  rename(province = ADM1_EN )\n\nReading layer `tha_admbnda_adm1_rtsd_20220121' from data source \n  `C:\\rydialiang\\isss626-aug24\\Take-home Exercise\\Take-home_Ex02\\data\\rawdata' \n  using driver `ESRI Shapefile'\nSimple feature collection with 77 features and 16 fields\nGeometry type: MULTIPOLYGON\nDimension:     XY\nBounding box:  xmin: 97.34336 ymin: 5.613038 xmax: 105.637 ymax: 20.46507\nGeodetic CRS:  WGS 84\n\nwrite_rds(province, \"data/rds/province.rds\")\n\n\nplot(province)\n\n\n\n\n\n\n\n\n\n\n2.3 Joining the dataset\nJoining the dataset using the province column.\n\ndata &lt;- left_join(tourism, \n                  province)\n\nwrite_rds(data, \"data/rds/data.rds\")\n\n\n\n2.4 Setting Seeds to Ensure Reproducibility\nThe set. seed() function is used to set a Random seed which Pseudorandom number generators use when generating “random” numbers. By using this function, we ensure that the randomly generated numbers remain the same when the code are reproduced.\n\nset.seed(12345)"
+  },
+  {
+    "objectID": "Take-home Exercise/Take-home_Ex02/Take-home_Ex02.html#exploratory-data-analysis-eda",
+    "href": "Take-home Exercise/Take-home_Ex02/Take-home_Ex02.html#exploratory-data-analysis-eda",
+    "title": "Take-home Ex 2",
+    "section": "3.0 Exploratory Data Analysis (EDA)",
+    "text": "3.0 Exploratory Data Analysis (EDA)"
   }
 ]

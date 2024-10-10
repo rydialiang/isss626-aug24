@@ -53,3 +53,206 @@ For the purpose of this take-home exercise, two data sets shall be used, they ar
 ## 2.0 Getting Started
 
 ### 2.1 Setting up the R environment
+
+```{r}
+pacman::p_load(sfdep, tmap, 
+               sf, plotly, 
+               tidyverse,
+               Kendall,
+               patchwork)
+```
+
+### 2.2 Loading and Wrangling the Data
+
+Loading the tourism economy indicators data:
+
+```{r}
+tourism <- read_csv("data/rawdata/thailand_domestic_tourism_2019_2023_ver2.csv") %>% 
+  select(1,3,5:7) %>% 
+  rename(province = province_eng)
+
+write_rds(tourism, "data/rds/tourism.rds")
+```
+
+Loading the geospatial data, extracting the study area at province level:
+
+```{r}
+province <- st_read("data/rawdata",
+                    layer = "tha_admbnda_adm1_rtsd_20220121" ) %>% 
+  dplyr::select(3,17) %>% 
+  st_transform(crs = 32647) %>% 
+  rename(province = ADM1_EN )
+
+write_rds(province, "data/rds/province.rds")
+```
+
+```{r}
+plot(province)
+```
+
+### 2.3 Joining the dataset
+
+Joining the dataset using the province column.
+
+```{r}
+data <- left_join(tourism, 
+                  province) %>% 
+  st_as_sf %>% 
+  st_transform(crs = 32647)
+  
+write_rds(data, "data/rds/data.rds")
+```
+
+### 2.4 Setting Seeds to Ensure Reproducibility
+
+The set. seed() function is used to set a Random seed which Pseudo-random number generators use when generating "random" numbers. By using this function, we ensure that the randomly generated numbers remain the same when the code are reproduced.
+
+```{r}
+set.seed(12345)
+```
+
+## 3.0 Exploratory Data Analysis (EDA)
+
+### 3.1 Understanding the share of Revenue across Provinces
+
+Creating revenue_all for each province.
+
+1.  Since the value of the revenue is in trillions for top provinces, we will filter out those provinces that contributes \> \$2 billion revenue.
+2.  This filter is just applied for the visualization so as to declutter the chart. It is for us to know which are the top provinces in terms of revenue.
+
+```{r}
+data <- read_rds("data/rds/data.rds")
+```
+
+```{r}
+rev_all_2b <- data %>%
+  filter(variable == "revenue_all") %>%
+  group_by(province) %>%
+  filter(value > 2000000000) %>% 
+  mutate(value = sum(value, na.rm = TRUE)) %>%
+  ungroup()
+```
+
+Taking a look at the revenue distribution:
+
+```{r}
+a <- ggplot(data = rev_all_1b) +
+  geom_bar(aes(x = reorder(province, -value), y = value, fill = province), stat = "identity") +
+  labs(title = "Total Revenue from Foreigner by Province", x = "Province", y = "Total Revenue") +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),  
+    plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
+    legend.position = "none")
+a
+```
+
+::: callout-note
+## Revenue_all
+
+-   From this chart, we can conclude that the top 10 provinces by revenue are:
+
+    -   Bangkok
+
+    -   Phuket
+
+    -   Chonburi
+
+    -   Chang Mai
+
+    -   Krabi
+
+    -   Surat Thani
+
+    -   Prachuap Khiri Khan
+
+    -   Songkhla
+
+    -   Chiang Rai
+
+    -   Phetchaburi
+:::
+
+### 3.2 Understanding the share of Revenue from Foreigners across Provinces
+
+```{r}
+rev_for_1b <- data %>%
+  filter(variable == "revenue_foreign") %>% 
+  group_by(province) %>%
+  filter(value > 1000000000) %>% 
+  mutate(value = sum(value, na.rm = TRUE)) %>%
+  ungroup() 
+```
+
+```{r}
+b <- ggplot(data = rev_for_1b) +
+  geom_bar(aes(x = reorder(province, -value), y = value, fill = province), stat = "identity") +
+  labs(title = "Total Revenue from Foreigner by Province", x = "Province", y = "Total Revenue") +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),  
+    plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
+    legend.position = "none")
+b
+```
+
+### 3.3 Understanding the share of Revenue from Thai across Provinces
+
+```{r}
+rev_thai_1b <- data %>%
+  filter(variable == "revenue_thai") %>% 
+  group_by(province) %>%
+  filter(value > 1000000000) %>% 
+  mutate(value = sum(value, na.rm = TRUE)) %>%
+  ungroup() 
+```
+
+```{r}
+c <- ggplot(data = rev_thai_1b) +
+  geom_bar(aes(x = reorder(province, -value), y = value, fill = province), stat = "identity") +
+  labs(title = "Total Revenue from Thai by Province", x = "Province", y = "Total Revenue") +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),  
+    plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
+    legend.position = "none")
+c
+```
+
+### 3.4 Comparing the Top 10
+
+| S/N | Revenue All         | Revenue Foreigner   | Revenue Thai        |
+|-----|---------------------|---------------------|---------------------|
+| 1   | Bangkok             | Bangkok             | Bangkok             |
+| 2   | Phuket              | Phuket              | Chiang Mai          |
+| 3   | Chonburi            | Chonburi            | Chonburi            |
+| 4   | Chang Mai           | Surat Thani         | Phuket              |
+| 5   | Krabi               | Krabi               | Prachuap Khiri Khan |
+| 6   | Surat Thani         | Chiang Mai          | Chiang Rai          |
+| 7   | Prachuap Khiri Khan | Phang Nga           | Phetchaburi         |
+| 8   | Songkhla            | Songkhla            | Khanchanaburi       |
+| 9   | Chiang Rai          | Prachuap Khiri Khan | Krabi               |
+| 10  | Phetchaburi         | Trat                | Rayong              |
+
+### 3.5 Understanding number of Tourist
+
+```{r}
+tourist_all <- data %>%
+  filter(variable == "no_tourist_all") %>% 
+  group_by(province) %>%
+  mutate(value = sum(value, na.rm = TRUE)) %>%
+  ungroup() 
+```
+
+```{r}
+ggplot(data = tourist_all) +
+  geom_bar(aes(x = reorder(province, -value), y = value, fill = province), stat = "identity") +
+  labs(title = "Total Number of Tourist by Province", x = "Province", y = "Total Number of Tourist") +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),  
+    plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
+    legend.position = "none")
+```
+
+## 4.0 
