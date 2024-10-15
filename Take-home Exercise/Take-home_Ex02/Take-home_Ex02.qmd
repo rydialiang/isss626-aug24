@@ -55,7 +55,8 @@ For the purpose of this take-home exercise, two data sets shall be used, they ar
 ### 2.1 Setting up the R environment
 
 ```{r}
-pacman::p_load(sfdep, tmap, 
+pacman::p_load(sfdep, tmap,
+               spdep,
                sf, plotly, 
                tidyverse,
                Kendall)
@@ -68,7 +69,14 @@ Loading the tourism economy indicators data:
 ```{r}
 tourism <- read_csv("data/rawdata/thailand_domestic_tourism_2019_2023_ver2.csv") %>% 
   select(1,3,5:7) %>% 
-  rename(province = province_eng)
+  rename(province = province_eng) %>% 
+  pivot_wider(names_from = variable, values_from = value) %>% 
+  mutate(year = year(date),
+         month = month(date))
+
+tourism$date <- as.Date(tourism$date, format = "%Y-%m-%d")
+tourism$year_month <- format(tourism$date, "%Y%m")
+tourism$year_month <- as.numeric(tourism$year_month )
 
 write_rds(tourism, "data/rds/tourism.rds")
 ```
@@ -79,16 +87,16 @@ Loading the geospatial data, extracting the study area at province level:
 province <- st_read("data/rawdata",
                     layer = "tha_admbnda_adm1_rtsd_20220121" ) %>% 
   dplyr::select(3,17) %>% 
-  st_transform(crs = 32647) %>% 
   rename(province = ADM1_EN ) %>% 
   mutate(province = case_when(
-    province == "Buriram" ~ "Buri Ram",
+    province == "Buri Ram" ~ "Buriram",
     province == "Chon Buri" ~ "Chonburi",
     province == "Lop Buri" ~ "Lopburi",
     province == "Nong Bua Lam Phu" ~ "Nong Bua Lamphu",
     province == "Phangnga" ~ "Phang Nga",
     province == "Prachin Buri" ~ "Prachinburi",
     province == "Si Sa Ket" ~ "Sisaket",
+    province == "Chai Nat" ~ "Chainat",
     TRUE ~ province))
 
 write_rds(province, "data/rds/province.rds")
@@ -107,8 +115,7 @@ Joining the dataset using the province column.
 data <- left_join(tourism, 
                   province) %>% 
   st_as_sf() %>% 
-  st_transform(crs = 32647) %>% 
-  pivot_wider(names_from = variable, values_from = value)
+  st_transform(crs = 32647)
   
 write_rds(data, "data/rds/data.rds")
 ```
@@ -260,35 +267,363 @@ ggplot(data = tourist_all) +
     legend.position = "none")
 ```
 
-## 4.0 Economic Indicator Layer
-
-We will combine all the data from 2019 to 2023 February, to take a look at how each province are different.
+## 4.0 Creating a Time Series Cube
 
 ```{r}
-econ <- data %>% 
-  group_by(province, region_eng, geometry) %>% 
-  summarise(revenue_all = sum(revenue_all, na.rm = TRUE),
-            revenue_foreign = sum(revenue_foreign, na.rm = TRUE),
-            revenue_thai = sum(revenue_thai, na.rm = TRUE),
-            no_tourist_all = sum(no_tourist_all, na.rm = TRUE))
+data_st <- spacetime(data,
+            province,
+            .loc_col = "province",
+            .time_col = "year_month")
+```
+
+Confirming data_st as spacetime_cube:
+
+```{r}
+is_spacetime_cube(data_st)
+```
+
+## 5.0 Global Spatial Autocorrelation Analysis
+
+### 5.1 **Visualising Regional Development Indicator**
+
+In this analysis, we will compare the sum all the relevant economic indicators for the year 2019 to 2023 to get a single value for each province to understand the global spatial autocorrelation
+
+```{r}
+rev_all <- data %>% 
+  group_by(province) %>% 
+  summarise(revenue_all = sum(revenue_all, 
+                              na.rm = TRUE))
+
+rev_all_2019 <- data %>% 
+  filter(year == "2019") %>% 
+  group_by(province) %>% 
+  summarise(revenue_all = sum(revenue_all, 
+                              na.rm = TRUE))
+
+rev_all_2020 <- data %>% 
+  filter(year == "2020") %>% 
+  group_by(province) %>% 
+  summarise(revenue_all = sum(revenue_all, 
+                              na.rm = TRUE))
 ```
 
 ```{r}
-plot(econ)
+all <- tm_shape(rev_all) +
+  tm_fill("revenue_all",
+          n = 8,
+          style = "quantile") +
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "Total Revenue")
+
+all_2019 <- tm_shape(rev_all_2019) +
+  tm_fill("revenue_all",
+          n = 8,
+          style = "quantile") +
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "Revenue in 2019")
+
+all_2020 <- tm_shape(rev_all_2020) +
+  tm_fill("revenue_all",
+          n = 8,
+          style = "quantile") +
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "Revenue in 2020")
+
+tmap_arrange(all, 
+             all_2019,
+             all_2020,
+             asp=1, 
+             ncol=3)
 ```
+
+::: callout-note
+By comparing the Sum of Total Revenue of 2019 to 2023, Total Revenue in 2019 and Total Revenue in 2020, we can see that by summing up the total revenue for all the years, the distribution is quite different from 2019 and 2020.
+
+In fact, I have tried both revenue_all and revenue in just 2019, both cases did not have a significant p-value to reject the null hypothesis that the value at one location do not depend on depend on values at other (neighbouring) locations.
+:::
+
+### 5.2 **Computing Contiguity Spatial Weights**
+
 ```{r}
+wm_q <- poly2nb(rev_all, 
+                queen=TRUE)
+
+summary(wm_q)
 ```
 
+Since there's one province region 48 which has no contiguous neighbour, we would need to find out which province is it and manually assign it a neighbour. It is likely that this particular province is an island.
 
 ```{r}
+rev_all$province[48]
 ```
 
+After checking the province Phuket on the map, we can assign Phuket's nearest non-contiguous neighbour as Phang Nga and Krabi.
+
+![](images/clipboard-2105970456.png)
+
+Using the code chunk below, we can identify the indices of Phang Nga (18) and Krabi (39), so as to edit the neighbour list before proceeding to the next step.
 
 ```{r}
+which(rev_all$province %in% c("Phang Nga", "Krabi"))
 ```
 
+#### 5.2.1 Assigning the neighbours to Phuket
+
+Besides assign Phang Nga and Krabi and neighbour to Phuket, we also need to add Phuket into Phang Nga and Krabi lists of neighbours.
 
 ```{r}
+wm_q[[48]] <- as.integer(c(18,39))
+wm_q[[18]] <- as.integer(c(31,39,48,67,70))
+wm_q[[39]] <- as.integer(c(18,48,51,67))
 ```
 
-## 5.0 Creating a Time Series Cube
+```{r}
+rswm_q <- nb2listw(wm_q, 
+                   style="W", 
+                   zero.policy = TRUE)
+rswm_q
+```
+
+### 5.3 **Global Measures of Spatial Autocorrelation: Moran’s I**
+
+```{r}
+moran.test(rev_all$revenue_all, 
+           listw=rswm_q, 
+           zero.policy = TRUE, 
+           na.action=na.omit)
+```
+
+::: callout-important
+Since p-value is 0.544 \< 0.05, we conclude that we do not reject null hypothesis that the value at one location do not depend on depend on values at other (neighbouring) locations.
+
+Moran I statistic is -0.0185 \< 0, showing that values are dispersed, and observations tend to be dissimilar.
+:::
+
+### **5.4 Computing Monte Carlo Moran’s I**
+
+```{r}
+set.seed(1234)
+bperm= moran.mc(rev_all$revenue_all, 
+                listw=rswm_q, 
+                nsim=999, 
+                zero.policy = TRUE, 
+                na.action=na.omit)
+bperm
+```
+
+::: callout-important
+Similarly for Monte Carlo Moran's I, p-value = 0.356\> 0.05, we conclude that we do not reject null hypothesis that the value at one location do not depend on values at other (neighbouring) locations.
+:::
+
+```{r}
+hist(bperm$res, 
+     freq=TRUE, 
+     breaks=20, 
+     xlab="Simulated Moran's I")
+abline(v=0, 
+       col="red") 
+```
+
+::: callout-important
+Since the visualisation has suggested skewness in the data, we will apply log transformation to the data to normalise the skewed data, and perform the Moran's I and Monte Carlo simulation again.
+:::
+
+### 5.5 Applying log to Moran's I and Monte Carlo Moran's I
+
+```{r}
+rev_all$log_revenue_all <- log(rev_all$revenue_all)
+```
+
+```{r}
+moran.test(rev_all$log_revenue_all, 
+           listw=rswm_q, 
+           zero.policy = TRUE, 
+           na.action=na.omit)
+```
+
+::: callout-important
+After performing the log transformation on the revenue, we obtain the following results:
+
+1.  p-value = 0.0009 \< 0.05, we reject H0. We conclude that the value at one location depends on values at other (neighbouring) locations.
+2.  Moran's I statistic is 0.2228 \> 0, indicating that values are Clustered, and observations tend to be similar.
+3.  Monte Carlo simulations of 1000 times also confirmed similar results.
+:::
+
+```{r}
+bperm= moran.mc(rev_all$log_revenue_all, 
+                listw=rswm_q, 
+                nsim=999, 
+                zero.policy = TRUE, 
+                na.action=na.omit)
+bperm
+```
+
+```{r}
+mean(bperm$res[1:999])
+```
+
+```{r}
+var(bperm$res[1:999])
+```
+
+```{r}
+summary(bperm$res[1:999])
+```
+
+```{r}
+hist(bperm$res, 
+     freq=TRUE, 
+     breaks=20, 
+     xlab="Simulated Moran's I")
+abline(v=0, 
+       col="red") 
+```
+
+After log transformation, the monte carlo simulation of the Moran's I also produced a normalise distribution.
+
+### 5.6 Geary's c
+
+```{r}
+geary.test(rev_all$log_revenue_all, 
+           listw=rswm_q)
+```
+
+::: callout-important
+The results of Geary's C using log transformed data is as follows:
+
+1.  p-value = 0.0018 \< 0.05, we reject H0. We conclude that the value at one location depends on values at other (neighbouring) locations.
+2.  Geary's C statistics is 0.736179399 \<1. The values are Clustered, and observations tend to be similar to its immediate neighbours.
+:::
+
+## 6.0 Local Indicators of Spatial Association (LISA)
+
+### 6.1 **Computing local Moran’s I**
+
+```{r}
+fips <- order(rev_all$province)
+localMI <- localmoran(rev_all$log_revenue_all, 
+                      rswm_q)
+head(localMI)
+```
+
+```{r}
+printCoefmat(data.frame(
+  localMI[fips,], 
+  row.names=rev_all$province[fips]),
+  check.names=FALSE)
+```
+
+#### 6.2 Mapping the local Moran’s I and Moran’s I values, with p-value
+
+```{r}
+rev_all.localMI <- cbind(rev_all,localMI) %>%
+  rename(Pr.Ii = Pr.z....E.Ii..)
+```
+
+```{r}
+localMI.map <- tm_shape(rev_all.localMI) +
+  tm_fill(col = "Ii", 
+          style = "pretty", 
+          title = "local moran statistics") +
+  tm_borders(alpha = 0.5)
+
+pvalue.map <- tm_shape(rev_all.localMI) +
+  tm_fill(col = "Pr.Ii", 
+          breaks=c(-Inf, 0.05, Inf),
+          palette="-Blues", 
+          title = "local Moran's I p-values") +
+  tm_borders(alpha = 0.5)
+
+tmap_arrange(localMI.map, pvalue.map, asp=1, ncol=2)
+```
+
+::: callout-important
+From the Local Moran's I statistics and p-values, we can conclude that there are four clusters based on p-value \< 0.0.5
+:::
+
+### **6.3 Creating a LISA Cluster Map**
+
+```{r}
+rev_all.Z <- scale(rev_all$log_revenue_all) %>% 
+  as.vector 
+
+nci <- moran.plot(rev_all.Z, 
+                  rswm_q,
+                  labels=as.character(rev_all$province), 
+                  xlab="Revenue_All", 
+                  ylab="Spatially Lag Revenue_All")
+```
+
+::: callout-note
+From the above, we can draw the following conclusion:
+
+1.  Phuket is in the high high autocorrelation, where it is a positive cluster with Phang Nga, and Krabi, where the neighbours also have high values.
+2.  Bangkok is a high outlier among its low neighbours
+3.  Amnat Charoen is in the low low autocorrelation, where it is a positive cluster with Yasothon, Mukdahan
+4.  Ubon Ratchathani seems to be just a slightly high outlier among its low neighbours
+:::
+
+#### 6.3.1 **Preparing LISA map classes**
+
+```{r}
+quadrant <- vector(mode="numeric",length=nrow(localMI))
+
+rev_all$lag_log_revenue_all <- lag.listw(rswm_q, rev_all$log_revenue_all)
+DV <- rev_all$lag_log_revenue_all - mean(rev_all$lag_log_revenue_all)     
+```
+
+```{r}
+LM_I <- localMI[,1] - mean(localMI[,1])    
+```
+
+Set Significance level:
+
+```{r}
+signif <- 0.05       
+```
+
+Defining the quadrants
+
+```{r}
+quadrant[DV <0 & LM_I>0] <- 1
+quadrant[DV >0 & LM_I<0] <- 2
+quadrant[DV <0 & LM_I<0] <- 3  
+quadrant[DV >0 & LM_I>0] <- 4      
+```
+
+Placing all non-significant Moran in the category 0:
+
+```{r}
+quadrant[localMI[,5]>signif] <- 0
+```
+
+#### 6.3.2 **Plotting LISA map**
+
+```{r}
+gdppc <- qtm(rev_all, "log_revenue_all")
+
+rev_all.localMI$quadrant <- quadrant
+colors <- c("#ffffff", "#2c7bb6", "#abd9e9", "#fdae61", "#d7191c")
+clusters <- c("insignificant", "low-low", "low-high", "high-low", "high-high")
+
+LISAmap <- tm_shape(rev_all.localMI) +
+  tm_fill(col = "quadrant", 
+          style = "cat", 
+          palette = colors[c(sort(unique(quadrant)))+1], 
+          labels = clusters[c(sort(unique(quadrant)))+1],
+          popup.vars = c("")) +
+  tm_view(set.zoom.limits = c(11,17)) +
+  tm_borders(alpha=0.5)
+
+tmap_arrange(gdppc, LISAmap, 
+             asp=1, ncol=2)
+```
+
+::: callout-important
+Using the LISA map we can conclude:
+
+1.  Mukdhan and Roi Et are in low-low cluster.
+2.  Ubon Ratchathani is high outlier with low neighbours.
+3.  Pkuket, Phang Nga, Krabi and Nakhon Si Thammarat are high-high cluster.
+4.  Chachoengsao and Samut Prakan are low outliers in with high neighbour (i.e. Bangkok)
+:::
