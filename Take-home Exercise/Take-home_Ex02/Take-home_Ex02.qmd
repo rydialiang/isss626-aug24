@@ -61,7 +61,7 @@ pacman::p_load(sfdep, tmap,
                Kendall)
 ```
 
-### 2.2 Loading and Wrangling the Data
+### 2.2 Loading the Data
 
 Loading the tourism economy indicators data:
 
@@ -80,7 +80,16 @@ province <- st_read("data/rawdata",
                     layer = "tha_admbnda_adm1_rtsd_20220121" ) %>% 
   dplyr::select(3,17) %>% 
   st_transform(crs = 32647) %>% 
-  rename(province = ADM1_EN )
+  rename(province = ADM1_EN ) %>% 
+  mutate(province = case_when(
+    province == "Buriram" ~ "Buri Ram",
+    province == "Chon Buri" ~ "Chonburi",
+    province == "Lop Buri" ~ "Lopburi",
+    province == "Nong Bua Lam Phu" ~ "Nong Bua Lamphu",
+    province == "Phangnga" ~ "Phang Nga",
+    province == "Prachin Buri" ~ "Prachinburi",
+    province == "Si Sa Ket" ~ "Sisaket",
+    TRUE ~ province))
 
 write_rds(province, "data/rds/province.rds")
 ```
@@ -94,10 +103,12 @@ plot(province)
 Joining the dataset using the province column.
 
 ```{r}
+#| eval: False
 data <- left_join(tourism, 
                   province) %>% 
   st_as_sf() %>% 
-  st_transform(crs = 32647)
+  st_transform(crs = 32647) %>% 
+  pivot_wider(names_from = variable, values_from = value)
   
 write_rds(data, "data/rds/data.rds")
 ```
@@ -125,10 +136,9 @@ data <- read_rds("data/rds/data.rds")
 
 ```{r}
 rev_all_2b <- data %>%
-  filter(variable == "revenue_all") %>%
   group_by(province) %>%
-  filter(value > 2000000000) %>% 
-  mutate(value = sum(value, na.rm = TRUE)) %>%
+  filter(revenue_all > 2000000000) %>% 
+  summarise(revenue_all = sum(revenue_all, na.rm = TRUE)) %>% 
   ungroup()
 ```
 
@@ -136,7 +146,9 @@ Taking a look at the revenue distribution:
 
 ```{r}
 ggplot(data = rev_all_2b) +
-  geom_bar(aes(x = reorder(province, -value), y = value, fill = province), stat = "identity") +
+  geom_bar(aes(x = reorder(province, -revenue_all), 
+               y = revenue_all, fill = province), 
+           stat = "identity") +
   labs(title = "Total Revenue from Foreigner by Province", x = "Province", y = "Total Revenue") +
   theme_minimal() +
   theme(
@@ -175,16 +187,15 @@ ggplot(data = rev_all_2b) +
 
 ```{r}
 rev_for_1b <- data %>%
-  filter(variable == "revenue_foreign") %>% 
   group_by(province) %>%
-  filter(value > 1000000000) %>% 
-  mutate(value = sum(value, na.rm = TRUE)) %>%
-  ungroup() 
+  filter(revenue_foreign > 1000000000) %>% 
+  summarise(revenue_foreign = sum(revenue_foreign, na.rm = TRUE)) %>% 
+  ungroup()
 ```
 
 ```{r}
 ggplot(data = rev_for_1b) +
-  geom_bar(aes(x = reorder(province, -value), y = value, fill = province), stat = "identity") +
+  geom_bar(aes(x = reorder(province, -revenue_foreign), y = revenue_foreign, fill = province), stat = "identity") +
   labs(title = "Total Revenue from Foreigner by Province", x = "Province", y = "Total Revenue") +
   theme_minimal() +
   theme(
@@ -197,16 +208,15 @@ ggplot(data = rev_for_1b) +
 
 ```{r}
 rev_thai_1b <- data %>%
-  filter(variable == "revenue_thai") %>% 
   group_by(province) %>%
-  filter(value > 1000000000) %>% 
-  mutate(value = sum(value, na.rm = TRUE)) %>%
-  ungroup() 
+  filter(revenue_thai > 2000000000) %>% 
+  summarise(revenue_thai = sum(revenue_thai, na.rm = TRUE)) %>% 
+  ungroup()
 ```
 
 ```{r}
 ggplot(data = rev_thai_1b) +
-  geom_bar(aes(x = reorder(province, -value), y = value, fill = province), stat = "identity") +
+  geom_bar(aes(x = reorder(province, -revenue_thai), y = revenue_thai, fill = province), stat = "identity") +
   labs(title = "Total Revenue from Thai by Province", x = "Province", y = "Total Revenue") +
   theme_minimal() +
   theme(
@@ -234,15 +244,14 @@ ggplot(data = rev_thai_1b) +
 
 ```{r}
 tourist_all <- data %>%
-  filter(variable == "no_tourist_all") %>% 
   group_by(province) %>%
-  mutate(value = sum(value, na.rm = TRUE)) %>%
+  summarise(no_tourist_all = sum(no_tourist_all, na.rm = TRUE)) %>%
   ungroup() 
 ```
 
 ```{r}
 ggplot(data = tourist_all) +
-  geom_bar(aes(x = reorder(province, -value), y = value, fill = province), stat = "identity") +
+  geom_bar(aes(x = reorder(province, -no_tourist_all), y = no_tourist_all, fill = province), stat = "identity") +
   labs(title = "Total Number of Tourist by Province", x = "Province", y = "Total Number of Tourist") +
   theme_minimal() +
   theme(
@@ -251,8 +260,35 @@ ggplot(data = tourist_all) +
     legend.position = "none")
 ```
 
-## 4.0 
+## 4.0 Economic Indicator Layer
+
+We will combine all the data from 2019 to 2023 February, to take a look at how each province are different.
 
 ```{r}
-
+econ <- data %>% 
+  group_by(province, region_eng, geometry) %>% 
+  summarise(revenue_all = sum(revenue_all, na.rm = TRUE),
+            revenue_foreign = sum(revenue_foreign, na.rm = TRUE),
+            revenue_thai = sum(revenue_thai, na.rm = TRUE),
+            no_tourist_all = sum(no_tourist_all, na.rm = TRUE))
 ```
+
+```{r}
+plot(econ)
+```
+```{r}
+```
+
+
+```{r}
+```
+
+
+```{r}
+```
+
+
+```{r}
+```
+
+## 5.0 Creating a Time Series Cube
