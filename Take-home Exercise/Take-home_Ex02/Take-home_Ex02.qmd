@@ -627,3 +627,71 @@ Using the LISA map we can conclude:
 3.  Pkuket, Phang Nga, Krabi and Nakhon Si Thammarat are high-high cluster.
 4.  Chachoengsao and Samut Prakan are low outliers in with high neighbour (i.e. Bangkok)
 :::
+
+## 7.0 Hot Spot and Cold Spot Area Analysis (HCSA)
+
+### 7.1  Computing local Gi\* statistics
+
+Using the space time cube created before, we will now derive the inverse weight distance using the following code chunk:
+
+```{r}
+st_nb <- data_st %>%
+  activate("geometry") %>%
+  mutate(nb = include_self(
+    st_contiguity(geometry)),
+    wt = st_inverse_distance(nb, 
+                             geometry, 
+                             scale = 1,
+                             alpha = 1),
+    .before = 1) %>%
+  set_nbs("nb") %>%
+  set_wts("wt")
+```
+
+```{r}
+st_nb$log_revenue_all <- log(st_nb$revenue_all)
+
+# st_nb$year_month <- st_nb$year_month %>% 
+  seq_along()
+```
+
+```{r}
+gi_stars <- st_nb %>% 
+  group_by(year_month) %>% 
+  mutate(gi_star = local_gstar_perm(
+    revenue_all, nb, wt)) %>% 
+  tidyr::unnest(gi_star)
+```
+
+### 7.2 Mann-Kendall Test on Gi
+
+```{r}
+cbg <- gi_stars %>% 
+  ungroup() %>% 
+  filter(province == "Bangkok") %>% 
+  select(province, year_month, gi_star)
+```
+
+```{r}
+ggplot(data = cbg, 
+       aes(x = year_month, 
+           y = gi_star)) +
+  geom_line() +
+  theme_light()
+```
+
+### 7.3 Mann-Kendall Test Report
+
+```{r}
+cbg %>%
+  summarise(mk = list(
+    unclass(
+      Kendall::MannKendall(gi_star)))) %>% 
+  tidyr::unnest_wider(mk)
+```
+
+::: callout-note
+Tau = -0.1493 (perfectly decreasing series)
+
+Since the p-value = 0.1279 \> 0.05, we do not reject the null hypothesis that revenue_all is a monotonic decreasing series for 2019 to 2023.
+:::
