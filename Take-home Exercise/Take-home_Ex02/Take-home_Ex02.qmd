@@ -75,10 +75,8 @@ tourism <- read_csv("data/rawdata/thailand_domestic_tourism_2019_2023_ver2.csv")
          month = month(date))
 
 tourism$date <- as.Date(tourism$date, format = "%Y-%m-%d")
-tourism$year_month <- format(tourism$date, "%Y%m")
-tourism$year_month <- as.numeric(tourism$year_month )
-
-write_rds(tourism, "data/rds/tourism.rds")
+tourism$year_month <- (as.numeric(format(tourism$date, "%Y")) - 2019) * 12 + as.numeric(format(tourism$date, "%m"))
+                                                        
 ```
 
 Loading the geospatial data, extracting the study area at province level:
@@ -270,10 +268,14 @@ ggplot(data = tourist_all) +
 ## 4.0 Creating a Time Series Cube
 
 ```{r}
+province <- read_rds("data/rds/province.rds")
+
 data_st <- spacetime(data,
             province,
             .loc_col = "province",
             .time_col = "year_month")
+
+write_rds(data_st,"data/rds/data_st.rds")
 ```
 
 Confirming data_st as spacetime_cube:
@@ -628,13 +630,15 @@ Using the LISA map we can conclude:
 4.  Chachoengsao and Samut Prakan are low outliers in with high neighbour (i.e. Bangkok)
 :::
 
-## 7.0 Hot Spot and Cold Spot Area Analysis (HCSA)
+## 7.0 Emerging Hot Spot Analysis (EHSA)
 
-### 7.1  Computing local Gi\* statistics
+### 7.1 Computing local Gi\* statistics
 
 Using the space time cube created before, we will now derive the inverse weight distance using the following code chunk:
 
 ```{r}
+data_st <- read_rds("data/rds/data_st.rds")
+  
 st_nb <- data_st %>%
   activate("geometry") %>%
   mutate(nb = include_self(
@@ -646,13 +650,6 @@ st_nb <- data_st %>%
     .before = 1) %>%
   set_nbs("nb") %>%
   set_wts("wt")
-```
-
-```{r}
-st_nb$log_revenue_all <- log(st_nb$revenue_all)
-
-# st_nb$year_month <- st_nb$year_month %>% 
-  seq_along()
 ```
 
 ```{r}
@@ -691,7 +688,75 @@ cbg %>%
 ```
 
 ::: callout-note
-Tau = -0.1493 (perfectly decreasing series)
+Tau = -0.1853 (perfectly decreasing series)
 
-Since the p-value = 0.1279 \> 0.05, we do not reject the null hypothesis that revenue_all is a monotonic decreasing series for 2019 to 2023.
+Since the p-value = 0.0587 \> 0.05, we do not reject the null hypothesis that revenue_all is a monotonic decreasing series for 2019 to 2023.
+:::
+
+### 7.4 Mann-Kendall by Province
+
+```{r}
+ehsa <- gi_stars %>%
+  group_by(province) %>%
+  summarise(mk = list(
+    unclass(
+      Kendall::MannKendall(gi_star)))) %>%
+  tidyr::unnest_wider(mk)
+head(ehsa)
+```
+
+```{r}
+emerging <- ehsa %>% 
+  arrange(sl, abs(tau)) %>% 
+  slice(1:10)
+head(emerging)
+```
+
+### 7.5 Performing Monte Carlo Simulation on EHSA
+
+```{r}
+ehsa <- emerging_hotspot_analysis(
+  x = data_st, 
+  .var = "revenue_all", 
+  k = 1, 
+  nsim = 99
+)
+```
+
+```{r}
+ehsa_plot <- as.data.frame(ehsa)
+
+ggplot(data = ehsa_plot,
+       aes(x = classification))+
+  geom_bar()
+```
+
+```{r}
+data_ehsa <- data %>%
+  as.data.frame() %>% 
+  left_join(ehsa,
+            by = join_by(province == location)) %>% 
+  st_as_sf()
+```
+
+### 7.6 Visualising EHSA
+
+```{r}
+ehsa_sig <- data_ehsa  %>%
+  filter(p_value < 0.05)
+tmap_mode("plot")
+tm_shape(data_ehsa) +
+  tm_polygons() +
+  tm_borders(alpha = 0.5) +
+tm_shape(ehsa_sig) +
+  tm_fill("classification") + 
+  tm_borders(alpha = 0.4)
+```
+
+![](images/clipboard-1326676166.png){width="353"}
+
+::: callout-important
+-   Sporadic Cold Spots - A lot of Thailand's provinces are sporadic cold spot, where 90% of the time they are statistically significant, and none of the time these province are significant hotspots. It means that these provinces almost never provides tourism revenue.
+
+-   Sporadic Hot Spots - One Thailand's provinces is sporadic hot spots, where 90% of the time they are statistically significant, and none of the time these province are significant coldspots. It means that these provinces are the ones likely to contribute to tourism revenue.
 :::
