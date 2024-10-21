@@ -1,10 +1,20 @@
 ---
-title: "Preparing HDB data"
-author: "Dr. Kam Tin Seong"
+title: "In-class Ex 08: Preparing HDB Data"
+author: "Liang Xiuhao Rydia"
+date: "Oct 21, 2024"
+date-modified: "last-modified"
+execute:
+  eval: true
+  echo: true
+  warning: false
+  freeze: true
+format: 
+  html:
+    code-fold: true
+    code-summary: "Show the code"
 ---
 
 ::: {style="font-size: 1.50em"}
-
 ```{r}
 pacman::p_load(tidyverse, sf, httr, jsonlite, rvest)
 ```
@@ -109,5 +119,4 @@ coords <- get_coords(add_list)
 ```{r}
 write_rds(coords, "data/HDB/rds/coords.rds")
 ```
-
 :::
