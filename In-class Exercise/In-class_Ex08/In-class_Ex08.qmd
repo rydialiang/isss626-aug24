@@ -20,11 +20,13 @@ pacman::p_load(tidyverse, sf, httr, jsonlite, rvest)
 ```
 
 ```{r}
+#| eval: False
 resale <- read_csv("data/HDB/rawdata/resale.csv") %>%
   filter(month >= "2023-01" & month <= "2024-09")
 ```
 
 ```{r}
+#| eval: False
 resale_tidy <- resale %>%
   mutate(address = paste(block,street_name)) %>%
   mutate(remaining_lease_yr = as.integer(
@@ -34,15 +36,18 @@ resale_tidy <- resale %>%
 ```
 
 ```{r}
+#| eval: False
 resale_selected <- resale_tidy %>%
   filter(month == "2024-09")
 ```
 
 ```{r}
+#| eval: False
 add_list <- sort(unique(resale_selected$address))
 ```
 
 ```{r}
+#| eval: False
 get_coords <- function(add_list){
   
   # Create a data frame to store all retrieved coordinates
@@ -113,10 +118,12 @@ get_coords <- function(add_list){
 ```
 
 ```{r}
+#| eval: False
 coords <- get_coords(add_list)
 ```
 
 ```{r}
+#| eval: False
 write_rds(coords, "data/HDB/rds/coords.rds")
 ```
 :::
