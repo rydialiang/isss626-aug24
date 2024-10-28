@@ -29,7 +29,80 @@ eldercare <- st_read(dsn = "data/rawdata",
   st_transform(crs = 3414)
 ```
 
+The code chunk to import CHAS information.
+
 ```{r}
 CHAS <- st_read("data/rawdata/CHASClinics.kml") %>% 
   st_transform(crs = 3414)
+```
+
+## Count Number of Points within a Distance
+
+Buffering: st_buffer()
+
+```{r}
+buffer_1km <- st_buffer(eldercare, 
+                        dist = 1000)
+```
+
+EPSG 3414 =\> Unit is in meters. Hence we use dist = 1000, i.e. 1000m, for 1km buffer.
+
+## Visualising the Buffer and CHAS clinic
+
+The code chunk below is used to plot the newly created buffer and the CHAS clinics.
+
+```{r}
+tmap_mode("view")
+tm_shape(buffer_1km) +
+  tm_polygons() +
+tm_shape(CHAS) +
+  tm_dots()
+```
+
+![](images/clipboard-4025690323.png)
+
+::: callout-note
+-   Notice that there are overlapping points within a 1km-circles around the Eldercare.
+
+-   Note that there are outliers.
+
+-   Note that kml will be in WGS 84
+:::
+
+```{r}
+tmap_mode("plot")
+```
+
+```{r}
+buffer_1km$pts_count <- lengths(
+  st_intersects(buffer_1km,CHAS)
+)
+```
+
+::: callout-note
+-   lengths() will give the count of the intersects
+
+-   need to append this into the exist table. We need to drop other unnecessary columns
+:::
+
+```{r}
+write_rds(eldercare,"data/rds/eldercare.rds")
+```
+
+```{r}
+write_rds(CHAS, "data/rds/CHAS.rds")
+```
+
+```{r}
+CHAS
+```
+
+::: callout-note
+-   Notice that the geometry is Point Z.
+
+-   If we are using Spatstat, we need to drop "Z" of point Z.
+:::
+
+```{r}
+write_rds(buffer_1km, "data/rds/buffer_1km.rds")
 ```
