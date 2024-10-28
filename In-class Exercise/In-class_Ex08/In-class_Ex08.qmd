@@ -127,3 +127,148 @@ coords <- get_coords(add_list)
 write_rds(coords, "data/HDB/rds/coords.rds")
 ```
 :::
+
+## Data Sampling
+
+```{r}
+pacman::p_load(tidymodels,
+               olsrr,
+               knitr)
+```
+
+
+```{r}
+set.seed(12345)
+resale_split  <- initial_split(mdata,
+                               prop = 6.5/10,)
+train_data_1 <- training(resale_split)
+test_daya_1 <- testing(resale_split)
+```
+
+Multicollinearity check
+```{r}
+mdata_nogeo <- mdata %>% 
+  st_drop_geometry()
+ggstatsplot::ggcorrmat(mdata_nogeo[,2:17])
+```
+## Printing Report
+
+```{r}
+price_mlr <- lm(resale_price ~ floor_area_sqm +
+                  storey_order + remaining_lease_mths +
+                  PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER +
+                  PROX_MRT + PROX_PARK + PROX_MALL + 
+                  PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN +
+                  WITHIN_350M_CHILDCARE + WITHIN_350M_BUS +
+                  WITHIN_1KM_PRISCH,
+                data=train_data)
+olsrr::ols_regress(price_mlr)
+```
+## Multicollinearity Check
+
+```{r}
+#| eval :False
+vif <- performance::check_collinearity(price_mlr)
+kable(vif,
+      caption = "Variance Inflation Factor Results") %>% 
+  kable_styling(font_size = 18)
+```
+
+## Predictive Modelling with MLR
+
+```{r}
+#| eval: False
+bw_adaptive <- bw.gwr(resale_price ~ floor_area_sqm +
+                  storey_order + remaining_lease_mths +
+                  PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER +
+                  PROX_MRT + PROX_PARK + PROX_MALL + 
+                  PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN +
+                  WITHIN_350M_CHILDCARE + WITHIN_350M_BUS +
+                  WITHIN_1KM_PRISCH,
+                  data=train_data_sp,
+                  approach="CV",
+                  kernel="gaussian",
+                  adaptive=TRUE,
+                  longlat=FALSE)
+```
+
+## Predictive Modelling: SpatialML methods
+
+```{r}
+coords <- st_coordinates(mdata)
+coords_train <- st_coordinates(train_data)
+coords_test <- st_coordinates(test_data)
+```
+
+## Calibrating RF model
+
+```{r}
+#| eval: False
+set.seed(1234)
+rf <- ranger(resale_price ~ floor_area_sqm + storey_order + 
+               remaining_lease_mths + PROX_CBD + PROX_ELDERLYCARE + 
+               PROX_HAWKER + PROX_MRT + PROX_PARK + PROX_MALL + 
+               PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN +
+               WITHIN_350M_CHILDCARE + WITHIN_350M_BUS + 
+               WITHIN_1KM_PRISCH,
+             data=train_data_nogeom)
+rf
+```
+
+## Calibrating with grf()
+
+```{r}
+#| eval: False 
+set.seed(1234)
+gwRF_adaptive <- grf(formula = resale_price ~ floor_area_sqm + storey_order +
+                       remaining_lease_mths + PROX_CBD + PROX_ELDERLYCARE +
+                       PROX_HAWKER + PROX_MRT + PROX_PARK + PROX_MALL +
+                       PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN +
+                       WITHIN_350M_CHILDCARE + WITHIN_350M_BUS +
+                       WITHIN_1KM_PRISCH,
+                     dframe=train_data, 
+                     bw=55,
+                     kernel="adaptive",
+                     coords=coords_train)
+```
+
+```{r}
+gwr_adaptive <- read_rds("data/model/gwr_adaptive.rds")
+```
+
+## Preparing the test data
+
+```{r}
+#| eval: False
+
+test_data_nogeom <- train_data %>% 
+  
+
+test_data_nogeom <- cbind(
+  test_data, coords_test) %>% 
+  st_drop_geometry()
+
+
+gwRF_pred <- predict.grf(gwRF_adaptive, 
+                           test_data_no_geom, 
+                           x.var.name="X",
+                           y.var.name="Y", 
+                           local.w=1,
+                           global.w=0)
+```
+
+## Predicting by using the test data
+```{r}
+#| eval: False
+GRF_pred <- read_rds("data/model/GRF_pred.rds")
+GRF_pred_df <- as.data.frame(GRF_pred)
+test_data_pred <- cbind(test_data,
+                        GRF_pred_df)
+```
+
+## Visualising the predicted values
+
+
+
+
+
