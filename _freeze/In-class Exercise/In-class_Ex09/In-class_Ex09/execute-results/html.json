@@ -1,0 +1,15 @@
+{
+  "hash": "f069daaa860100a7ceab57ed07b797fc",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\ntitle: \"In-class Ex 09: Preparing HDB Data\"\nauthor: \"Liang Xiuhao Rydia\"\ndate: \"Oct 28, 2024\"\ndate-modified: \"last-modified\"\nexecute:\n  eval: true\n  echo: true\n  warning: false\n  freeze: true\nformat: \n  html:\n    code-fold: true\n    code-summary: \"Show the code\"\n---\n\n::: {.cell}\n\n```{.r .cell-code}\npacman::p_load(sf, spdep,\n               tmap, tidyverse)\n```\n:::\n\n\n## Count Number of Points within a Distance\n\nELDERCARE is in shapefile format, the code chunk below will be used:\n\n\n::: {.cell}\n\n```{.r .cell-code}\neldercare <- st_read(dsn = \"data/rawdata\",\n                     layer = \"ELDERCARE\") %>% \n  st_transform(crs = 3414)\n```\n\n::: {.cell-output .cell-output-stdout}\n\n```\nReading layer `ELDERCARE' from data source \n  `C:\\rydialiang\\isss626-aug24\\In-class Exercise\\In-class_Ex09\\data\\rawdata' \n  using driver `ESRI Shapefile'\nSimple feature collection with 133 features and 18 fields\nGeometry type: POINT\nDimension:     XY\nBounding box:  xmin: 14481.92 ymin: 28218.43 xmax: 41665.14 ymax: 46804.9\nProjected CRS: SVY21\n```\n\n\n:::\n:::\n\n::: {.cell}\n\n```{.r .cell-code}\nCHAS <- st_read(\"data/rawdata/CHASClinics.kml\") %>% \n  st_transform(crs = 3414)\n```\n\n::: {.cell-output .cell-output-stdout}\n\n```\nReading layer `MOH_CHAS_CLINICS' from data source \n  `C:\\rydialiang\\isss626-aug24\\In-class Exercise\\In-class_Ex09\\data\\rawdata\\CHASClinics.kml' \n  using driver `KML'\nSimple feature collection with 1193 features and 2 fields\nGeometry type: POINT\nDimension:     XYZ\nBounding box:  xmin: 103.5818 ymin: 1.016264 xmax: 103.9903 ymax: 1.456037\nz_range:       zmin: 0 zmax: 0\nGeodetic CRS:  WGS 84\n```\n\n\n:::\n:::\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

@@ -1,0 +1,35 @@
+---
+title: "In-class Ex 09: Preparing HDB Data"
+author: "Liang Xiuhao Rydia"
+date: "Oct 28, 2024"
+date-modified: "last-modified"
+execute:
+  eval: true
+  echo: true
+  warning: false
+  freeze: true
+format: 
+  html:
+    code-fold: true
+    code-summary: "Show the code"
+---
+
+```{r}
+pacman::p_load(sf, spdep,
+               tmap, tidyverse)
+```
+
+## Count Number of Points within a Distance
+
+ELDERCARE is in shapefile format, the code chunk below will be used:
+
+```{r}
+eldercare <- st_read(dsn = "data/rawdata",
+                     layer = "ELDERCARE") %>% 
+  st_transform(crs = 3414)
+```
+
+```{r}
+CHAS <- st_read("data/rawdata/CHASClinics.kml") %>% 
+  st_transform(crs = 3414)
+```

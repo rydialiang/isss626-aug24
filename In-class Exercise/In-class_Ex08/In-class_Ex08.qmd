@@ -136,7 +136,6 @@ pacman::p_load(tidymodels,
                knitr)
 ```
 
-
 ```{r}
 set.seed(12345)
 resale_split  <- initial_split(mdata,
@@ -146,11 +145,13 @@ test_daya_1 <- testing(resale_split)
 ```
 
 Multicollinearity check
+
 ```{r}
 mdata_nogeo <- mdata %>% 
   st_drop_geometry()
 ggstatsplot::ggcorrmat(mdata_nogeo[,2:17])
 ```
+
 ## Printing Report
 
 ```{r}
@@ -164,6 +165,7 @@ price_mlr <- lm(resale_price ~ floor_area_sqm +
                 data=train_data)
 olsrr::ols_regress(price_mlr)
 ```
+
 ## Multicollinearity Check
 
 ```{r}
@@ -258,6 +260,7 @@ gwRF_pred <- predict.grf(gwRF_adaptive,
 ```
 
 ## Predicting by using the test data
+
 ```{r}
 #| eval: False
 GRF_pred <- read_rds("data/model/GRF_pred.rds")
@@ -267,8 +270,3 @@ test_data_pred <- cbind(test_data,
 ```
 
 ## Visualising the predicted values
-
-
-
-
-
