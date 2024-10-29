@@ -106,3 +106,28 @@ CHAS
 ```{r}
 write_rds(buffer_1km, "data/rds/buffer_1km.rds")
 ```
+
+## Data Import
+
+### Using st_jitter()
+
+::: callout-important
+-   use st_jitter() to exclude away overlapping points.
+
+-   use to displace multiple points on the same coordinate.
+
+-   use amount, it is unit of coordinate. 2 meters.
+
+-   don't use decimal place as small numbers will lead to rounding down, i.e. resulting in zero, which means no jitter effects.
+
+-   factor, not recommended.
+
+-   the jitter effect will be applied to all data. if we only want to jitter the repeated transactions, we should extract them out and merge back again.
+
+-   reverse Geo-coding done on postal code, i.e. in our case, there may be more than one transaction that is on the same postal code. Therefore, we need to use jitter to shifts the geometry to ensure they are seen as separate points.
+:::
+
+```{r}
+mdata <- read_rds("data/model/mdata.rds") %>% 
+  st_jitter(amount = 2)
+```
