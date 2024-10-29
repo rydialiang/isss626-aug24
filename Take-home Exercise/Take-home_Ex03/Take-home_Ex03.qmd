@@ -30,8 +30,6 @@ Below is the list of data used for this take-home exercise. These data are extra
 
     -   Age of the unit
 
-    -   Main Upgrading Program (MUP) completed (optional)
-
 -   Locational factors
 
     -   Proxomity to CBD
@@ -58,7 +56,7 @@ Below is the list of data used for this take-home exercise. These data are extra
 
     -   Numbers of primary school within 1km
 
-## 2.0 Importing Data
+## 2.0 Getting Started
 
 ### 2.1 Setting up the environment
 
@@ -68,9 +66,27 @@ pacman::p_load(sf, tmap,
                httr, jsonlite)
 ```
 
-Importing all the data into the R environment:
+### 2.2 Importing and Wrangling the Data
 
-1.  Resale data (3-Room Flat)
+Importing all the data into the R environment.
+
+#### 2.2.1 Resale HDB Data
+
+Resale data (3-Room Flat), and transaction between Jan 2023 to Sep 2024. Selecting to retain only relevant fields:
+
+-   Address
+
+-   Postal Code
+
+-   Area of the unit
+
+-   Floor level
+
+-   Remaining lease
+
+-   Age of the unit
+
+-   x-y coordinates (left_join with coordinates extracted through reverse geo-coding with address using onemap API)
 
 ```{r}
 resale <- read_csv("data/rawdata/resale.csv") %>% 
@@ -80,7 +96,9 @@ resale <- read_csv("data/rawdata/resale.csv") %>%
   mutate(remaining_lease_yr = as.integer(
     str_sub(remaining_lease, 0, 2)))%>%
   mutate(remaining_lease_mth = as.integer(
-    str_sub(remaining_lease, 9, 11)))
+    str_sub(remaining_lease, 9, 11))) %>% 
+  mutate(age_of_unit = 2024 - lease_commence_date) %>% 
+  select(address, floor_area_sqm, storey_range, remaining_lease_yr, remaining_lease_mth,age_of_unit)
 ```
 
 Extracting the coords:
@@ -173,9 +191,245 @@ coords <- read_rds("data/rds/coords.rds")
 
 ```{r}
 resale_xy <- left_join(resale, coords,
-                       by = "address")
+                       by = "address") %>% 
+  st_as_sf(coords = c("longitude", "latitude"),
+                       crs=4326) %>%
+  st_transform(crs = 3414)
 ```
 
 ```{r}
 write_rds(resale_xy, "data/rds/resale_xy.rds")
+```
+
+```{r}
+resale_xy <- read_rds("data/rds/resale_xy.rds") 
+```
+
+#### 2.2.2 Proximity to CBD
+
+![](images/clipboard-1267202484.png)
+
+![](images/clipboard-506858820.png)
+
+![](images/clipboard-2690948445.png)
+
+Based on scribblemaps.com and google map, we can have a sense of Singapore's CBD and Central Area. Central Area includes area spanning Orchard, Chinatown, Marina Bay, Marina East, Bras Basah, Rochor and Newton. For the purpose of this exercise, we will be taking Dhoby Ghaut MRT station(1.299866722252685, 103.8454773226203) as the definition of our centroid of the CBD area for distance calculation purpose. The reason for choosing this point is as such:
+
+1.  Dhoby Ghaut MRT station serves three lines (N-S Line, N-E Line, and Circle Line)
+2.  It is approximately central of the Central Area as per the google map.
+
+Another possible centroid would be City Hall MRT(1.2932052372864624, 103.8519615479051), where it serves 2 main MRT lines (N-S Line and E-W Line) and would be representative of centroid when we consider including the Marina Bay East area as part of the Central Area of Singapore.
+
+Next, we will create the sf object for Dhoby Ghaut MRT station.
+
+```{r}
+cbd_dg <- data.frame(longitude = "103.8454773226203",
+                 latitude = "1.299866722252685") %>% 
+  st_as_sf(coords = c("longitude", "latitude"),
+                       crs=4326) %>%
+  st_transform(crs = 3414)
+```
+
+Then, we will check to ensure that both sf data.frame have the same CRS:
+
+```{r}
+st_crs(cbd_dg) == st_crs(resale_xy) 
+```
+
+Next, we will calculate the distance(in metres) using st_distance and append it back to resale_xy:
+
+```{r}
+distances <- st_distance(cbd_dg, resale_xy)
+resale_xy$dist_to_cbd <- as.numeric(distances)
+```
+
+#### 2.2.3 Proximity to Eldercare
+
+Since there may be multiple eldercare within the area, we will be using the proximity to the nearest available eldercare facility for the resale HDB. ELDERCARE is in shapefile format, hence, we will use st_read() to extract the file as sf data.frame, and also ensure the EPSG code is 3414 using st_transform().
+
+```{r}
+eldercare <- st_read(dsn = "data/rawdata", 
+                  layer = "ELDERCARE") %>%
+  st_transform(crs = 3414) %>% 
+  select(geometry)
+```
+
+```{r}
+st_crs(eldercare)
+```
+
+As there are multiple eldercares, we would need to first find the distance matrix, then find the minimum distance amongst all the matrix, and lastly, append the minimum dist back to our resale_xy dataframe.
+
+```{r}
+dist_elder <- st_distance(resale_xy,eldercare)
+min_distances <- apply(dist_elder, 1, min)
+resale_xy$dist_eldercare <- min_distances
+```
+
+#### 2.2.4 Proximity to Foodcourt/hawker center
+
+Similar steps are applied to Foodcourt/hawker center.
+
+```{r}
+food <- st_read(dsn = "data/rawdata/HawkerCentresKML.kml") %>%
+  st_transform(crs = 3414) %>% 
+  select(geometry) 
+```
+
+```{r}
+dist_food <- st_distance(resale_xy,food)
+min_distances <- apply(dist_food, 1, min)
+resale_xy$dist_food <- min_distances
+```
+
+#### 2.2.5 Proximity to MRT
+
+Similar steps are applied to MRT.
+
+```{r}
+mrt <- st_read(dsn = "data/rawdata",
+               layer = "G_MP08_ACT_MRT_STN_PT") %>%
+  st_transform(crs = 3414) %>% 
+  select(geometry)
+```
+
+```{r}
+dist_mrt <- st_distance(resale_xy,mrt)
+min_distances <- apply(dist_mrt, 1, min)
+resale_xy$dist_mrt <- min_distances
+```
+
+#### 2.2.6 Proximity to Park
+
+Similar steps are applied to Park. As geojson file contains geometry information with Z-dimension (height), we will use st_zm() to remove this dimensions since we do not need this information.
+
+```{r}
+park <- st_read(dsn = "data/rawdata/park.geojson") %>%
+  st_zm() %>% 
+  st_transform(crs = 3414) %>% 
+  select(geometry)
+```
+
+```{r}
+dist_park <- st_distance(resale_xy,park)
+min_distances <- apply(dist_park, 1, min)
+resale_xy$dist_park <- min_distances
+```
+
+#### 2.2.7 Proximity to a good primary school
+
+Since the definition of a "good" primary school differs, we will use the knowledge from concerned community as the gauge for a "good" primary school. For the purpose of this exercise, I adopted the two definitions that is associated with a "good" primary school:
+
+1.  Special Assistance Plan (SAP) Schools - Cultural Richness in Learning
+2.  Gifted Education Programme (GEP) Schools - Tailoring Education for the Gifted
+
+Based on [Creative Campus](https://www.creativecampus.com.sg/best-primary-schools-in-singapore-2024), the list of "good" primary school are compiled in the list named good_sch, using google map to extract the latitude and longitude.
+
+```{r}
+good_sch <- data.frame(
+  name = c("Ai Tong School", 
+           "Anglo-Chinese School (Primary)", 
+           "Catholic High School", 
+           "CHIJ St., Nicholas Girls’ School", 
+           "Henry Park Primary School", 
+           "Holy Innocents’ Primary School", 
+           "Hong Wen School", 
+           "Kong Hwa School", 
+           "Maha Bodhi School", 
+           "Maris Stella High School (Primary)", 
+           "Nan Hua Primary School", 
+           "Nanyang Primary School", 
+           "Pei Chun Public School", 
+           "Pei Hwa Presbyterian Primary School", 
+           "Poi Ching School", 
+           "Raffles Girls’ Primary School", 
+           "Red Swastika School", 
+           "Rosyth School", 
+           "St. Hilda’s Primary School", 
+           "Tao Nan School"),
+  latitude = c(1.3605640181003413,
+               1.3191507364879236,
+               1.355277597260772, 
+               1.374247187308568,
+               1.3170721007183392, 
+               1.366919234532623, 
+               1.3216304962516947,
+               1.3113035192025317,
+               1.3286168882975922,
+               1.3413858298053156,
+               1.3199812404785924,
+               1.3207867963363251,
+               1.3373761205768626,
+               1.3385314868306721,
+               1.3580371568487648,
+               1.3302362732220747,
+               1.3333982209974653,
+               1.3731445652271157,
+               1.3498237347980189,
+               1.3052062281563859),
+  longitude = c(103.83272785347252, 
+                103.83577417484831,
+                103.84457970481196,
+                103.83412198595342,
+                103.78415775347251,
+                103.8935703058735,
+                103.85710945532114,
+                103.88815583813025,
+                103.90150335711749,
+                103.87764453470902,
+                103.76203935532115,
+                103.80855218230802,
+                103.85576078045922,
+                103.77617291114346,
+                103.9356781534726,
+                103.80616995162373,
+                103.9341450516237,
+                103.8747181976503,
+                103.93610449580149,
+                103.9114018092948)
+  ) %>% 
+  st_as_sf(coords = c("longitude", "latitude"),
+                       crs=4326) %>%
+  st_transform(crs = 3414)
+write_rds(good_sch, "data/rds/good_sch.rds")
+
+```
+
+```{r}
+dist_good_sch <- st_distance(resale_xy,good_sch)
+min_distances <- apply(dist_good_sch, 1, min)
+resale_xy$dist_good_sch <- min_distances
+```
+
+#### 2.2.8 Proximity to Shopping Mall
+
+Similar steps are applied to Shopping Mall.
+
+```{r}
+mall <- st_read(dsn = "data/rawdata",
+               layer = "Mall") %>%
+  st_transform(crs = 3414) %>% 
+  select(geometry)
+```
+
+```{r}
+dist_mall <- st_distance(resale_xy,mall)
+min_distances <- apply(dist_mall, 1, min)
+resale_xy$dist_mall <- min_distances
+```
+
+#### 2.2.9 Proximity to Supermarket
+
+Similar steps are applied to Supermarket.
+
+```{r}
+supermarket <- st_read(dsn = "data/rawdata/SupermarketsKML.kml") %>%
+  st_transform(crs = 3414) %>% 
+  select(geometry)
+```
+
+```{r}
+dist_supermarket <- st_distance(resale_xy,supermarket)
+min_distances <- apply(dist_supermarket, 1, min)
+resale_xy$dist_supermarket <- min_distances
 ```

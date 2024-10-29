@@ -131,3 +131,70 @@ write_rds(buffer_1km, "data/rds/buffer_1km.rds")
 mdata <- read_rds("data/model/mdata.rds") %>% 
   st_jitter(amount = 2)
 ```
+
+## Hands-on Exercise 9 review
+
+```{r}
+pacman::p_load(SpatialAcc, sf, 
+               tidyverse, ggstatsplot, tmap)
+```
+
+```{r}
+mpsz <- st_read(dsn = "data/geospatial", layer = "MP14_SUBZONE_NO_SEA_PL")
+```
+
+```{r}
+hexagons <- st_read(dsn = "data/geospatial", layer = "hexagons") 
+```
+
+```{r}
+eldercare <- st_read(dsn = "data/geospatial", layer = "ELDERCARE") 
+```
+
+```{r}
+st_crs(mpsz)
+```
+
+```{r}
+ODMatrix <- read_csv("data/aspatial/OD_Matrix.csv", skip = 0)
+```
+
+Data cleaning and Updating Attributes:
+
+```{r}
+eldercare <- eldercare %>%
+  select(fid, ADDRESSPOS) %>%
+  mutate(capacity = 100)
+```
+
+```{r}
+hexagons <- hexagons %>%
+  select(fid) %>%
+  mutate(demand = 100)
+```
+
+::: callout-note
+-   Capacity and demand is a created field for this exercise. Real capacity and demand can be crawled online.
+
+-   We dropped away all column that are not important.
+:::
+
+```{r}
+distmat <- ODMatrix %>%
+  select(origin_id, destination_id, total_cost) %>%
+  spread(destination_id, total_cost)%>%
+  select(c(-c('origin_id')))
+```
+
+```{r}
+distmat_km <- as.matrix(distmat/1000)
+```
+
+```{r}
+acc_Hansen <- data.frame(ac(hexagons$demand,
+                            eldercare$capacity,
+                            distmat_km, 
+                            #d0 = 50,
+                            power = 2, 
+                            family = "Hansen"))
+```
