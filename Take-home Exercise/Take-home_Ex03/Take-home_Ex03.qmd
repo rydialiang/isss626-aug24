@@ -63,7 +63,8 @@ Below is the list of data used for this take-home exercise. These data are extra
 ```{r}
 pacman::p_load(sf, tmap,
                spdep, tidyverse,
-               httr, jsonlite)
+               httr, jsonlite,
+               SpatialAcc, ggstatsplot)
 ```
 
 ### 2.2 Importing and Wrangling the Data
@@ -432,4 +433,76 @@ supermarket <- st_read(dsn = "data/rawdata/SupermarketsKML.kml") %>%
 dist_supermarket <- st_distance(resale_xy,supermarket)
 min_distances <- apply(dist_supermarket, 1, min)
 resale_xy$dist_supermarket <- min_distances
+```
+
+#### 2.2.10 Creating buffer of 350m and 1km for resale HDB
+
+```{r}
+buffer_350m <- st_buffer(resale_xy, 
+                        dist = 350)
+```
+
+```{r}
+buffer_1km <- st_buffer(resale_xy, 
+                        dist = 1000)
+```
+
+Importing data for kindergartens, childcare, bus stop, and primary school:
+
+```{r}
+kindergarten <- st_read(dsn = "data/rawdata/Kindergartens.kml") %>%
+  st_transform(crs = 3414) %>% 
+  select(geometry)
+
+childcare <- st_read(dsn = "data/rawdata/ChildCareServices.kml") %>%
+  st_transform(crs = 3414) %>% 
+  select(geometry)
+
+bus <- st_read(dsn = "data/rawdata",
+               layer = "BusStop") %>%
+  st_transform(crs = 3414) %>% 
+  select(geometry)
+
+pri_sch <- st_read(dsn = "data/rawdata/LTASchoolZoneKML.kml") %>%
+  st_transform(crs = 3414)
+```
+
+Since the primary school I have got is the a school zone, we will use st_centroid() to find the centroid of each school's location, and use it to calculate distance. We will also need to drop the Z-dimension using st_zm(). Also, to make the name of primary school more readable, we will use sub() of base R to extract the name of the primary school.
+
+```{r}
+pri_sch <- pri_sch %>% 
+  st_zm() %>% 
+  st_centroid() 
+
+pri_sch$Description <- sub(".*<th>SITENAME</th> <td>(.*?)</td>.*", "\\1", pri_sch$Description)
+
+write_rds(pri_sch, "data/rds/pri_sch.rds")
+```
+
+#### 2.2.11 Counting the numbers of facilities within the buffers
+
+Counting points for kindergartens, childcare, bus stop, and primary school:
+
+```{r}
+resale_xy$kinder_count <- lengths(
+  st_intersects(buffer_350m, kindergarten))
+
+resale_xy$childcare_count <- lengths(
+  st_intersects(buffer_350m, childcare))
+
+resale_xy$bus_count <- lengths(
+  st_intersects(buffer_350m, bus))
+
+resale_xy$pri_sch_count <- lengths(
+  st_intersects(buffer_1km, pri_sch))
+```
+
+```{r}
+write_rds(resale_xy, "data/rds/resale_xy.rds")
+```
+
+## 3.0 Predictive Pricing for Resale HDB
+
+```{r}
+resale_xy <- read_rds("data/rds/resale_xy.rds")
 ```
