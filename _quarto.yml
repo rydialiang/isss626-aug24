@@ -31,8 +31,10 @@ website:
             href: Hands-on Exercise/Hands-on_Ex08/Hands-on_Ex08.qmd
           - text: "Hands-on Exercise 9"
             href: Hands-on Exercise/Hands-on_Ex09/Hands-on_Ex09.qmd
-          - text: "Hands-on Exercise 10"
-            href: Hands-on Exercise/Hands-on_Ex10/Hands-on_Ex10.qmd
+          - text: "Hands-on Exercise 10a"
+            href: Hands-on Exercise/Hands-on_Ex10a/Hands-on_Ex10a.qmd
+          - text: "Hands-on Exercise 10b"
+            href: Hands-on Exercise/Hands-on_Ex10b/Hands-on_Ex10b.qmd
       - text: In-class Exercise
         menu: 
           - text: "In-class Exercise 1"
