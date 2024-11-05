@@ -64,7 +64,11 @@ Below is the list of data used for this take-home exercise. These data are extra
 pacman::p_load(sf, tmap,
                spdep, tidyverse,
                httr, jsonlite,
-               SpatialAcc, ggstatsplot)
+               SpatialAcc, ggstatsplot,
+               olsrr, corrplot, ggpubr, 
+               GWmodel, tmap,
+               DT, plotly, patchwork,
+               lwgeom)
 ```
 
 ### 2.2 Importing and Wrangling the Data
@@ -97,9 +101,10 @@ resale <- read_csv("data/rawdata/resale.csv") %>%
   mutate(remaining_lease_yr = as.integer(
     str_sub(remaining_lease, 0, 2)))%>%
   mutate(remaining_lease_mth = as.integer(
-    str_sub(remaining_lease, 9, 11))) %>% 
-  mutate(age_of_unit = 2024 - lease_commence_date) %>% 
-  select(address, floor_area_sqm, storey_range, remaining_lease_yr, remaining_lease_mth,age_of_unit)
+    str_sub(remaining_lease, 9, 11))) %>%
+  separate(storey_range, into = c("min_storey", "max_storey"), sep = " TO ", convert = TRUE) %>%
+  mutate(storey_order = as.numeric(min_storey)) %>%
+  select(month, resale_price, address, floor_area_sqm, storey_order, remaining_lease_yr, remaining_lease_mth)
 ```
 
 Extracting the coords:
@@ -289,9 +294,10 @@ Similar steps are applied to MRT.
 
 ```{r}
 mrt <- st_read(dsn = "data/rawdata",
-               layer = "G_MP08_ACT_MRT_STN_PT") %>%
+               layer = "PassengerPickupBay") %>%
   st_transform(crs = 3414) %>% 
-  select(geometry)
+  select("geometry") %>% 
+  st_centroid()
 ```
 
 ```{r}
@@ -501,8 +507,409 @@ resale_xy$pri_sch_count <- lengths(
 write_rds(resale_xy, "data/rds/resale_xy.rds")
 ```
 
-## 3.0 Predictive Pricing for Resale HDB
+#### 2.2.12 Importing the Singapore Boundary
+
+```{r}
+mpsz = st_read(dsn = "data/rawdata/", 
+               layer = "MP14_SUBZONE_WEB_PL") %>% 
+  st_transform(crs = 3414)
+```
+
+## 3.0 Exploratory Data Analysis (EDA)
+
+### 3.1 HDB Resale Price
 
 ```{r}
 resale_xy <- read_rds("data/rds/resale_xy.rds")
 ```
+
+```{r}
+ggplot(data=resale_xy, 
+       aes(x=`resale_price`)) +
+  geom_histogram(bins=20, 
+                 color="black", 
+                 fill="light blue") +
+  theme_minimal()
+```
+
+From this histogram, we can see the resale price is right skewed, with right tail as high as in the range of \$1.568 million, which is quite a high price for a 3-Room HDB in Singapore. The peak of the histogram is around \$400,000, suggesting the resale price median and mean price is around this value.
+
+Let's take a look at the outliers using the ggplotly.
+
+```{r}
+p <- ggplot(data=resale_xy, 
+       aes(y=`resale_price`)) +
+  geom_boxplot(color="black", 
+               fill="light blue") +
+  theme_minimal()
+
+ip <- ggplotly(p)
+ip
+```
+
+From the boxplot, we observe that there's one low outlier price of \$150K, and many high outliers above \$590K (upper quartile).
+
+Next we will take a look at the data above \$590K to determine how we want to treat these outliers.
+
+```{r}
+resale_above590k <- resale_xy[resale_xy$resale_price > 590000, ]
+
+datatable(resale_above590k)
+
+```
+
+Investigating the relationship between the resale_price and floor_area_sqm:
+
+```{r}
+ggplot(data = resale_xy, 
+       aes(x = floor_area_sqm, 
+           y = resale_price)) +
+  geom_point() +
+  geom_smooth(method = "lm", color = "blue", se = FALSE) +  # Adds a trendline
+  labs(
+    title = "Scatter Plot of Resale Price vs Floor Area with Trendline",
+    x = "Floor Area (sqm)",
+    y = "Resale Price"
+  ) +
+  theme_minimal()
+```
+
+```{r}
+resale_final <- resale_xy %>% 
+  filter(resale_price <= 1000000 & floor_area_sqm <= 100) %>% filter(resale_price != 150000)
+```
+
+::: callout-important
+## Dropping Outliers
+
+-   Lower Outlier of Price \$150k will be dropped.
+
+-   Higher Outliers of location at JLN MA'MOR, JLN BAHAGIA, STIRLING RD seems to have very high resale price and also much higher floor_area_sqm compared to the 60-70 sqm range of a normal 3-Room flat, as well as a remaining_lease_yr in 40 plus years range.
+
+    ![](images/clipboard-1568852073.png)
+
+-   For the high outliers, we will drop the data that has a resale value above \$1mil, more than 100 sqm.
+:::
+
+```{r}
+a <- ggplot(data=resale_final, 
+       aes(x=`resale_price`)) +
+  geom_histogram(bins=20, 
+                 color="black", 
+                 fill="light blue") +
+  theme_minimal()
+```
+
+```{r}
+ggplot(data = resale_final, 
+       aes(x = floor_area_sqm, 
+           y = resale_price)) +
+  geom_point() +
+  geom_smooth(method = "lm", color = "blue", se = FALSE) +  # Adds a trendline
+  labs(
+    title = "Scatter Plot of Resale Price vs Floor Area with Trendline",
+    x = "Floor Area (sqm)",
+    y = "Resale Price"
+  ) +
+  theme_minimal()
+```
+
+```{r}
+p <- ggplot(data=resale_final, 
+       aes(y=`resale_price`)) +
+  geom_boxplot(color="black", 
+               fill="light blue") +
+  theme_minimal()
+
+ip <- ggplotly(p)
+ip
+```
+
+```{r}
+resale_final <- resale_final %>%
+  mutate(`log_resale_price` = log(resale_price))
+
+b <- ggplot(data=resale_final, aes(x=`log_resale_price`)) +
+  geom_histogram(bins=20, color="black", fill="light blue") +
+  theme_minimal()
+```
+
+After applying log to the resale_price, we get a distribution that resemble the
+
+```{r}
+a/b
+```
+
+```{r}
+write_rds(resale_final,"data/rds/resale_final.rds")
+```
+
+### 3.2 Drawing Statistical Point Map
+
+```{r}
+tm_shape(mpsz) +
+  tm_polygons() +
+  tm_shape(resale_final) +  
+   tm_dots(col = "resale_price",
+           alpha = 0.6,
+           style = "quantile",
+           palette = "Reds") +
+   tm_view(set.zoom.limits = c(11, 14))
+```
+
+```{r}
+tmap_mode("view")
+
+tm_shape(resale_final) +  
+   tm_dots(col = "resale_price",
+           alpha = 0.6,
+           style = "quantile",
+           palette = "Reds") 
+```
+
+```{r}
+tmap_mode("plot")
+```
+
+::: callout-note
+-   Note that Punggol area has a high concentration of high resale price for 3-room HDB. These are likely newly MOP 3-room flats.
+:::
+
+## 4.0 Hedonic Pricing Model for Resale HDB
+
+```{r}
+resale_final <- read_rds("data/rds/resale_final.rds")
+```
+
+### 4.1 **Multiple Linear Regression Model**
+
+#### 4.1.1 Check Multi-colinearity
+
+```{r}
+resale_final <- resale_final %>% 
+  mutate(across(c(4, 5, 6, 8, 10:21), as.numeric)) %>% 
+  as.data.frame()
+
+corrplot(cor(resale_final[, c(4,5,6, 8, 10:21)]), 
+         diag = FALSE, order = "AOE",
+         tl.pos = "td", tl.cex = 0.8,  
+         tl.srt = 45,  
+         number.cex = 0.5,
+         method = "number", type = "upper")  
+
+```
+
+::: callout-important
+All correlations values are below 0.8, hence we can conclude that there is no multi-colinearity.
+:::
+
+### 4.2 Splitting the Training data and Test data
+
+We will use Jan 2023 to Jun 2024 data as training dataset, and use ground truth of Jul-Sep 2024 to check the performance of the model.
+
+```{r}
+train_data <- resale_final %>% 
+  st_as_sf() %>% 
+  filter(month >= "2023-01" & month <= "2024-06") %>% 
+  st_jitter()
+
+test_data <- resale_final %>% 
+  st_as_sf() %>% 
+  filter(month >= "2024-07" & month <= "2024-09") %>% 
+  st_jitter()
+```
+
+```{r}
+write_rds(train_data, "data/rds/train_data.rds")
+write_rds(test_data, "data/rds/test_data.rds")
+```
+
+### 4.3 **Building a non-spatial multiple linear regression**
+
+```{r}
+price_mlr <- lm(resale_price ~ floor_area_sqm +
+                  + remaining_lease_yr + storey_order +
+                  dist_to_cbd + dist_eldercare + dist_food +
+                  dist_mrt +dist_park +dist_good_sch +
+                  dist_mall + dist_supermarket +
+                  kinder_count + childcare_count + bus_count +
+                  pri_sch_count,
+                data=train_data)
+summary(price_mlr)
+```
+
+::: callout-note
+-   All predictors have p-value lesser than alpha = 0.05, meaning all are statistically significant, except eldercare, with a p-value of 0.284436.
+
+-   Adjusted R-squared is 0.7334, suggesting a strong model with 73.34% of the variance in the resale prices is explained by the predictors.
+
+-   The model also has p-value lesser than alpha = 0.05, suggesting that this model is statistically significant.
+:::
+
+```{r}
+write_rds(price_mlr, "data/model/price_mlr.rds" ) 
+```
+
+### 4.4 GWR Predictive Model
+
+```{r}
+train_data_sp <- as_Spatial(train_data)
+# Extract coordinates from the SpatialPointsDataFrame
+coords <- coordinates(train_data_sp)
+
+# Check for duplicates in the coordinates
+duplicate_indices <- which(duplicated(coords))
+
+# Print duplicate coordinates and their indices
+if (length(duplicate_indices) > 0) {
+  cat("Duplicate points found at indices:\n")
+  print(duplicate_indices)
+  print(coords[duplicate_indices, ])
+} else {
+  cat("No duplicate points found.")
+}
+
+```
+
+```{r}
+test_data_sp <- as_Spatial(test_data)
+
+# Extract coordinates from the SpatialPointsDataFrame
+coords <- coordinates(test_data_sp)
+
+# Check for duplicates in the coordinates
+duplicate_indices <- which(duplicated(coords))
+
+# Print duplicate coordinates and their indices
+if (length(duplicate_indices) > 0) {
+  cat("Duplicate points found at indices:\n")
+  print(duplicate_indices)
+  print(coords[duplicate_indices, ])
+} else {
+  cat("No duplicate points found.")
+}
+
+```
+
+```{r}
+plot(train_data_sp, col = 'blue', pch = 16, main = "Training and Test Points")
+points(test_data_sp, col = 'red', pch = 16)
+legend("topright", legend = c("Train", "Test"), col = c("blue", "red"), pch = 16)
+
+```
+
+#### 4.4.1 Computing Adaptive Bandwidth
+
+Removing dist_eldercare from the model:
+
+```{r}
+bw_adaptive <- bw.gwr(resale_price ~ floor_area_sqm +
+                  + remaining_lease_yr + storey_order +
+                  dist_to_cbd + dist_food +
+                  dist_mrt +dist_park +dist_good_sch +
+                  dist_mall + dist_supermarket +
+                  kinder_count + childcare_count + bus_count +
+                  pri_sch_count,
+                  data=train_data_sp,
+                  approach="CV",
+                  kernel="gaussian",
+                  adaptive=TRUE,
+                  longlat=FALSE)
+```
+
+
+
+```{r}
+write_rds(bw_adaptive, "data/model/bw_adaptive.rds")
+```
+
+#### 4.4.2 **Constructing the adaptive bandwidth gwr model**
+
+```{r}
+bw_adaptive <- read_rds("data/model/bw_adaptive.rds")
+```
+
+The result shows that 49 neighbour points will be the optimal bandwidth to be used if adaptive bandwidth is used for this data set.
+
+```{r}
+bw_adaptive
+```
+
+Using the derived adaptive bandwidth for gwr-based pricing model
+
+```{r}
+gwr_adaptive <- gwr.basic(formula = resale_price ~ floor_area_sqm +
+                  + remaining_lease_yr + storey_order +
+                  dist_to_cbd + dist_food +
+                  dist_mrt +dist_park +dist_good_sch +
+                  dist_mall + dist_supermarket +
+                  kinder_count + childcare_count + bus_count +
+                  pri_sch_count,
+                          data=train_data_sp,
+                          bw=bw_adaptive, 
+                          kernel = 'gaussian', 
+                          adaptive=TRUE,
+                          longlat = FALSE)
+```
+
+```{r}
+write_rds(gwr_adaptive, "data/model/gwr_adaptive.rds")
+```
+
+#### 4.4.3 Retrieving gwr output object
+
+```{r}
+gwr_adaptive <- read_rds("data/model/gwr_adaptive.rds")
+```
+
+```{r}
+gwr_adaptive
+```
+
+::: callout-important
+-   Adjusted R-square is 0.931709, which indicates that the GWR model is improved from the general multiple linear regression.
+:::
+
+#### 4.4.4 **Computing adaptive bandwidth for the test data**
+
+```{r}
+bw_adaptive_test <- bw.gwr(resale_price ~ floor_area_sqm +
+                  + remaining_lease_yr + storey_order +
+                  dist_to_cbd + dist_food +
+                  dist_mrt +dist_park +dist_good_sch +
+                  dist_mall + dist_supermarket +
+                  kinder_count + childcare_count + bus_count +
+                  pri_sch_count,
+                  data=test_data_sp,
+                  approach="CV",
+                  kernel="gaussian",
+                  adaptive=TRUE,
+                  longlat=FALSE)
+```
+
+```{r}
+bw_adaptive_test
+```
+
+Adaptive bandwidth to be used for test data is 33
+
+### **14.8.7 Computing predicted values of the test data**
+
+```{r}
+#| eval: False
+gwr_pred <- gwr.predict(formula = resale_price ~ floor_area_sqm +
+                  + remaining_lease_yr + storey_order +
+                  dist_to_cbd + dist_food +
+                  dist_mrt +dist_park +dist_good_sch +
+                  dist_mall + dist_supermarket +
+                  kinder_count + childcare_count + bus_count +
+                  pri_sch_count, 
+                  data=train_data_sp, 
+                  predictdata = test_data_sp, 
+                  bw=bw_adaptive, 
+                  kernel = 'gaussian', 
+                  adaptive=TRUE, 
+                  longlat = FALSE)
+```
+
+## 4.5 Random Forest Model
