@@ -68,7 +68,8 @@ pacman::p_load(sf, tmap,
                olsrr, corrplot, ggpubr, 
                GWmodel, tmap,
                DT, plotly, patchwork,
-               lwgeom)
+               ranger, SpatialML,
+               rsample, Metrics)
 ```
 
 ### 2.2 Importing and Wrangling the Data
@@ -678,7 +679,8 @@ tmap_mode("plot")
 ## 4.0 Hedonic Pricing Model for Resale HDB
 
 ```{r}
-resale_final <- read_rds("data/rds/resale_final.rds")
+resale_final <- read_rds("data/rds/resale_final.rds") %>% 
+  drop_na()
 ```
 
 ### 4.1 **Multiple Linear Regression Model**
@@ -687,10 +689,10 @@ resale_final <- read_rds("data/rds/resale_final.rds")
 
 ```{r}
 resale_final <- resale_final %>% 
-  mutate(across(c(4, 5, 6, 8, 10:21), as.numeric)) %>% 
+  mutate(across(c(4, 5, 6, 10:21), as.numeric)) %>% 
   as.data.frame()
 
-corrplot(cor(resale_final[, c(4,5,6, 8, 10:21)]), 
+corrplot(cor(resale_final[, c(4,5,6,10:22)]), 
          diag = FALSE, order = "AOE",
          tl.pos = "td", tl.cex = 0.8,  
          tl.srt = 45,  
@@ -709,11 +711,13 @@ We will use Jan 2023 to Jun 2024 data as training dataset, and use ground truth 
 
 ```{r}
 train_data <- resale_final %>% 
+  drop_na() %>% 
   st_as_sf() %>% 
   filter(month >= "2023-01" & month <= "2024-06") %>% 
   st_jitter(amount=5)
 
-test_data <- resale_final %>% 
+test_data <- resale_final %>%
+  drop_na() %>% 
   st_as_sf() %>% 
   filter(month >= "2024-07" & month <= "2024-09") %>% 
   st_jitter(amount=5)
@@ -729,19 +733,19 @@ write_rds(test_data, "data/rds/test_data.rds")
 ```{r}
 price_mlr <- lm(resale_price ~ floor_area_sqm +
                   + remaining_lease_yr + storey_order +
-                  dist_to_cbd + dist_eldercare + dist_food +
+                  dist_to_cbd +
                   dist_mrt +dist_park +dist_good_sch +
                   dist_mall + dist_supermarket +
                   kinder_count + childcare_count + bus_count +
                   pri_sch_count,
                 data=train_data)
-summary(price_mlr)
+olsrr::ols_regress(price_mlr)
 ```
 
 ::: callout-note
 -   All predictors have p-value lesser than alpha = 0.05, meaning all are statistically significant, except eldercare, with a p-value of 0.284436.
 
--   Adjusted R-squared is 0.7334, suggesting a strong model with 73.34% of the variance in the resale prices is explained by the predictors.
+-   Adjusted R-squared is 0.7315, suggesting a strong model with 73.15% of the variance in the resale prices is explained by the predictors.
 
 -   The model also has p-value lesser than alpha = 0.05, suggesting that this model is statistically significant.
 :::
@@ -800,12 +804,10 @@ legend("topright", legend = c("Train", "Test"), col = c("blue", "red"), pch = 16
 
 #### 4.4.1 Computing Adaptive Bandwidth
 
-Removing dist_eldercare from the model:
-
 ```{r}
 bw_adaptive <- bw.gwr(resale_price ~ floor_area_sqm +
                   + remaining_lease_yr + storey_order +
-                  dist_to_cbd + dist_food +
+                  dist_to_cbd +
                   dist_mrt +dist_park +dist_good_sch +
                   dist_mall + dist_supermarket +
                   kinder_count + childcare_count + bus_count +
@@ -827,7 +829,7 @@ write_rds(bw_adaptive, "data/model/bw_adaptive.rds")
 bw_adaptive <- read_rds("data/model/bw_adaptive.rds")
 ```
 
-The result shows that 49 neighbour points will be the optimal bandwidth to be used if adaptive bandwidth is used for this data set.
+The result shows that 45 neighbour points will be the optimal bandwidth to be used if adaptive bandwidth is used for this data set.
 
 ```{r}
 bw_adaptive
@@ -836,9 +838,10 @@ bw_adaptive
 Using the derived adaptive bandwidth for gwr-based pricing model
 
 ```{r}
+#| eval: False
 gwr_adaptive <- gwr.basic(formula = resale_price ~ floor_area_sqm +
                   + remaining_lease_yr + storey_order +
-                  dist_to_cbd + dist_food +
+                  dist_to_cbd +
                   dist_mrt +dist_park +dist_good_sch +
                   dist_mall + dist_supermarket +
                   kinder_count + childcare_count + bus_count +
@@ -851,6 +854,7 @@ gwr_adaptive <- gwr.basic(formula = resale_price ~ floor_area_sqm +
 ```
 
 ```{r}
+#| eval: False
 write_rds(gwr_adaptive, "data/model/gwr_adaptive.rds")
 ```
 
@@ -865,12 +869,14 @@ gwr_adaptive
 ```
 
 ::: callout-important
--   Adjusted R-square is 0.931709, which indicates that the GWR model is improved from the general multiple linear regression.
+-   Adjusted R-square is 0.9240217, which indicates that the GWR model is improved from the general multiple linear regression.
+-   dist_food and dist_eldercare are removed due to them being statistically insignificant
 :::
 
 #### 4.4.4 **Computing adaptive bandwidth for the test data**
 
 ```{r}
+#| eval: False
 bw_adaptive_test <- bw.gwr(resale_price ~ floor_area_sqm +
                   + remaining_lease_yr + storey_order +
                   dist_to_cbd + dist_food +
@@ -886,27 +892,184 @@ bw_adaptive_test <- bw.gwr(resale_price ~ floor_area_sqm +
 ```
 
 ```{r}
+#| eval: False
 bw_adaptive_test
 ```
 
-Adaptive bandwidth to be used for test data is 33
+Adaptive bandwidth to be used for test data is 25.
 
 ### **14.8.7 Computing predicted values of the test data**
 
 ```{r}
-gwr_pred <- gwr.predict(formula = resale_price ~ floor_area_sqm +
+#| eval: False
+gwr_pred <- gwr.predict(
+  formula = resale_price ~ floor_area_sqm +
                   + remaining_lease_yr + storey_order +
-                  dist_to_cbd + dist_food +
-                  dist_mrt +dist_park +dist_good_sch +
+                  dist_to_cbd +
+                  dist_mrt + dist_park + dist_good_sch +
                   dist_mall + dist_supermarket +
                   kinder_count + childcare_count + bus_count +
-                  pri_sch_count, 
-                  data=train_data_sp, 
-                  predictdata = test_data_sp, 
-                  bw=bw_adaptive, 
-                  kernel = 'gaussian', 
-                  adaptive=TRUE, 
-                  longlat = FALSE)
+                  pri_sch_count,
+  data=train_data_sp, 
+  predictdata = test_data_sp, 
+  bw=bw_adaptive, 
+  kernel = 'gaussian', 
+  adaptive=TRUE, 
+  longlat = FALSE)
 ```
 
 ## 4.5 Random Forest Model
+
+Preparing the coordinates:
+
+```{r}
+coords <- st_coordinates(st_as_sf(resale_final))
+coords_train <- st_coordinates(train_data)
+coords_test <- st_coordinates(test_data)
+```
+
+```{r}
+coords_train <- write_rds(coords_train, "data/model/coords_train.rds" )
+coords_test <- write_rds(coords_test, "data/model/coords_test.rds" )
+```
+
+```{r}
+train_data <- train_data %>% 
+  st_drop_geometry()
+```
+
+```{r}
+#| eval: False
+set.seed(1234)
+rf <- ranger(resale_price ~ floor_area_sqm +
+                  + remaining_lease_yr + storey_order +
+                  dist_to_cbd +
+                  dist_mrt +dist_park +dist_good_sch +
+                  dist_mall + dist_supermarket +
+                  kinder_count + childcare_count + bus_count +
+                  pri_sch_count,
+             data=train_data,
+             num.trees = 100)
+rf
+```
+
+```{r}
+#| eval: False
+write_rds(rf, "data/model/rf.rds")
+```
+
+```{r}
+rf <- read_rds("data/model/rf.rds")
+rf
+```
+
+::: callout-note
+Currently, the number of trees is set to 100.
+:::
+
+### 4.5.1 **Calibrating Geographical Random Forest Model**
+
+#### 4.5.1.1 Calibrating using training data
+
+```{r}
+#| eval: False
+set.seed(1234)
+gwRF_adaptive <- grf(formula = resale_price ~ floor_area_sqm +
+                  + remaining_lease_yr + storey_order +
+                  dist_to_cbd +
+                  dist_mrt +dist_park +dist_good_sch +
+                  dist_mall + dist_supermarket +
+                  kinder_count + childcare_count + bus_count +
+                  pri_sch_count,
+                     dframe=train_data, 
+                     bw=bw_adaptive,
+                     kernel="adaptive",
+                     coords=coords_train)
+```
+
+Saving the model for future retrieval:
+
+```{r}
+#| eval: False
+write_rds(gwRF_adaptive, "data/model/gwRF_adaptive.rds")
+```
+
+```{r}
+gwRF_adaptive <- read_rds("data/model/gwRF_adaptive.rds")
+```
+
+### 4.5.2 Predicting by using test data
+
+The code chunk below will be used to combine the test data with its corresponding coordinates data.
+
+```{r}
+test_data <- cbind(test_data, coords_test) %>%
+  st_drop_geometry()
+```
+
+```{r}
+#| eval: False
+gwRF_pred <- predict.grf(gwRF_adaptive, 
+                           test_data, 
+                           x.var.name="X",
+                           y.var.name="Y", 
+                           local.w=1,
+                           global.w=0)
+```
+
+```{r}
+#| eval: False
+GRF_pred <- write_rds(gwRF_pred, "data/model/GRF_pred.rds")
+```
+
+```{r}
+GRF_pred <- read_rds("data/model/GRF_pred.rds")
+GRF_pred_df <- as.data.frame(GRF_pred)
+
+test_data_p <- cbind(test_data, GRF_pred_df)
+write_rds(test_data_p, "data/model/test_data_p.rds")
+```
+
+### 4.5.3 **Calculating Root Mean Square Error**
+
+```{r}
+rmse_test <- rmse(test_data_p$resale_price, 
+     test_data_p$GRF_pred)
+```
+
+```{r}
+rmse_test/mean(test_data_p$resale_price)*100
+```
+
+![](images/clipboard-3998222552.png)
+
+::: callout-note
+-   After normalising the RMSE with the mean of the actual resale price, it shows that the normalised RMSE is 8.64% , which indicates that this model is fairly good, as it is lower than 10%.
+:::
+
+### 4.5.4 **Visualising the predicted values**
+
+```{r}
+g <- ggplot(data = test_data_p,
+       aes(x = GRF_pred,
+           y = resale_price)) +
+  geom_point() +
+  geom_abline(slope = 1, 
+              intercept = 0,
+              color = "red", 
+              size = 1.5)
+ig <- ggplotly(g)
+ig
+```
+
+![](images/clipboard-3575398694.png)
+
+::: callout-note
+-   By comparing the points to the diagonal line, we can conclude that although most of the points follows the diagonal lines, the points are not very close to the line.
+
+-   Generally, this Geographical Random Forest model tends to predict lower than the actual resale price.
+
+-   Also, for more expensive resale HDB, most of the predicted value are much lower than the actual resale price.
+
+-   Lastly, there are outliers (three points below the diagonal lines) that has predicted price exceeding actual resale price by \$200,000.
+:::
