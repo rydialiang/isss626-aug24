@@ -728,24 +728,35 @@ write_rds(train_data, "data/rds/train_data.rds")
 write_rds(test_data, "data/rds/test_data.rds")
 ```
 
+```{r}
+train_data <- read_rds("data/rds/train_data.rds")
+test_data <- read_rds("data/rds/test_data.rds")
+```
+
 ### 4.3 **Building a non-spatial multiple linear regression**
 
 ```{r}
 price_mlr <- lm(resale_price ~ floor_area_sqm +
                   + remaining_lease_yr + storey_order +
-                  dist_to_cbd +
+                  dist_to_cbd + 
                   dist_mrt +dist_park +dist_good_sch +
                   dist_mall + dist_supermarket +
-                  kinder_count + childcare_count + bus_count +
-                  pri_sch_count,
+                  kinder_count + childcare_count +
+                  bus_count + pri_sch_count,
                 data=train_data)
 olsrr::ols_regress(price_mlr)
 ```
 
 ::: callout-note
--   All predictors have p-value lesser than alpha = 0.05, meaning all are statistically significant, except eldercare, with a p-value of 0.284436.
+-   Since dist_eldercare and dist_food is not statistically significant (Sig \> 0.05) for this model, it was removed from the model and the model was re-run again.
 
--   Adjusted R-squared is 0.7315, suggesting a strong model with 73.15% of the variance in the resale prices is explained by the predictors.
+    ![](images/clipboard-2406026202.png)
+
+-   After removing dist_eldercare and dist_food![](images/clipboard-873367391.png)
+
+-   All predictors have p-value lesser than alpha = 0.05, meaning all are statistically significant.
+
+-   Adjusted R-squared is 0.731, suggesting a strong model with 73.1% of the variance in the resale prices is explained by the predictors.
 
 -   The model also has p-value lesser than alpha = 0.05, suggesting that this model is statistically significant.
 :::
@@ -796,7 +807,8 @@ if (length(duplicate_indices) > 0) {
 ```
 
 ```{r}
-plot(train_data_sp, col = 'blue', pch = 16, main = "Training and Test Points")
+plot(st_geometry(mpsz))
+points(train_data_sp, col = 'blue', pch = 16)
 points(test_data_sp, col = 'red', pch = 16)
 legend("topright", legend = c("Train", "Test"), col = c("blue", "red"), pch = 16)
 
@@ -805,12 +817,14 @@ legend("topright", legend = c("Train", "Test"), col = c("blue", "red"), pch = 16
 #### 4.4.1 Computing Adaptive Bandwidth
 
 ```{r}
+#| eval: False
 bw_adaptive <- bw.gwr(resale_price ~ floor_area_sqm +
                   + remaining_lease_yr + storey_order +
                   dist_to_cbd +
                   dist_mrt +dist_park +dist_good_sch +
                   dist_mall + dist_supermarket +
-                  kinder_count + childcare_count + bus_count +
+                  kinder_count + childcare_count +
+                    bus_count +
                   pri_sch_count,
                   data=train_data_sp,
                   approach="CV",
@@ -820,6 +834,7 @@ bw_adaptive <- bw.gwr(resale_price ~ floor_area_sqm +
 ```
 
 ```{r}
+#| eval: False
 write_rds(bw_adaptive, "data/model/bw_adaptive.rds")
 ```
 
@@ -841,7 +856,7 @@ Using the derived adaptive bandwidth for gwr-based pricing model
 #| eval: False
 gwr_adaptive <- gwr.basic(formula = resale_price ~ floor_area_sqm +
                   + remaining_lease_yr + storey_order +
-                  dist_to_cbd +
+                  dist_to_cbd + dist_eldercare + dist_food +
                   dist_mrt +dist_park +dist_good_sch +
                   dist_mall + dist_supermarket +
                   kinder_count + childcare_count + bus_count +
