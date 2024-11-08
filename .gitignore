@@ -7,4 +7,5 @@
 data/
 /.quarto/
 earth.jpeg
-
+.RDataTmp
+.RDataTmp1
