@@ -145,8 +145,10 @@ The correlation matrix above shows that all the correlation values are below 0.8
 ## **14.6 Retriving the Stored Data**
 
 ```{r}
-train_data <- read_rds("data/model/train_data.rds")
-test_data <- read_rds("data/model/test_data.rds")
+train_data <- read_rds("data/model/train_data.rds") %>% 
+  st_jitter(amount=5)
+test_data <- read_rds("data/model/test_data.rds") %>% 
+  st_jitter(amount=5)
 ```
 
 ## **14.7 Building a non-spatial multiple linear regression**

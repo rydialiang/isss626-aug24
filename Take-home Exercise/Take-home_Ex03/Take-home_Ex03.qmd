@@ -711,12 +711,12 @@ We will use Jan 2023 to Jun 2024 data as training dataset, and use ground truth 
 train_data <- resale_final %>% 
   st_as_sf() %>% 
   filter(month >= "2023-01" & month <= "2024-06") %>% 
-  st_jitter()
+  st_jitter(amount=5)
 
 test_data <- resale_final %>% 
   st_as_sf() %>% 
   filter(month >= "2024-07" & month <= "2024-09") %>% 
-  st_jitter()
+  st_jitter(amount=5)
 ```
 
 ```{r}
@@ -817,8 +817,6 @@ bw_adaptive <- bw.gwr(resale_price ~ floor_area_sqm +
                   longlat=FALSE)
 ```
 
-
-
 ```{r}
 write_rds(bw_adaptive, "data/model/bw_adaptive.rds")
 ```
@@ -896,7 +894,6 @@ Adaptive bandwidth to be used for test data is 33
 ### **14.8.7 Computing predicted values of the test data**
 
 ```{r}
-#| eval: False
 gwr_pred <- gwr.predict(formula = resale_price ~ floor_area_sqm +
                   + remaining_lease_yr + storey_order +
                   dist_to_cbd + dist_food +
