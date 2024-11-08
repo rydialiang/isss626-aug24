@@ -898,7 +898,7 @@ bw_adaptive_test
 
 Adaptive bandwidth to be used for test data is 25.
 
-### **14.8.7 Computing predicted values of the test data**
+### **4.4.5 Computing predicted values of the test data**
 
 ```{r}
 #| eval: False
@@ -918,7 +918,7 @@ gwr_pred <- gwr.predict(
   longlat = FALSE)
 ```
 
-## 4.5 Random Forest Model
+### 4.5 Random Forest Model
 
 Preparing the coordinates:
 
@@ -998,7 +998,7 @@ write_rds(gwRF_adaptive, "data/model/gwRF_adaptive.rds")
 gwRF_adaptive <- read_rds("data/model/gwRF_adaptive.rds")
 ```
 
-### 4.5.2 Predicting by using test data
+#### 4.5.2 Predicting by using test data
 
 The code chunk below will be used to combine the test data with its corresponding coordinates data.
 
@@ -1030,7 +1030,7 @@ test_data_p <- cbind(test_data, GRF_pred_df)
 write_rds(test_data_p, "data/model/test_data_p.rds")
 ```
 
-### 4.5.3 **Calculating Root Mean Square Error**
+#### 4.5.3 **Calculating Root Mean Square Error**
 
 ```{r}
 rmse_test <- rmse(test_data_p$resale_price, 
@@ -1047,7 +1047,7 @@ rmse_test/mean(test_data_p$resale_price)*100
 -   After normalising the RMSE with the mean of the actual resale price, it shows that the normalised RMSE is 8.64% , which indicates that this model is fairly good, as it is lower than 10%.
 :::
 
-### 4.5.4 **Visualising the predicted values**
+#### 4.5.4 **Visualising the predicted values**
 
 ```{r}
 g <- ggplot(data = test_data_p,
